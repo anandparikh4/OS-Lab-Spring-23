@@ -1,0 +1,37 @@
+{
+    "created_at": "Tue Jan 19 22:14:15 +0000 2021",
+    "id": 1350144357976807424,
+    "id_str": "1350144357976807424",
+    "text": "Example tweet text 1",
+    "user": {
+        "id": 1234567890,
+        "name": "John Doe",
+        "screen_name": "johndoe"
+    },
+    "retweet_count": 0,
+    "favorite_count": 2,
+    "entities": {
+        "hashtags": [],
+        "urls": [],
+        "user_mentions": []
+    }
+}
+{
+    "created_at": "Tue Jan 20 22:14:15 +0000 2021",
+    "id": 1350144357976807425,
+    "id_str": "1350144357976807425",
+    "text": "Example tweet text 2",
+    "user": {
+        "id": 1234567891,
+        "name": "Jane Doe",
+        "screen_name": "janedoe"
+    },
+    "retweet_count": 0,
+    "favorite_count": 2,
+    "entities": {
+        "hashtags": [],
+        "urls": [],
+        "user_mentions": []
+    }
+}
+
