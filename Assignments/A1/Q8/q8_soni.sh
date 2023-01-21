@@ -35,12 +35,12 @@ done
 [[ ! -z ${n_arg+x} ]] && echo "Amount spent by name: $n_arg is $n_amt"
 )
 case $s_arg in
-	CATEGORY) tail -n+2 "main2.csv" | sort -k2 -t, -o main2.csv;;
-			#   sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main2.csv;;
-	AMOUNT) tail -n+2 "main2.csv" | sort -k3 -n -t, -o main2.csv;;
-			# sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main2.csv;;
-	NAME) tail -n+2 "main2.csv" | sort -k4 -t, -o main2.csv;;
-		#   sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main2.csv;;
+	CATEGORY) tail -n+2 "main.csv" | sort -k2 -t, -o main.csv
+			  sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv;;
+	AMOUNT) tail -n+2 "main.csv" | sort -k3 -n -t, -o main.csv
+			sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv;;
+	NAME) tail -n+2 "main.csv" | sort -k4 -t, -o main.csv
+		  sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv;;
 esac
 
-[[ ! -z ${s_arg+x} ]] && sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main2.csv
+#[[ ! -z ${s_arg+x} ]] && sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv
