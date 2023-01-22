@@ -1,1 +1,1 @@
-sed -re "/^$2$/s/([a-zA-Z][^a-zA-Z]*)([a-zA-Z][^a-zA-Z]*)?/\u\1\l\2/gi" -e "/ $2 /s/([a-zA-Z][^a-zA-Z]*)([a-zA-Z][^a-zA-Z]*)?/\u\1\l\2/gi" -e "/^$2 /s/([a-zA-Z][^a-zA-Z]*)([a-zA-Z][^a-zA-Z]*)?/\u\1\l\2/gi" -e "/ $2$/s/([a-zA-Z][^a-zA-Z]*)([a-zA-Z][^a-zA-Z]*)?/\u\1\l\2/gi" <$1
+sed -r "/\b($2)\b/ s/([a-zA-Z][^a-zA-Z]*)([a-zA-Z][^a-zA-Z]*)?/\u\1\l\2/gi" <$1
