@@ -44,7 +44,7 @@ then
 				sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv;;
 		NAME) tail -n+2 "main.csv" | sort -k4 -t, -o main.csv
 			  sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv;;
-		DATE) sed 1d main.csv | sort -t, -k1.7,1.10n -k1.4,1.5n -k1.1,1.2n -o main.csv
+		DATE) tail -n+2 "main.csv" | sort -t, -k1.7,1.10n -k1.4,1.5n -k1.1,1.2n -o main.csv
 			  sed -i '1 i DATE,CATEGORY,AMOUNT,NAME' main.csv;;
 	esac
 fi
