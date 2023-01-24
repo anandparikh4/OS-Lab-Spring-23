@@ -18,4 +18,4 @@ while read line;do
         line=$(($line/${primes[line]}));
     done
     echo ""
-done <"input.txt" >"output5.txt"
+done <"input.txt" >"output.txt"
