@@ -52,14 +52,6 @@ if (( h_flag > 0 ))
 then
     printf "\nNAME\n    CSV_FILE_HANDLER\n"
     printf "\nSYNOPSIS\n\tbash Assgn1_8_33.sh [OPTIONS]... ARGS\n"
-    printf "\nDESCRIPTION\n"
-    printf "\nOPTIONS\n"
-    printf "\n    Add information to main.csv, file created if does not already exist. Manipulate and observe information\n"
-    printf "\n    -c\n\tprint amount of money spent in a given category"
-    printf "\n    -n\n\tprint amount of money spent by person having a given name"
-    printf "\n    -s\n\tsort the file by the given category"
-    printf "\n    -h\n\thelp"
     printf "\nARGS"
     printf "\n    To add an event, enter 4 arguments (in the same order and format specified) : date (dd-mm-yyyy) category amount name"
-    printf "\n\nAUTHORS\n\tWritten by Soni Aditya Bharatbhai, Anand Manojkumar Parikh, Pranav Mehrotra, Saransh Sharma\n\n"
 fi
