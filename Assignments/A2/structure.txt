@@ -1,0 +1,60 @@
+// do error handling ONLY using throw and catch. No business of returning values and if-else checking
+
+class process{
+    public:
+        bool background;    // boolean value to check if process runs in background or foreground
+        char* args[256];    // array of args
+        process():
+        background = FALSE
+        {
+            for(int i=0;i<256;i++) args[i] = NULL;
+        }
+}
+
+main(){
+    while(1){
+        char * line = getline();                // scan the whole line
+        vector<process> job;
+        int success1 = parse(line , &job);      // split it into processes and store in a vector
+        int success2 = exec_job(job);           // execute the whole job
+    }
+}
+
+void parse(char * line , &vector<process>){
+    // take a line (simple char *)
+    // split it at the pipes
+    // each pipe separated char * will be a process
+    // so create an object of class process for each one and also parse (simply split at spaces) it and store the arguments
+    // return this vector of processes
+    // also check for & symbol, if present then each process in this job runs in the background
+}
+
+void exec_job(vector<processes> job){
+    // setup the pipe between processes. handle case if no pipes found. execute each process.
+    loop(processes){
+        // setup pipe , infd , outfd
+        exec_proc(process , infd , outfd);
+    }
+    
+    if(!process.background) wait()  // parent process   --- ##### FIX THIS, wait only for each job, not each process   
+}
+
+void exec_proc(process , infd , outfd){
+    // execute the process, where the input and output file descriptors are given
+    cpid = fork();
+
+    if(cpid == 0){      // child process
+        char ** args = redirect(process , infd , outfd);    // get the args to pass to the final execvp() call
+        // add NULL to the end of the result
+        execvp(args[0] , args);
+    }
+}
+
+char ** redirect(process , infd , outfd){       // do NOT add extra NULL at the end
+    // first, redirect to infd and outfd unconditionally
+    // then loop over the arguments of the given process to find any < or > symbols
+    // if found, again dup2 the stdout and stdin to the file names, after opening and closing them appropriately
+    // return the finals arguments after stripping off <,>
+}
+
+// Add signal handling
