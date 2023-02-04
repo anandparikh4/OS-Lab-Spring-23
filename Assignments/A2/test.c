@@ -19,8 +19,7 @@ void exec_job(process * job , int n_proc , int background){
             connect_fd = fd[0];
         }
         exec_proc(&job[i] , infd , outfd);
-
-        // printf("Executed: %s\n",job[i].args[0]);
+        printf("Executed: %s\n",job[i].args[0]);
     }
 
     // while(!background && n_proc){        // while some procs are running in the foreground, wait
@@ -38,14 +37,14 @@ void exec_job(process * job , int n_proc , int background){
     while(!background && n_proc){
         int status;
         int cpid = waitpid(-1 , &status , 0);
-        printf("%d\n" , cpid);
+        // printf("%d " , cpid);
         n_proc--;
     }
+    // printf("\n");
     return;
 }
 
 void exec_proc(process * p, int infd, int outfd){    // execute process
-    // redirect(p , infd , outfd);
     int c_pid = fork();
     if(c_pid < 0){
         perror("fork");
@@ -59,21 +58,18 @@ void exec_proc(process * p, int infd, int outfd){    // execute process
         exit(0);
     }
     else{
-        // close(infd);
-        close(outfd);
+        // close(STDOUT_FILENO);
+        // outfd = open("/dev/tty", O_WRONLY);
+        // if (outfd == -1) {
+        //     perror("open");
+        //     return;
+        // }
         // close(STDIN_FILENO);
-        infd = open("/dev/tty", O_RDONLY);
-        if (infd == -1) {
-            perror("open");
-            return;
-        }
-        close(STDOUT_FILENO);
-        outfd = open("/dev/tty", O_WRONLY);
-        if (outfd == -1) {
-            perror("open");
-            return;
-        }
-        // wait(NULL);
+        // infd = open("/dev/tty", O_RDONLY);
+        // if (infd == -1) {
+        //     perror("open");
+        //     return;
+        // }
     }
     return;
 }
@@ -120,7 +116,7 @@ void redirect(process * proc , int infd , int outfd){
             i++;            // assuming next arg as output file path
             if(outfd != STDOUT_FILENO)
                 close(outfd);
-            if((outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0666)) < 0){        // ## CHECK permissions!
+            if((outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0776)) < 0){        // ## CHECK permissions!
                 perror("open");
                 exit(0);
             }
@@ -134,18 +130,17 @@ void redirect(process * proc , int infd , int outfd){
         }
     }
 
-
     final_args[final_nargs] = NULL;         // argument list end sentinel (for execvp's use)
     int k=0;
     while(final_args[k]!=NULL){
         proc->args[k] = final_args[k];
+        // printf("%s " , proc->args[k]);
         k++;
     }
-    free(final_args);
     proc->args[k] = NULL;
     proc->n_args = final_nargs;
     k=0;
-    // free(final_args);
+    free(final_args);
     printf("\t\tFinal args: ");
     while(proc->args[k]!=NULL){
         // proc->args[k] = final_args[k];
@@ -153,6 +148,7 @@ void redirect(process * proc , int infd , int outfd){
         k++;
     }
     printf("\n");
+
     if(infd != STDIN_FILENO){
         dup2(infd , STDIN_FILENO);
         close(infd);
@@ -161,5 +157,6 @@ void redirect(process * proc , int infd , int outfd){
         dup2(outfd , STDOUT_FILENO);
         close(outfd);
     }
+
     return;
 }
