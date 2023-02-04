@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "process.h": "c",
+        "parse.h": "c",
+        "avl_tree.h": "c",
+        "exec_job.h": "c"
     }
 }

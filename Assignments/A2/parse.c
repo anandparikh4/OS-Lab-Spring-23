@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "parse.h"
+
 #define MAX_LINE_LEN 1024
 
 void remove_spaces(char *line){
@@ -34,13 +36,13 @@ void remove_spaces(char *line){
 	line = realloc(line,strlen(line));
 }
 
-char ***parse(char *line) {
+process * parse(char *line , int * n_proc , int * background) {
     remove_spaces(line);
     int i,j,k,len = strlen(line);
     int inside_single_quotes=0,inside_double_quotes=0,escape_char=0;
     int pipes_count=0,arg_count=0,start=0, end=0,tem_start;
-    char ***commands;
-
+    // char ***commands;
+    process * job;
     for(i=0;i<len;i++){
         if (line[i] == '\'' && !inside_double_quotes && !escape_char)
             inside_single_quotes = !inside_single_quotes;
@@ -54,13 +56,18 @@ char ***parse(char *line) {
             escape_char = 0;
     }
 
-    commands = (char ***) malloc((pipes_count + 2) * sizeof(char **));
-    commands[pipes_count+1] = NULL;
+    // commands = (char ***) malloc((pipes_count + 2) * sizeof(char **));
+    // commands[pipes_count+1] = NULL;
+    job = (process *) malloc((pipes_count + 1) * sizeof(process));
+    *n_proc = pipes_count + 1;
+    // Loop over the commands
     for(i=0;i<=pipes_count;i++){
         inside_single_quotes = 0;
         inside_double_quotes = 0;
         escape_char = 0;
         arg_count = 0;
+
+        //Find the end of the command
         for (end = start; end < len; end++) {
             if (line[end] == '\'' && !inside_double_quotes && !escape_char)
                 inside_single_quotes = !inside_single_quotes;
@@ -75,6 +82,7 @@ char ***parse(char *line) {
         }
         if(line[start]==' ')    start++;
         tem_start = start;
+        // Count the number of arguments
         for (j = start; j < end; j++) {
             if (line[j] == '\'' && !inside_double_quotes && !escape_char)
                 inside_single_quotes = !inside_single_quotes;
@@ -89,13 +97,16 @@ char ***parse(char *line) {
         }
         if(line[j-1]!=' ')
             arg_count++;
-        commands[i] = (char **) malloc((arg_count + 1) * sizeof(char *));
+        // commands[i] = (char **) malloc((arg_count + 1) * sizeof(char *));
+        job[i].args = (char **) malloc((arg_count+1) * sizeof(char *));
+        job[i].n_args = arg_count;
 
         start = tem_start;
         j = start;
         inside_single_quotes = 0;
         inside_double_quotes = 0;
         escape_char = 0;
+        // Loop over the arguments and copy them
         for (k = 0; k < arg_count; k++) {
             while(j<end){
                 if (line[j] == '\'' && !inside_double_quotes && !escape_char)
@@ -111,22 +122,27 @@ char ***parse(char *line) {
                 j++;
             }
 
-            commands[i][k] = (char *) malloc((j - start + 1) * sizeof(char));
+            job[i].args[k] = (char *) malloc((j - start + 1) * sizeof(char));
 
-            strncpy(commands[i][k], line + start, j - start);
-            commands[i][k][j - start] = '\0';
+            strncpy(job[i].args[k], line + start, j - start);
+            job[i].args[k][j - start] = '\0';
 
             start = j + 1;
             j = start;
         }
 
-        commands[i][arg_count] = NULL;
+        job[i].args[arg_count] = NULL;
 
         start = end + 1;
         end = start;
+        // printf("Number of arguments: %d\n",job[i].n_args);
+        // for(int p=0;p<job[i].n_args;p++){
+        //     printf("%s ",job[i].args[p]);
+        // }
+        // printf("\n\n");
     }
 
-    return commands;
+    return job;
 }
 
 

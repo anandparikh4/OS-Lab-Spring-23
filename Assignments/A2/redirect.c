@@ -1,15 +1,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "process.h"
+#include <string.h>
 
-char ** redirect(struct process * proc , int infd , int outfd){
+void redirect(process * proc , int infd , int outfd){
 
     char ** final_args = NULL;
     int final_nargs = proc->n_args;
 
+    // Wrong, will not work for cases like: grep -i "hello" > out.txt
     for(int i=0;i<proc->n_args;i++){
-        if(strcmp(proc->args[i++] , "<")) final_nargs -= 2;
-        else if(strcmp(proc->args[i++] , ">")) final_nargs -= 2;
+        if(strcmp(proc->args[i] , "<")==0) final_nargs -= 2;
+        else if(strcmp(proc->args[i] , ">")==0) final_nargs -= 2;
     }
 
     final_args = (char **) malloc((final_nargs+1) * sizeof(char *));    // free after execvp in exec_proc
@@ -30,7 +32,7 @@ char ** redirect(struct process * proc , int infd , int outfd){
     for(int i=0;i<proc->n_args;i++){
 
         // check for input redirect
-        if(strcmp(proc->args[i] , "<")){
+        if(strcmp(proc->args[i] , "<")==0){
             i++;            // assuming next arg as input file path
             int new_infd;
             if((new_infd = open(proc->args[i], O_RDONLY)) < 0){      // ## CHECK permissions!
@@ -39,10 +41,12 @@ char ** redirect(struct process * proc , int infd , int outfd){
             }
             close(infd);
             dup2(new_infd , infd);
+            free(proc->args[i-1]);
+            free(proc->args[i]);
         }
 
         // check for output redirect
-        else if(strcmp(proc->args[i] , ">")){
+        else if(strcmp(proc->args[i] , ">")==0){
             i++;            // assuming next arg as output file path
             int new_outfd;
             if((new_outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0766)) < 0){        // ## CHECK permissions!
@@ -51,16 +55,28 @@ char ** redirect(struct process * proc , int infd , int outfd){
             }
             close(outfd);
             dup2(new_outfd , outfd);
+            free(proc->args[i-1]);
+            free(proc->args[i]);
         }
 
         else{
-            strdup(final_args[final_nargs++] , proc->args[i]);      // else, make a deep copy of the arguments
+            final_args[final_nargs++] = strdup(proc->args[i]);      // else, make a deep copy of the arguments
+            free(proc->args[i]);        // free the original argument (if not a redirect)
         }
     }
 
     final_args[final_nargs] = NULL;         // argument list end sentinel (for execvp's use)
-
-    return final_args;
+    int k=0;
+    while(final_args[k]!=NULL){
+        proc->args[k] = final_args[k];
+        k++;
+    }
+    proc->n_args = final_nargs;
+    // Do not uncomment the following lines. They will free the arguments in the process structure, which is not what we want
+    // for(k=0;k<=final_nargs;k++){
+    //     free(final_args[k]);
+    // }
+    free(final_args);
 }
 
 // following error cases need to be handled during parsing
