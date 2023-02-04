@@ -33,7 +33,7 @@ void remove_spaces(char *line){
     if(b[j-1]==' ') b[j-1]='\0';
 	else b[j] = '\0';
 	strcpy(line,b);
-	line = realloc(line,strlen(line));
+	//line = realloc(line,strlen(line));
 }
 
 void init_proc(process * p){     // initialize process structure content

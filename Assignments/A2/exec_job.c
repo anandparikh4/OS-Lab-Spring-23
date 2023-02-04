@@ -18,14 +18,14 @@ void exec_job(process * job , int n_proc , int background){
             outfd = fd[1];
             connect_fd = fd[0];
         }
-        exec_proc(&job[i] , infd , outfd , background);
+        exec_proc(&job[i] , infd , outfd);
         // printf("Executed: %s\n",job[i].args[0]);
     }
 
     // while(!background && n_proc){        // while some procs are running in the foreground, wait
     //     int proc_status;
     //     int child_pid;
-    //     if((child_pid = waitpid(-1 , &proc_status , 0)) < 0){    // wait on all children, blocking, no flag set
+    //     if((child_pid = waitpid(-1 , &proc_status , WNOHANG)) < 0){    // wait on all children, blocking, no flag set
     //         perror("waitpid");
     //         exit(0);
     //     }
@@ -36,14 +36,13 @@ void exec_job(process * job , int n_proc , int background){
     // }
     while(!background && n_proc){
         int status;
-        int cpid = waitpid(-1 , &status , 0);
+        int cpid = waitpid(-1 , &status , WNOHANG);
         n_proc--;
     }
     return;
 }
 
-
-void exec_proc(process * p, int infd, int outfd, int background){    // execute process
+void exec_proc(process * p, int infd, int outfd){    // execute process
     int c_pid = fork();
     if(c_pid < 0){
         perror("fork");
@@ -56,15 +55,8 @@ void exec_proc(process * p, int infd, int outfd, int background){    // execute 
         perror("execvp");
         exit(0);
     }
-    else{
-        // parent
-        // if(!background){
-        //     // struct Node* new_proc_node = newNode(c_pid);
-        //     insertNode(fg_procs , c_pid);
-        // }
-    }
+    return;
 }
-
 
 void redirect(process * proc , int infd , int outfd){
 
@@ -85,45 +77,29 @@ void redirect(process * proc , int infd , int outfd){
 
     final_args = (char **) malloc((final_nargs+1) * sizeof(char *));    // free after execvp in exec_proc
     final_nargs = 0;
-
-    // initial unconditional redirects
-    if(infd != STDIN_FILENO){
-        dup2(infd , STDIN_FILENO);
-        close(infd);
-    }
-    if(outfd != STDOUT_FILENO){
-        dup2(outfd , STDOUT_FILENO);
-        close(outfd);
-    }
     
     // check for explicit redirects to specific file names AFTER (possible) piping
     // this is the behavior that actual shells express. Pipe redirects have LESS priority over file redirects
     for(int i=0;i<proc->n_args;i++){
 
         // check for input redirect
-        if(strcmp(proc->args[i] , "<")==0){
+        if(strcmp(proc->args[i] , "<") == 0){
             i++;            // assuming next arg as input file path
-            int new_infd;
-            if((new_infd = open(proc->args[i], O_RDONLY)) < 0){      // ## CHECK permissions!
+            if((infd = open(proc->args[i], O_RDONLY)) < 0){      // ## CHECK permissions!
                 perror("open");
                 exit(0);
             }
-            dup2(new_infd , infd);
-            close(new_infd);
             free(proc->args[i-1]);
             free(proc->args[i]);
         }
 
         // check for output redirect
-        else if(strcmp(proc->args[i] , ">")==0){
+        else if(strcmp(proc->args[i] , ">") == 0){
             i++;            // assuming next arg as output file path
-            int new_outfd;
-            if((new_outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0766)) < 0){        // ## CHECK permissions!
+            if((outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0666)) < 0){        // ## CHECK permissions!
                 perror("open");
                 exit(0);
             }
-            dup2(new_outfd , outfd);
-            close(new_outfd);
             free(proc->args[i-1]);
             free(proc->args[i]);
         }
@@ -134,16 +110,24 @@ void redirect(process * proc , int infd , int outfd){
         }
     }
 
+    if(infd != STDIN_FILENO){
+        dup2(infd , STDIN_FILENO);
+        close(infd);
+    }
+    if(outfd != STDOUT_FILENO){
+        dup2(outfd , STDOUT_FILENO);
+        close(outfd);
+    }
+
     final_args[final_nargs] = NULL;         // argument list end sentinel (for execvp's use)
     int k=0;
     while(final_args[k]!=NULL){
         proc->args[k] = final_args[k];
         k++;
     }
+    proc->args[k] = NULL;
     proc->n_args = final_nargs;
-    // Do not uncomment the following lines. They will free the arguments in the process structure, which is not what we want
-    // for(k=0;k<=final_nargs;k++){
-    //     free(final_args[k]);
-    // }
+
     free(final_args);
+    return;
 }

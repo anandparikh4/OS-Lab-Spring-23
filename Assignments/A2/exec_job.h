@@ -12,7 +12,7 @@ extern struct Node *fg_procs;
 
 void exec_job(process * job , int n_proc , int background);
 
-void exec_proc(process * p, int infd, int outfd, int background);
+void exec_proc(process * p, int infd, int outfd);
 
 void redirect(process * proc , int infd , int outfd);
 #endif
