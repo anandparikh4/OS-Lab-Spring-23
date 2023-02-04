@@ -42,7 +42,7 @@ int main(){
                 printf("%s ", job[i].args[j]);
             printf("\nNumber of arguments = %d\n\n",job[i].n_args);
         }
-        char * ls_args[] = { "ls" , "-l", NULL};
+        // char * ls_args[] = { "ls" , "-l", NULL};
         //                    ^ 
         //  use the name ls
         //  rather than the
