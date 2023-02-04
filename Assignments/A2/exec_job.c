@@ -15,10 +15,10 @@ void exec_job(process * job , int n_proc , int background){
                 perror("pipe");
                 exit(0);
             }
-            outfd = fd[0];
-            connect_fd = fd[1];
+            outfd = fd[1];
+            connect_fd = fd[0];
         }
-        exec_proc(&job[i] , infd , outfd,background);
+        exec_proc(&job[i] , infd , outfd , background);
         // printf("Executed: %s\n",job[i].args[0]);
     }
 
@@ -34,7 +34,11 @@ void exec_job(process * job , int n_proc , int background){
     //         deleteNode(fg_procs , child_pid);   // and remove from set
     //     }
     // }
-
+    while(!background && n_proc){
+        int status;
+        int cpid = waitpid(-1 , &status , 0);
+        n_proc--;
+    }
     return;
 }
 
@@ -58,8 +62,6 @@ void exec_proc(process * p, int infd, int outfd, int background){    // execute 
         //     // struct Node* new_proc_node = newNode(c_pid);
         //     insertNode(fg_procs , c_pid);
         // }
-        wait(NULL);     // wait for child to exit
-        return;
     }
 }
 
@@ -71,8 +73,14 @@ void redirect(process * proc , int infd , int outfd){
 
     // Wrong, will not work for cases like: grep -i "hello" > out.txt
     for(int i=0;i<proc->n_args;i++){
-        if(strcmp(proc->args[i] , "<")==0) final_nargs -= 2;
-        else if(strcmp(proc->args[i] , ">")==0) final_nargs -= 2;
+        if(strcmp(proc->args[i] , "<")==0){
+            i++;
+            final_nargs -= 2;
+        }
+        else if(strcmp(proc->args[i] , ">")==0){
+            i++;
+            final_nargs -= 2;
+        }
     }
 
     final_args = (char **) malloc((final_nargs+1) * sizeof(char *));    // free after execvp in exec_proc
@@ -80,12 +88,12 @@ void redirect(process * proc , int infd , int outfd){
 
     // initial unconditional redirects
     if(infd != STDIN_FILENO){
-        close(STDIN_FILENO);            // ## need error handling here? or will it be pedantic?
         dup2(infd , STDIN_FILENO);
+        close(infd);
     }
     if(outfd != STDOUT_FILENO){
-        close(STDOUT_FILENO);
         dup2(outfd , STDOUT_FILENO);
+        close(outfd);
     }
     
     // check for explicit redirects to specific file names AFTER (possible) piping
@@ -100,8 +108,8 @@ void redirect(process * proc , int infd , int outfd){
                 perror("open");
                 exit(0);
             }
-            close(infd);
             dup2(new_infd , infd);
+            close(new_infd);
             free(proc->args[i-1]);
             free(proc->args[i]);
         }
@@ -114,8 +122,8 @@ void redirect(process * proc , int infd , int outfd){
                 perror("open");
                 exit(0);
             }
-            close(outfd);
             dup2(new_outfd , outfd);
+            close(new_outfd);
             free(proc->args[i-1]);
             free(proc->args[i]);
         }

@@ -24,8 +24,8 @@ int main(){
     size_t max_line_len = MAX_LINE_LEN;
 
     while(1){
+        fflush(stdout);
         printf("Enter the command: ");
-        // fflush(stdout);
         getline(&line, &max_line_len, stdin);
         line[strlen(line)-1] = '\0';
         if(strcmp(line,"exit")==0)
@@ -36,12 +36,12 @@ int main(){
 
         job = parse(line,&n_proc,&background);
         int i, j;
-        printf("Number of processes = %d\n",n_proc);
-        for (i = 0; i<n_proc; i++) {
-            for (j = 0; j<job[i].n_args; j++)
-                printf("%s ", job[i].args[j]);
-            printf("\nNumber of arguments = %d\n\n",job[i].n_args);
-        }
+        // printf("Number of processes = %d\n",n_proc);
+        // for (i = 0; i<n_proc; i++) {
+        //     for (j = 0; j<job[i].n_args; j++)
+        //         printf("%s ", job[i].args[j]);
+        //     printf("\nNumber of arguments = %d\n\n",job[i].n_args);
+        // }
         // char * ls_args[] = { "ls" , "-l", NULL};
         //                    ^ 
         //  use the name ls
