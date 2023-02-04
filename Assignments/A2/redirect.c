@@ -2,16 +2,19 @@
 #include <fcntl.h>
 #include "process.h"
 
-// ## CHECK permission for read and write files - Currently allowing owner to do all. And group members/other users can only read/write, not execute (for obvious reasons)
-
-// char ** redirect(process * p , infd , outfd){       // DO add extra NULL at the end
-//     // first, redirect to infd and outfd unconditionally
-//     // then loop over the arguments of the given process to find any < or > symbols
-//     // if found, again dup2 the stdout and stdin to the file names, after opening and closing them appropriately
-//     // return the final arguments after stripping off <,>
-// }
-
 char ** redirect(struct process * proc , int infd , int outfd){
+
+    char ** final_args = NULL;
+    int final_nargs = proc->n_args;
+
+    for(int i=0;i<proc->n_args;i++){
+        if(strcmp(proc->args[i++] , "<")) final_nargs -= 2;
+        else if(strcmp(proc->args[i++] , ">")) final_nargs -= 2;
+    }
+
+    final_args = (char **) malloc((final_nargs+1) * sizeof(char *));    // free after execvp in exec_proc
+    final_nargs = 0;
+
     // initial unconditional redirects
     if(infd != STDIN_FILENO){
         close(STDIN_FILENO);            // ## need error handling here? or will it be pedantic?
@@ -49,7 +52,15 @@ char ** redirect(struct process * proc , int infd , int outfd){
             close(outfd);
             dup2(new_outfd , outfd);
         }
+
+        else{
+            strdup(final_args[final_nargs++] , proc->args[i]);      // else, make a deep copy of the arguments
+        }
     }
+
+    final_args[final_nargs] = NULL;         // argument list end sentinel (for execvp's use)
+
+    return final_args;
 }
 
 // following error cases need to be handled during parsing
