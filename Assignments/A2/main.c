@@ -24,7 +24,7 @@ int main(){
     size_t max_line_len = MAX_LINE_LEN;
 
     while(1){
-        fflush(stdout);
+        //fflush(stdout);
         printf("Enter the command: ");
         getline(&line, &max_line_len, stdin);
         line[strlen(line)-1] = '\0';
