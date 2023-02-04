@@ -5,6 +5,8 @@ struct process{
     int n_args = 0;             // store the number of args in the process
 }
 
+struct Node* fg_procs = NULL;          // AVL tree of foreground processes
+
 main(){
     while(1){
         char * line = getline();                // scan the whole line
@@ -30,17 +32,19 @@ void exec_job(process * job , int n_proc , int background){
     // setup the pipes between processes. handle case if no pipes found. call exec_proc on each process.
     loop(processes){
         // setup pipe , infd , outfd
-        exec_proc(&process , infd , outfd);
+        exec_proc(&process , infd , outfd , background);
     }
     
     if(background) wait()  // parent process    ## IMPROVE LATER. for now, just do it in a while loop and decrement the count each time a process finishes. break loop when 0
 }
 
-void exec_proc(process * p , infd , outfd){
+void exec_proc(process * p , infd , outfd , int background){
     // execute the process, where the input and output file descriptors are given
     cpid = fork();
 
     if(cpid == 0){      // child process
+        struct Node* new_proc_node = newNode(getpid());
+        if(!background) insertNode(fg_procs , new_proc_node);           // create and insert the node in the AVL tree ONLY IF foreground -- V.IMP
         char ** args = redirect(p , infd , outfd);    // get the args to pass to the final execvp() call
         // NULL already added to the end by redirect. simply execute
         execvp(args[0] , args);
@@ -55,3 +59,5 @@ char ** redirect(process * p , infd , outfd){       // DO add extra NULL at the 
 }
 
 // Add signal handling
+// Currently, the shell simply exits if there is an error anywhere, but this must change later
+// also, only processes cannot be sent to background using Ctrl+Z currently. Processes are in background only if started with an & symbol
