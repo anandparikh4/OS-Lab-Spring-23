@@ -25,8 +25,10 @@ int main(){
 
     while(1){
         printf("Enter the command: ");
+        // fflush(stdout);
         getline(&line, &max_line_len, stdin);
-        if(strcmp(line,"exit\n")==0)
+        line[strlen(line)-1] = '\0';
+        if(strcmp(line,"exit")==0)
             break;
         process *job;
         int n_proc;
@@ -35,11 +37,24 @@ int main(){
         job = parse(line,&n_proc,&background);
         int i, j;
         printf("Number of processes = %d\n",n_proc);
-        // for (i = 0; i<n_proc; i++) {
-        //     for (j = 0; j<job[i].n_args; j++)
-        //         printf("%s ", job[i].args[j]);
-        //     printf("\nNumber of arguments = %d\n\n",job[i].n_args);
+        for (i = 0; i<n_proc; i++) {
+            for (j = 0; j<job[i].n_args; j++)
+                printf("%s ", job[i].args[j]);
+            printf("\nNumber of arguments = %d\n\n",job[i].n_args);
+        }
+        char * ls_args[] = { "ls" , "-l", NULL};
+        //                    ^ 
+        //  use the name ls
+        //  rather than the
+        //  path to /bin/ls
+        // if(fork()==0){
+        //     printf("Child process executing %s\n",job[0].args[0]);
+        //     // job[0].args[job[0].n_args] = NULL;
+        // // execvp(ls_args[0],ls_args);
+        // execvp(job[0].args[0],job[0].args);
+        // exit(0);
         // }
+        // else continue;
         exec_job(job,n_proc,background);
     }
 }

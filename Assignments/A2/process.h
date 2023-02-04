@@ -9,7 +9,7 @@
 #include <fcntl.h>
 
 typedef struct{
-    char ** args;
+    char * args[MAX_ARGS];
     int n_args;
 }process;
 

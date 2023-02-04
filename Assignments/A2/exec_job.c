@@ -19,6 +19,7 @@ void exec_job(process * job , int n_proc , int background){
             connect_fd = fd[1];
         }
         exec_proc(&job[i] , infd , outfd,background);
+        // printf("Executed: %s\n",job[i].args[0]);
     }
 
     // while(!background && n_proc){        // while some procs are running in the foreground, wait
@@ -46,18 +47,20 @@ void exec_proc(process * p, int infd, int outfd, int background){    // execute 
     }
     else if(c_pid == 0){        // child
         redirect(p , infd , outfd);
-        printf("Executing: %s",p->args[0]);
+        // printf("Executing: %s",p->args[0]);
         execvp(p->args[0],p->args);
         perror("execvp");
+        exit(0);
     }
     else{
         // parent
-        if(!background){
-            // struct Node* new_proc_node = newNode(c_pid);
-            insertNode(fg_procs , c_pid);
-        }
+        // if(!background){
+        //     // struct Node* new_proc_node = newNode(c_pid);
+        //     insertNode(fg_procs , c_pid);
+        // }
+        wait(NULL);     // wait for child to exit
+        return;
     }
-    return;
 }
 
 
