@@ -56,5 +56,5 @@ char ** redirect(struct process * proc , int infd , int outfd){
 // 1) > (or < )without any file name after it
 // 2) no space between < (or >) and file name
 
-// Do we need to close the other end of the pipe (in the successive sibling process, if any at all) in case a user does both ">" withing a proc and uses "|" after a proc??
+// Do we need to close the other end of the pipe (in the successive sibling process, (if any at all) in case a user does both ">" withing a proc and uses "|" after a proc??
 // Means, do we need to do this ourselves to avoid a pipe burst or is it handled by default behaviour?
