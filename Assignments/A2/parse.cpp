@@ -2,9 +2,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <glob.h>
+#include <iostream>
+#include <iterator>
+#include <list>
+#include <string>
 #include "parse.h"
 
 #define MAX_LINE_LEN 1024
+
+using namespace std;
 
 void remove_spaces(char *line){
 	int i=0,j=0,k=strlen(line),f=1;
@@ -45,8 +51,8 @@ void remove_spaces(char *line){
 // }
 
 // Function to remove back slashes from a string
-void remove_back_slashes(char *a){
-    int i=0,j=0,k=strlen(a);
+void remove_back_slashes(string &a){
+    int i=0,j=0,k=a.size();
 	if(k==0)	return;
 	char b[k+1];
 	while(a[i]!='\0'){
@@ -54,22 +60,72 @@ void remove_back_slashes(char *a){
         b[j++] = a[i-1];
 	}
     b[j] = '\0';
-	strcpy(a,b);
+	a = b;
 }
 
 // Function to remove quotes from a string, if any at start and end
-void remove_quotes(char *a){
-    int i=0,j=0,k=strlen(a);
-    if(k==0)	return;
-    char b[k+1];
+void remove_quotes(string &a){
+    int i=0,j=0,k=a.size();
+	if(k==0)	return;
+	char b[k+1];
     if(a[0]=='\"' || a[0]=='\'')    i++;
     while(a[i]!='\0')
         b[j++] = a[i++];
     if(b[j-1]=='\"' || b[j-1]=='\'')    b[j-1]='\0';
     else
         b[j] = '\0';
-    strcpy(a,b);
+    a = b;
 }
+
+// Function to convert 2-d character array to list of strings
+void convert_to_list(char **a, int n, list<string> &l){
+    for(int i=0;i<n;i++){
+        l.push_back(a[i]);
+    }
+}
+
+
+// Function to handle wildcards like * and ?
+char ** handle_wildcards(char **a, int &n){
+    list<string> l,m;
+    convert_to_list(a,n,l);
+    int i=0;
+    for(i=0;i<n;i++){
+        free(a[i]);
+    }
+    for(auto it = l.begin(); it != l.end(); it++){
+        if((*it)[0]=='\"' || (*it)[0]=='\''){
+            remove_quotes(*it);
+            m.push_back(*it);
+        }
+        else{
+            glob_t glob_result;
+            if(glob((*it).c_str(),0,NULL,&glob_result)!=0){
+                remove_back_slashes(*it);
+                m.push_back(*it);
+            }
+            else{
+                for(int j=0;j<glob_result.gl_pathc;j++){
+                    // printf("%s\n",glob_result.gl_pathv[j]);
+                    m.push_back(glob_result.gl_pathv[j]);
+                }
+                // printf("Helll\n");
+            }  
+            globfree(&glob_result);
+        }
+    }
+    n = m.size();
+    a = (char **) realloc(a,(n+1)*sizeof(char *));
+    i=0;
+    for(auto it = m.begin(); it != m.end(); it++){
+        a[i++] = strdup((*it).c_str());
+        // cout<<a[i-1]<<endl;
+    }
+    a[i] = NULL;
+    // printf("Helll2\n");
+    return a;
+}
+
 
 
 process * parse(char *line , int * n_proc , int * background) {
@@ -168,15 +224,17 @@ process * parse(char *line , int * n_proc , int * background) {
                 job[i].n_args = k;
                 break;
             }
-            if(job[i].args[k][0]=='\"' || job[i].args[k][0]=='\'')
-                remove_quotes(job[i].args[k]);
-            else
-                remove_back_slashes(job[i].args[k]);
+            // if(job[i].args[k][0]=='\"' || job[i].args[k][0]=='\'')
+            //     remove_quotes(job[i].args[k]);
+            // else
+            //     remove_back_slashes(job[i].args[k]);
             start = j + 1;
             j = start;
         }
 
-        job[i].args[job[i].n_args] = NULL;
+        // job[i].args[job[i].n_args] = NULL;
+        job[i].args=handle_wildcards(job[i].args,job[i].n_args);
+        // printf("Number of arguments: %d\n",job[i].n_args);
         if(*background==1)
             break;
         
@@ -184,7 +242,7 @@ process * parse(char *line , int * n_proc , int * background) {
         end = start;
         // printf("Number of arguments: %d\n",job[i].n_args);
         // for(int p=0;p<job[i].n_args;p++){
-        //     printf("%s ",job[i].args[p]);
+        //     printf("%s\n",job[i].args[p]);
         // }
         // printf("\n\n");
     }
