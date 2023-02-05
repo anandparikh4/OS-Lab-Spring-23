@@ -43,6 +43,7 @@ void init_proc(process * p){     // initialize process structure content
     return;
 }
 
+// Function to remove back slashes from a string
 void remove_back_slashes(char *a){
     int i=0,j=0,k=strlen(a);
 	if(k==0)	return;
@@ -54,6 +55,21 @@ void remove_back_slashes(char *a){
     b[j] = '\0';
 	strcpy(a,b);
 }
+
+// Function to remove quotes from a string, if any at start and end
+void remove_quotes(char *a){
+    int i=0,j=0,k=strlen(a);
+    if(k==0)	return;
+    char b[k+1];
+    if(a[0]=='\"' || a[0]=='\'')    i++;
+    while(a[i]!='\0')
+        b[j++] = a[i++];
+    if(b[j-1]=='\"' || b[j-1]=='\'')    b[j-1]='\0';
+    else
+        b[j] = '\0';
+    strcpy(a,b);
+}
+
 
 process * parse(char *line , int * n_proc , int * background) {
     remove_spaces(line);
@@ -151,7 +167,10 @@ process * parse(char *line , int * n_proc , int * background) {
                 job[i].n_args = k;
                 break;
             }
-            remove_back_slashes(job[i].args[k]);
+            if(job[i].args[k][0]=='\"' || job[i].args[k][0]=='\'')
+                remove_quotes(job[i].args[k]);
+            else
+                remove_back_slashes(job[i].args[k]);
             start = j + 1;
             j = start;
         }
