@@ -43,6 +43,17 @@ void init_proc(process * p){     // initialize process structure content
     return;
 }
 
+void remove_back_slashes(char *a){
+    int i=0,j=0,k=strlen(a);
+	if(k==0)	return;
+	char b[k+1];
+	while(a[i]!='\0'){
+		if(a[i++]=='\\')	continue;
+        b[j++] = a[i-1];
+	}
+    b[j] = '\0';
+	strcpy(a,b);
+}
 
 process * parse(char *line , int * n_proc , int * background) {
     remove_spaces(line);
@@ -140,6 +151,7 @@ process * parse(char *line , int * n_proc , int * background) {
                 job[i].n_args = k;
                 break;
             }
+            remove_back_slashes(job[i].args[k]);
             start = j + 1;
             j = start;
         }

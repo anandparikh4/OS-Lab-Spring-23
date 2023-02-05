@@ -20,11 +20,56 @@ void exec_job(process * job , int n_proc , int background){
             outfd = fd[1];
             connect_fd = fd[0];
         }
-        exec_proc(&job[i] , infd , outfd,background);
+        if(strcmp(job[i].args[0] , "cd") == 0){
+            if(job[i].n_args == 1){
+                if(chdir(getenv("HOME")) < 0){
+                    perror("chdir");
+                    // exit(0);
+                    continue;
+                }
+                // Getcwd to get the current working directory
+                char cwd[1024];
+                if(getcwd(cwd , sizeof(cwd)) != NULL){
+                    printf("Current working directory: %s\n" , cwd);
+                }
+                else{
+                    perror("getcwd");
+                    // exit(0);
+                    continue;
+                }
+            }
+            else if(job[i].n_args > 2)
+                printf("Too many arguments to cd\n");
+            else{
+                // printf("cd %s  \t %d\n",job[i].args[1],job[i].n_args);
+                if(chdir(job[i].args[1]) < 0){
+                    perror("chdir");
+                    // exit(0);
+                    continue;
+                }
+                // Getcwd to get the current working directory
+                char cwd[1024];
+                if(getcwd(cwd , sizeof(cwd)) != NULL){
+                    printf("Current working directory: %s\n" , cwd);
+                }
+                else{
+                    perror("getcwd");
+                    // exit(0);
+                    continue;
+                }
+            }
+        }
+        else 
+            exec_proc(&job[i] , infd , outfd,background);
 
         // printf("Executed: %s\n",job[i].args[0]);
     }
-
+    for(int i=0;i<n_proc;i++){
+        for(int j=0;j<job[i].n_args;j++){
+            free(job[i].args[j]);
+        }
+    }
+    free(job);
     if(!background){
         while(!fg_procs.empty());
     }
@@ -41,6 +86,17 @@ void exec_proc(process * p, int infd, int outfd,int background){    // execute p
     }
     else if(c_pid == 0){        // child
         redirect(p , infd , outfd);
+        // Handling pwd command
+        if(strcmp(p->args[0] , "pwd") == 0){
+            char * cwd = (char *) malloc(1024 * sizeof(char));
+            if(getcwd(cwd , 1024) == NULL){
+                perror("getcwd");
+                exit(0);
+            }
+            printf("%s\n" , cwd);
+            free(cwd);
+            exit(0);
+        }
         sigchld_blocker(SIG_UNBLOCK);
 
         execvp(p->args[0],p->args);
