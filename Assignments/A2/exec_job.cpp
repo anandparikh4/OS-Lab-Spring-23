@@ -40,7 +40,7 @@ void exec_job(process * job , int n_proc , int background){
     while(!background && n_proc){
         int status;
         int cpid = waitpid(-1 , &status , 0);
-        printf("%d\n" , cpid);
+        //printf("%d\n" , cpid);
         n_proc--;
     }
     return;
@@ -153,13 +153,13 @@ void redirect(process * proc , int infd , int outfd){
     proc->n_args = final_nargs;
     k=0;
     // free(final_args);
-    printf("\t\tFinal args: ");
+    //printf("\t\tFinal args: ");
     while(proc->args[k]!=NULL){
         // proc->args[k] = final_args[k];
-        printf("%s " , proc->args[k]);
+        //printf("%s " , proc->args[k]);
         k++;
     }
-    printf("\n");
+    //printf("\n");
     if(infd != STDIN_FILENO){
         dup2(infd , STDIN_FILENO);
         close(infd);
