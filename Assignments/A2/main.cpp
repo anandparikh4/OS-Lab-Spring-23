@@ -27,8 +27,7 @@ void sigchild_handler(int signum){
     while(1){
         int status;
         int cpid = waitpid(-1,&status,WUNTRACED|WNOHANG|WCONTINUED); //WCONTINUED check
-        if(cpid<0)exit(0); //check
-        else if(cpid==0)break;
+        if(cpid<=0)break;
         if(fg_procs.find(cpid)!=fg_procs.end()){
             fg_procs.erase(cpid);
             if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
@@ -40,6 +39,13 @@ void sigchild_handler(int signum){
     
     }
     
+}
+
+void sigchld_blocker(int signal_state){
+    sigset_t signal_set;
+    sigemptyset(&signal_set);
+    sigaddset(&signal_set , SIGCHLD);
+    sigprocmask(signal_state , &signal_set , NULL);
 }
 
 int main(){

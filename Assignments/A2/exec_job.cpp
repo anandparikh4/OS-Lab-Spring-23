@@ -1,6 +1,7 @@
 #include "exec_job.h"
 // #include <iostream>
 extern std::set<int> fg_procs,bg_run_procs,bg_stop_procs;
+extern void sigchld_blocker(int);
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
 void exec_job(process * job , int n_proc , int background){
@@ -32,28 +33,27 @@ void exec_job(process * job , int n_proc , int background){
 }
 
 void exec_proc(process * p, int infd, int outfd,int background){    // execute process
-    // redirect(p , infd , outfd);
     int c_pid = fork();
+    sigchld_blocker(SIG_BLOCK);
     if(c_pid < 0){
         perror("fork");
         exit(0);
     }
     else if(c_pid == 0){        // child
         redirect(p , infd , outfd);
-        
-        // printf("Executing: %s\n",p->args[0]);
+        sigchld_blocker(SIG_UNBLOCK);
+
         execvp(p->args[0],p->args);
         perror("execvp");
         exit(0);
     }
     else{
-        //get foreground processes here
-        //check if(background) here
         if(!background)fg_procs.insert(c_pid);
         else bg_run_procs.insert(c_pid);
-        // close(infd);
+        sigchld_blocker(SIG_UNBLOCK);
+
         close(outfd);
-        // close(STDIN_FILENO);
+
         infd = open("/dev/tty", O_RDONLY);
         if (infd == -1) {
             perror("open");
@@ -65,7 +65,6 @@ void exec_proc(process * p, int infd, int outfd,int background){    // execute p
             perror("open");
             return;
         }
-        // wait(NULL);
     }
     return;
 }
@@ -75,7 +74,6 @@ void redirect(process * proc , int infd , int outfd){
     char ** final_args = NULL;
     int final_nargs = proc->n_args;
 
-    // Wrong, will not work for cases like: grep -i "hello" > out.txt
     for(int i=0;i<proc->n_args;i++){
         if(strcmp(proc->args[i] , "<")==0){
             i++;
