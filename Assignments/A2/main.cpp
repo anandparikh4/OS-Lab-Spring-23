@@ -10,22 +10,46 @@
 
 using namespace std;
 #define MAX_LINE_LEN 1024
-set <int> fg_procs;
+set <int> fg_procs,bg_run_procs,bg_stop_procs;
 
 void sigint_handler(int signum){
     signal(SIGINT,sigint_handler);
-    printf("Inside signal handler for Ctrl-C\n");
-    for(auto it:fg_procs){
-        cout << it << endl;
+    // printf("Inside signal handler for Ctrl-C\n");
+    for(auto &it:fg_procs){
         kill(it,SIGINT);
     }
-    fg_procs.clear();  
+    printf("\nEnter the command: ");
+    return;
 }
 
+void sigchild_handler(int signum){
+    signal(SIGCHLD,sigchild_handler);
+    while(1){
+        int status;
+        int cpid = waitpid(-1,&status,WUNTRACED|WNOHANG|WCONTINUED); //WCONTINUED check
+        if(cpid<0)exit(0); //check
+        else if(cpid==0)break;
+        if(fg_procs.find(cpid)!=fg_procs.end()){
+            fg_procs.erase(cpid);
+            if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
+        }
+        else if(bg_run_procs.find(cpid)!=bg_run_procs.end()){
+            bg_run_procs.erase(cpid);
+            if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
+        }
+    
+    }
+    
+}
 
 int main(){
     fg_procs.clear();
+    bg_run_procs.clear();
+    bg_stop_procs.clear();
     signal(SIGINT,sigint_handler);
+    signal(SIGCHLD,sigchild_handler);
+
+
     char *line = (char*)malloc(MAX_LINE_LEN * sizeof(char)); 
     // strcpy(line,"ls -l|grep 'hello     world'|wc -l -c");
     size_t max_line_len = MAX_LINE_LEN;

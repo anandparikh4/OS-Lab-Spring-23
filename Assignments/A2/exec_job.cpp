@@ -1,7 +1,6 @@
 #include "exec_job.h"
 // #include <iostream>
-using namespace std;
-extern std::set<int> fg_procs;
+extern std::set<int> fg_procs,bg_run_procs,bg_stop_procs;
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
 void exec_job(process * job , int n_proc , int background){
@@ -20,36 +19,19 @@ void exec_job(process * job , int n_proc , int background){
             outfd = fd[1];
             connect_fd = fd[0];
         }
-        exec_proc(&job[i] , infd , outfd);
+        exec_proc(&job[i] , infd , outfd,background);
 
         // printf("Executed: %s\n",job[i].args[0]);
     }
 
-    // while(!background && n_proc){        // while some procs are running in the foreground, wait
-    //     int proc_status;
-    //     int child_pid;
-    //     if((child_pid = waitpid(-1 , &proc_status , WNOHANG)) < 0){    // wait on all children, blocking, no flag set
-    //         perror("waitpid");
-    //         exit(0);
-    //     }
-    //     if(findNode(fg_procs , child_pid) != NULL){
-    //         n_proc--;                           // child that exited was a foreground process, so decrement n_procs
-    //         deleteNode(fg_procs , child_pid);   // and remove from set
-    //     }
-    // }
-    while(!background && n_proc){
-        int status;
-        int cpid = waitpid(-1 , &status , 0);
-        //printf("%d\n" , cpid);
-        if(cpid > 0){
-            fg_procs.erase(cpid);
-            n_proc--;
-        }
+    if(!background){
+        while(!fg_procs.empty());
     }
+    
     return;
 }
 
-void exec_proc(process * p, int infd, int outfd){    // execute process
+void exec_proc(process * p, int infd, int outfd,int background){    // execute process
     // redirect(p , infd , outfd);
     int c_pid = fork();
     if(c_pid < 0){
@@ -67,8 +49,8 @@ void exec_proc(process * p, int infd, int outfd){    // execute process
     else{
         //get foreground processes here
         //check if(background) here
-        fg_procs.insert(c_pid);
-
+        if(!background)fg_procs.insert(c_pid);
+        else bg_run_procs.insert(c_pid);
         // close(infd);
         close(outfd);
         // close(STDIN_FILENO);
