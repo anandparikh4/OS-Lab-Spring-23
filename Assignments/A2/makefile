@@ -1,12 +1,10 @@
-main: main.c parse.o parse.h avl_tree.o avl_tree.h exec_job.o exec_job.h
-	gcc -o main main.c parse.o avl_tree.o exec_job.o
-parse.o: parse.c parse.h process.h
-	gcc -c parse.c
-exec_job.o: exec_job.c exec_job.h process.h avl_tree.h
-	gcc -c exec_job.c
-process.o: process.c process.h
-	gcc -c process.c
-avl_tree.o: avl_tree.c avl_tree.h
-	gcc -c avl_tree.c
+main: main.cpp parse.o parse.h exec_job.o exec_job.h
+	g++ -o main main.cpp parse.o exec_job.o
+parse.o: parse.cpp parse.h process.h
+	g++ -c parse.cpp
+exec_job.o: exec_job.cpp exec_job.h process.h 
+	g++ -c exec_job.cpp
+process.o: process.cpp process.h
+	g++ -c process.cpp
 clean:
-	rm -f main parse.o process.o avl_tree.o
+	rm -f main parse.o process.o exec_job.o

@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include "process.h"
 #include <sys/wait.h>
-#include "avl_tree.h"
+#include <set>
 
-extern struct Node *fg_procs;
+
 
 void exec_job(process * job , int n_proc , int background);
 

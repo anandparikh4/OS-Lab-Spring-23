@@ -1,5 +1,7 @@
 #include "exec_job.h"
-
+// #include <iostream>
+using namespace std;
+extern std::set<int> fg_procs;
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
 void exec_job(process * job , int n_proc , int background){
@@ -53,12 +55,17 @@ void exec_proc(process * p, int infd, int outfd){    // execute process
     }
     else if(c_pid == 0){        // child
         redirect(p , infd , outfd);
-        // printf("Executing: %s",p->args[0]);
+        
+        // printf("Executing: %s\n",p->args[0]);
         execvp(p->args[0],p->args);
         perror("execvp");
         exit(0);
     }
     else{
+        //get foreground processes here
+        //check if(background) here
+        fg_procs.insert(c_pid);
+
         // close(infd);
         close(outfd);
         // close(STDIN_FILENO);
