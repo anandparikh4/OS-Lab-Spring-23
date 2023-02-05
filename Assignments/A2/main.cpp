@@ -7,9 +7,11 @@
 #include <set>
 #include <sys/signal.h>
 #include <iostream>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 using namespace std;
-#define MAX_LINE_LEN 1024
+#define MAX_COMMANDS 1000
 
 int foreground_pgid;
 set <int> fg_procs,bg_run_procs,bg_stop_procs;
@@ -59,41 +61,50 @@ int main(){
     signal(SIGTTOU,SIG_IGN);
     foreground_pgid = 0;
 
-    char *line = (char*)malloc(MAX_LINE_LEN * sizeof(char)); 
+    // char *line = (char*)malloc(MAX_LINE_LEN * sizeof(char)); 
     // strcpy(line,"ls -l|grep 'hello     world'|wc -l -c");
-    size_t max_line_len = MAX_LINE_LEN;
+    // size_t max_line_len = MAX_LINE_LEN;
+    char *line = NULL;
+    using_history();
+    stifle_history(MAX_COMMANDS);
+    rl_bind_key('1', rl_beg_of_line);
+    rl_bind_key('9', rl_end_of_line);
+    while ((line = readline("$ ")) != NULL) {
+        if (line[0] != 0) {
+            add_history(line);
+            // printf("You entered: %s\n", line)
+            //fflush(stdout);
+            // printf("Enter the command: ");
+            // getline(&line, &max_line_len, stdin);
+            // line[strlen(line)-1] = '\0';
+            if(strcmp(line,"exit")==0)break;
+            process *job;
+            int n_proc;
+            int background = 0;
 
-    while(1){
-        //fflush(stdout);
-        printf("Enter the command: ");
-        getline(&line, &max_line_len, stdin);
-        line[strlen(line)-1] = '\0';
-        if(strcmp(line,"exit")==0)break;
-        process *job;
-        int n_proc;
-        int background = 0;
-
-        job = parse(line,&n_proc,&background);
-        int i, j;
-        // printf("Number of processes = %d\n",n_proc);
-        // for (i = 0; i<n_proc; i++) {
-        //     for (j = 0; j<job[i].n_args; j++)
-        //         printf("%s ", job[i].args[j]);
-        //     printf("\nNumber of arguments = %d\n\n",job[i].n_args);
-        // }
-        // char * ls_args[] = { "ls" , "-l", NULL};
-        //                    ^ 
-        //  use the name ls
-        //  rather than the
-        //  path to /bin/ls
-        // if(fork()==0){
-        //     printf("Child process executing %s\n",job[0].args[0]);
-        //     // job[0].args[job[0].n_args] = NULL;
-        // // execvp(ls_args[0],ls_args);
-        // execvp(job[0].args[0],job[0].args);
-        // exit(0);
-        // }
-        // else continue;
-        exec_job(job,n_proc,background);
+            job = parse(line,&n_proc,&background);
+            int i, j;
+            // printf("Number of processes = %d\n",n_proc);
+            // for (i = 0; i<n_proc; i++) {
+            //     for (j = 0; j<job[i].n_args; j++)
+            //         printf("%s ", job[i].args[j]);
+            //     printf("\nNumber of arguments = %d\n\n",job[i].n_args);
+            // }
+            // char * ls_args[] = { "ls" , "-l", NULL};
+            //                    ^ 
+            //  use the name ls
+            //  rather than the
+            //  path to /bin/ls
+            // if(fork()==0){
+            //     printf("Child process executing %s\n",job[0].args[0]);
+            //     // job[0].args[job[0].n_args] = NULL;
+            // // execvp(ls_args[0],ls_args);
+            // execvp(job[0].args[0],job[0].args);
+            // exit(0);
+            // }
+            // else continue;
+            exec_job(job,n_proc,background);
+        }
+        free(line);
     }
 }
