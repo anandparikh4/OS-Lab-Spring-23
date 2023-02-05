@@ -10,6 +10,8 @@
 
 using namespace std;
 #define MAX_LINE_LEN 1024
+
+int foreground_pgid;
 set <int> fg_procs,bg_run_procs,bg_stop_procs;
 
 void sigint_handler(int signum){
@@ -52,9 +54,10 @@ int main(){
     fg_procs.clear();
     bg_run_procs.clear();
     bg_stop_procs.clear();
-    signal(SIGINT,sigint_handler);
+    //signal(SIGINT,sigint_handler);
     signal(SIGCHLD,sigchild_handler);
-
+    signal(SIGTTOU,SIG_IGN);
+    foreground_pgid = 0;
 
     char *line = (char*)malloc(MAX_LINE_LEN * sizeof(char)); 
     // strcpy(line,"ls -l|grep 'hello     world'|wc -l -c");

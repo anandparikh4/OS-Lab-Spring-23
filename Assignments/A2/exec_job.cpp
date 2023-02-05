@@ -2,10 +2,12 @@
 // #include <iostream>
 extern std::set<int> fg_procs,bg_run_procs,bg_stop_procs;
 extern void sigchld_blocker(int);
+extern int foreground_pgid;
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
 void exec_job(process * job , int n_proc , int background){
     
+    foreground_pgid = 0;
     // setup pipes between processes
     int connect_fd = 0;             // output of previous pipe (STDIN for first process)
     for(int i=0;i<n_proc;i++){
@@ -72,7 +74,9 @@ void exec_job(process * job , int n_proc , int background){
     free(job);
     if(!background){
         while(!fg_procs.empty());
+        tcsetpgrp(STDIN_FILENO , getpid());
     }
+    //foreground_pgid = 0;
     
     return;
 }
@@ -98,6 +102,7 @@ void exec_proc(process * p, int infd, int outfd,int background){    // execute p
             exit(0);
         }
         sigchld_blocker(SIG_UNBLOCK);
+        setpgid(getpid() , foreground_pgid);
 
         execvp(p->args[0],p->args);
         perror("execvp");
@@ -106,6 +111,10 @@ void exec_proc(process * p, int infd, int outfd,int background){    // execute p
     else{
         if(!background)fg_procs.insert(c_pid);
         else bg_run_procs.insert(c_pid);
+        if(foreground_pgid == 0){
+            foreground_pgid = c_pid;
+            if(!background) tcsetpgrp(STDIN_FILENO , foreground_pgid);
+        }
         sigchld_blocker(SIG_UNBLOCK);
 
         close(outfd);
