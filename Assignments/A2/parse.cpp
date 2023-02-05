@@ -134,13 +134,20 @@ process * parse(char *line , int * n_proc , int * background) {
 
             strncpy(job[i].args[k], line + start, j - start);
             job[i].args[k][j - start] = '\0';
-
+            if(strcmp(job[i].args[k],"&")==0){
+                *background = 1;
+                free(job[i].args[k]);
+                job[i].n_args = k;
+                break;
+            }
             start = j + 1;
             j = start;
         }
 
-        // job[i].args[job[i].n_args] = NULL;
-
+        job[i].args[job[i].n_args] = NULL;
+        if(*background==1)
+            break;
+        
         start = end + 1;
         end = start;
         // printf("Number of arguments: %d\n",job[i].n_args);

@@ -41,7 +41,10 @@ void exec_job(process * job , int n_proc , int background){
         int status;
         int cpid = waitpid(-1 , &status , 0);
         //printf("%d\n" , cpid);
-        n_proc--;
+        if(cpid > 0){
+            fg_procs.erase(cpid);
+            n_proc--;
+        }
     }
     return;
 }
