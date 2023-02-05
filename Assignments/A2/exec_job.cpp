@@ -70,6 +70,7 @@ void exec_job(process * job , int n_proc , int background){
         for(int j=0;j<job[i].n_args;j++){
             free(job[i].args[j]);
         }
+        free(job[i].args);
     }
     free(job);
     if(!background){

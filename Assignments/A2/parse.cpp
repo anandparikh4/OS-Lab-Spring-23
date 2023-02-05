@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <glob.h>
 #include "parse.h"
 
 #define MAX_LINE_LEN 1024
@@ -35,13 +36,13 @@ void remove_spaces(char *line){
 	//line = realloc(line,strlen(line));
 }
 
-void init_proc(process * p){     // initialize process structure content
-    for(int i=0;i<MAX_ARGS;i++){
-        p->args[i] = NULL;
-    }
-    p->n_args = 0;
-    return;
-}
+// void init_proc(process * p){     // initialize process structure content
+//     for(int i=0;i<MAX_ARGS;i++){
+//         p->args[i] = NULL;
+//     }
+//     p->n_args = 0;
+//     return;
+// }
 
 // Function to remove back slashes from a string
 void remove_back_slashes(char *a){
@@ -101,7 +102,7 @@ process * parse(char *line , int * n_proc , int * background) {
         inside_double_quotes = 0;
         escape_char = 0;
         arg_count = 0;
-        init_proc(&job[i]);
+        // init_proc(&job[i]);
         //Find the end of the command
         for (end = start; end < len; end++) {
             if (line[end] == '\'' && !inside_double_quotes && !escape_char)
@@ -133,7 +134,7 @@ process * parse(char *line , int * n_proc , int * background) {
         if(line[j-1]!=' ')
             arg_count++;
         // commands[i] = (char **) malloc((arg_count + 1) * sizeof(char *));
-        // job[i].args = (char **) malloc((arg_count+1) * sizeof(char *));
+        job[i].args = (char **) malloc((arg_count+1) * sizeof(char *));
         job[i].n_args = arg_count;
 
         start = tem_start;

@@ -1,6 +1,6 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
-#define MAX_ARGS 256
+// #define MAX_ARGS 256
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +9,7 @@
 #include <fcntl.h>
 
 typedef struct{
-    char * args[MAX_ARGS];
+    char ** args;
     int n_args;
 }process;
 
