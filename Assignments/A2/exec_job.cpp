@@ -83,8 +83,8 @@ void exec_job(process * job , int n_proc , int background){
 }
 
 void exec_proc(process * p, int infd, int outfd,int background){    // execute process
-    int c_pid = fork();
     sigchld_blocker(SIG_BLOCK);
+    int c_pid = fork();
     if(c_pid < 0){
         perror("fork");
         exit(0);

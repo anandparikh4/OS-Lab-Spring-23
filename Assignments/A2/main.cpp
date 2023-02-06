@@ -18,11 +18,13 @@ set <int> fg_procs,bg_run_procs,bg_stop_procs;
 
 void sigint_handler(int signum){
     signal(SIGINT,sigint_handler);
-    // printf("Inside signal handler for Ctrl-C\n");
-    for(auto &it:fg_procs){
-        kill(it,SIGINT);
-    }
-    printf("\nEnter the command: ");
+    printf("\n$ ");
+    return;
+}
+
+void sigtstp_handler(int signum){
+    signal(SIGTSTP,sigint_handler);
+    printf("\n$ ");
     return;
 }
 
@@ -56,7 +58,8 @@ int main(){
     fg_procs.clear();
     bg_run_procs.clear();
     bg_stop_procs.clear();
-    //signal(SIGINT,sigint_handler);
+    signal(SIGINT,sigint_handler);
+    signal(SIGTSTP,sigtstp_handler);
     signal(SIGCHLD,sigchild_handler);
     signal(SIGTTOU,SIG_IGN);
     foreground_pgid = 0;
