@@ -6,13 +6,12 @@
 #include <sys/signal.h>
 #include <iostream>
 #include <termios.h>
-
+#include <deque>
 #include "parse.h" 
 #include "exec_job.h"
 #include "history.h"
 
 using namespace std;
-#define MAX_COMMANDS 1000
 
 int foreground_pgid;
 set <int> fg_procs,bg_run_procs,bg_stop_procs;
@@ -85,7 +84,7 @@ int main(){
     signal(SIGCHLD,sigchild_handler);
     signal(SIGTTOU,SIG_IGN);
     foreground_pgid = 0;
-    vector <string> history;
+    deque<string> history;
     int historyIndex = 0;
     string currentLine = "";
 

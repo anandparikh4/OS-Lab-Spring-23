@@ -2,14 +2,16 @@
 #define HISTORY_H
 
 #include <iostream>
-#include <vector>
+#include <deque>
 #include <unistd.h>
 #include <termios.h>
 using namespace std;
 
+#define MAX_COMMANDS 1000
+
 int getch();
 
-void getHistory(vector<string> &history, int &historyIndex, string &currentLine);
+void getHistory(deque<string> &history, int &historyIndex, string &currentLine);
 
 
 #endif
