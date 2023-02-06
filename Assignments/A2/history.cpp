@@ -25,6 +25,19 @@ void getHistory(deque<string> &history, int &historyIndex, string &currentLine){
     while(true){
         int ch = getch();
         // printf("%d",ch);
+        if(ch==1){
+            // printf("Ctrl+A\n");
+            printf("\033[");
+            printf("%d",currentLine.size());
+            printf("D");
+            continue;
+        }
+        else if(ch==2){
+            printf("\033[");
+            printf("%d",currentLine.size());
+            printf("C");
+            continue;
+        }
         if (ch == 27) {
             ch = getch();
             if (ch == 91) {

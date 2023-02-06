@@ -1,8 +1,10 @@
 #include "exec_job.h"
-// #include <iostream>
+#include <iostream>
+using namespace std;
 extern std::set<int> fg_procs,bg_run_procs,bg_stop_procs;
 extern void sigchld_blocker(int);
 extern int foreground_pgid;
+char buf[MAX_RES_LEN];
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
 void exec_job(process * job , int n_proc , int background){
@@ -13,6 +15,7 @@ void exec_job(process * job , int n_proc , int background){
     for(int i=0;i<n_proc;i++){
         int infd = connect_fd;
         int outfd = 1;
+        int testfd;
         if(i < n_proc-1){           // no pipes case automatically handled
             int fd[2];
             if(pipe(fd) < 0){
@@ -21,6 +24,15 @@ void exec_job(process * job , int n_proc , int background){
             }
             outfd = fd[1];
             connect_fd = fd[0];
+        }
+        if(strcmp(job[i].args[0],"lsof")==0){
+            int fd[2];
+            if(pipe(fd) < 0){
+                perror("pipe");
+                exit(0);
+            }
+            outfd = fd[1];
+            testfd = fd[0];
         }
         if(strcmp(job[i].args[0] , "cd") == 0){
             if(job[i].n_args == 1){
@@ -65,6 +77,28 @@ void exec_job(process * job , int n_proc , int background){
             exec_proc(&job[i] , infd , outfd,background);
 
         // printf("Executed: %s\n",job[i].args[0]);
+        if(strcmp(job[i].args[0],"lsof")==0){
+            int n = read(testfd , buf , MAX_RES_LEN);
+            buf[n] = '\0';
+            printf("%s\n",buf);
+            if(n <= 1)
+                printf("No such process\n");
+            else{
+                printf("Do you want to kill all the processes using the file (yes/no)? ");
+                // char *ans=(char *)malloc(10*sizeof(char));
+                // scanf("%s",ans);
+                // cin>>ans;
+                // if(strcmp(ans,"y") == 0){
+                    char * token = strtok(buf , " ");
+                    while(token != NULL){
+                        printf("hell1%shell2\n",token);
+                        // int pid = atoi(token);
+                        // kill(pid , SIGKILL);
+                        token = strtok(NULL , " ");
+                    }
+                // }
+            }
+        }
     }
     for(int i=0;i<n_proc;i++){
         for(int j=0;j<job[i].n_args;j++){
@@ -117,7 +151,6 @@ void exec_proc(process * p, int infd, int outfd,int background){    // execute p
             if(!background) tcsetpgrp(STDIN_FILENO , foreground_pgid);
         }
         sigchld_blocker(SIG_UNBLOCK);
-
         close(outfd);
 
         infd = open("/dev/tty", O_RDONLY);
