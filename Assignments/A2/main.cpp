@@ -19,13 +19,33 @@ set <int> fg_procs,bg_run_procs,bg_stop_procs;
 
 void sigint_handler(int signum){
     signal(SIGINT,sigint_handler);
-    printf("\n$ ");
+    printf("\n");
+    char * cwd = (char *) malloc(1024 * sizeof(char));
+    if(getcwd(cwd , 1024) == NULL){
+        perror("getcwd");
+        exit(0);
+    }
+    printf("\033[34m");
+    printf("%s" , cwd);
+    printf("\033[0m");
+    printf("$ ");
+    fflush(stdout);
     return;
 }
 
 void sigtstp_handler(int signum){
     signal(SIGTSTP,sigint_handler);
-    printf("\n$ ");
+    printf("\n");
+    char * cwd = (char *) malloc(1024 * sizeof(char));
+    if(getcwd(cwd , 1024) == NULL){
+        perror("getcwd");
+        exit(0);
+    }
+    printf("\033[34m");
+    printf("%s" , cwd);
+    printf("\033[0m");
+    printf("$ ");
+    fflush(stdout);
     return;
 }
 
