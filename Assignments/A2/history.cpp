@@ -107,6 +107,7 @@ void getHistory(deque<string> &history, int &historyIndex, string &currentLine){
             }
             else {
                 free(cwd);
+                printf("\n");
                 return;
             }   
         } else {

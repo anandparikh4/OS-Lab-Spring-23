@@ -25,15 +25,6 @@ void exec_job(process * job , int n_proc , int background){
             outfd = fd[1];
             connect_fd = fd[0];
         }
-        if(strcmp(job[i].args[0],"lsof")==0){
-            int fd[2];
-            if(pipe(fd) < 0){
-                perror("pipe");
-                exit(0);
-            }
-            outfd = fd[1];
-            testfd = fd[0];
-        }
         if(strcmp(job[i].args[0] , "cd") == 0){
             if(job[i].n_args == 1){
                 if(chdir(getenv("HOME")) < 0){
@@ -73,32 +64,10 @@ void exec_job(process * job , int n_proc , int background){
                 }
             }
         }
-        else 
+        else
             exec_proc(&job[i] , infd , outfd,background);
 
         // printf("Executed: %s\n",job[i].args[0]);
-        if(strcmp(job[i].args[0],"lsof")==0){
-            int n = read(testfd , buf , MAX_RES_LEN);
-            buf[n] = '\0';
-            printf("%s\n",buf);
-            if(n <= 1)
-                printf("No such process\n");
-            else{
-                printf("Do you want to kill all the processes using the file (yes/no)? ");
-                // char *ans=(char *)malloc(10*sizeof(char));
-                // scanf("%s",ans);
-                // cin>>ans;
-                // if(strcmp(ans,"y") == 0){
-                    char * token = strtok(buf , " ");
-                    while(token != NULL){
-                        printf("hell1%shell2\n",token);
-                        // int pid = atoi(token);
-                        // kill(pid , SIGKILL);
-                        token = strtok(NULL , " ");
-                    }
-                // }
-            }
-        }
     }
     for(int i=0;i<n_proc;i++){
         for(int j=0;j<job[i].n_args;j++){
