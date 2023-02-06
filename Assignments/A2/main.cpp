@@ -30,6 +30,7 @@ void sigint_handler(int signum){
     printf("\033[0m");
     printf("$ ");
     fflush(stdout);
+    free(cwd);
     return;
 }
 
@@ -46,6 +47,7 @@ void sigtstp_handler(int signum){
     printf("\033[0m");
     printf("$ ");
     fflush(stdout);
+    free(cwd);
     return;
 }
 
