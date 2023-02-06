@@ -44,8 +44,7 @@ void sigchild_handler(int signum){
             if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
         }
     
-    }
-    
+    }    
 }
 
 void sigchld_blocker(int signal_state){
