@@ -81,9 +81,13 @@ void getHistory(vector<string> &history, int &historyIndex, string &currentLine)
                     history.push_back(currentLine);
                 historyIndex = (int)history.size();
                 printf("\n");
+                free(cwd);
                 return;
             }
-            else    return;
+            else {
+                free(cwd);
+                return;
+            }   
         } else {
             
             if(ch==127)
@@ -99,4 +103,5 @@ void getHistory(vector<string> &history, int &historyIndex, string &currentLine)
             } 
         }
     }
+    free(cwd);
 }
