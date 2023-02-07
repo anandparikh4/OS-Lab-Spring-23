@@ -7,6 +7,8 @@
 #include <deque>
 using namespace std;
 
+#define MAX_COMMANDS 1000
+
 class shell_history{
 	public:
 		deque <char *> dq;

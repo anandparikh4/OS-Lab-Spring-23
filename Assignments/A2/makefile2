@@ -7,4 +7,4 @@ exec_job.o: exec_job.cpp exec_job.h process.h
 history2.o: history2.cpp history2.h
 	g++ -c history2.cpp
 clean:
-	rm -f main parse.o exec_job.o
+	rm -f main2 parse.o exec_job.o history2.o

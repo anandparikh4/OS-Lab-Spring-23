@@ -11,7 +11,6 @@
 #include "history2.h"
 
 using namespace std;
-#define MAX_COMMANDS 1000
 
 int foreground_pgid;
 set <int> fg_procs,bg_run_procs,bg_stop_procs;
@@ -50,12 +49,14 @@ int down_function(int s1,int s2){
 void sigint_handler(int signum){
     signal(SIGINT,sigint_handler);
     printf("\n");
-    char * cwd = (char *) malloc(1024 * sizeof(char));
+    char cwd[1024];
     if(getcwd(cwd , 1024) == NULL){
         perror("getcwd");
         exit(0);
     }
+    printf("\033[34m");
     printf("%s" , cwd);
+    printf("\033[0m");
     printf("$ ");
     fflush(stdout);
     return;
@@ -64,12 +65,14 @@ void sigint_handler(int signum){
 void sigtstp_handler(int signum){
     signal(SIGTSTP,sigint_handler);
     printf("\n");
-    char * cwd = (char *) malloc(1024 * sizeof(char));
+    char cwd[1024];
     if(getcwd(cwd , 1024) == NULL){
         perror("getcwd");
         exit(0);
     }
+    printf("\033[34m");
     printf("%s" , cwd);
+    printf("\033[0m");
     printf("$ ");
     fflush(stdout);
     return;
@@ -125,7 +128,11 @@ int main(){
         int n_proc;
         int background = 0;
         
-        if(strlen(history.line)==0)continue;
+        if(history.line==NULL || strlen(history.line)==0){
+            if(history.line!=NULL)
+                free(history.line);
+            continue;
+        }
         job = parse(history.line,&n_proc,&background);
         exec_job(job,n_proc,background);       
     }
