@@ -118,6 +118,13 @@ int main(){
     signal(SIGTTOU,SIG_IGN);
     
     foreground_pgid = 0;
+
+    char **lsof = (char **)malloc(6*sizeof(char *));
+    lsof[0] = strdup("lsof");
+    lsof[1] = strdup("-t");
+    lsof[2] = strdup("-f");
+    lsof[3] = strdup("--");
+    lsof[5] = NULL;
     
     while(1){
         history.get_history();
@@ -134,6 +141,61 @@ int main(){
             continue;
         }
         job = parse(history.line,&n_proc,&background);
-        exec_job(job,n_proc,background);       
+        if(strcmp(job[0].args[0],"delep")==0){
+            lsof[4] = strdup(job[0].args[1]);
+            int infd=0,outfd,testfd;
+            int fd[2];
+            if(pipe(fd) < 0){
+                perror("pipe");
+                exit(0);
+            }
+            outfd = fd[1];
+            testfd = fd[0];
+            int c_pid = fork();
+            if(c_pid == 0){
+                dup2(outfd,STDOUT_FILENO);
+                close(outfd);
+                execvp(lsof[0],lsof);
+                perror("execvp");
+                exit(0);
+            }
+            else{
+                close(outfd);
+                char buf[MAX_RES_LEN];
+                int n = read(testfd , buf , MAX_RES_LEN);
+                buf[n] = '\0';
+                close(testfd);
+                // lsof -e /run/user/125/gvfs -t -f -- ./t3.txt
+                // lsof -t -f -- ./t3.txt
+                if(n <= 1)
+                    printf("No process has currently opened the file or held a lock.\n");
+                else{
+                    printf("Processes currently opening the file or holding a lock over it:\n\nPIDs\n");
+                    printf("%s\n",buf);
+                    printf("Do you want to kill all the processes using the file (yes/no)? ");
+                    char ans[10];
+                    fgets(ans,10,stdin);
+                    if(strcmp(ans,"yes\n") == 0){
+                        char * token = strtok(buf , "\n");
+                        while(token != NULL){
+                            printf("Killed: %s\n",token);
+                            int pid = atoi(token);
+                            kill(pid , SIGKILL);
+                            token = strtok(NULL , "\n");
+                        }
+                        remove(job[0].args[1]);
+                    } 
+                }
+            }
+            free(lsof[4]);
+            for(int i=0;i<n_proc;i++){
+                for(int j=0;j<job[i].n_args;j++){
+                    free(job[i].args[j]);
+                }
+                free(job[i].args);
+            }
+        }
+        else
+            exec_job(job,n_proc,background);   
     }
 }

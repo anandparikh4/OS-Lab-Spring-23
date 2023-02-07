@@ -55,6 +55,10 @@ void shell_history::manage_history(){
 		dq.pop_front();
 		history_cnt--;
 	}
+	if(dq.size()>0 && strcmp(dq[dq.size()-1],line)==0){
+		history_idx = history_cnt;
+		return;
+	}
 	dq.push_back(line);
 	history_cnt++;
 	history_idx = history_cnt;
