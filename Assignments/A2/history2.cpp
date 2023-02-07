@@ -38,6 +38,10 @@ void shell_history::manage_history(){
 	history_cnt++;
 	history_idx = history_cnt;
 	FILE* fp = fopen(".history","a+");
+	// if(fp==NULL){
+	// 	printf("big problem\n");
+	// 	exit(0);
+	// }
 	fprintf(fp,"%s\n",line);
 	fflush(fp);
 	fclose(fp);

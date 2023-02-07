@@ -39,7 +39,6 @@ int down_function(int s1,int s2){
 		history.history_idx++;
 	}
 	else{
-        //check
 		rl_replace_line(history.dq[history.history_idx+1],0);
 		rl_redisplay();
         rl_end_of_line(s1,s2);
@@ -104,13 +103,17 @@ int main(){
     fg_procs.clear();
     bg_run_procs.clear();
     bg_stop_procs.clear();
+    
     rl_bind_keyseq("\\e[A",up_function);
     rl_bind_keyseq("\\e[B",down_function);
-
+    rl_bind_key(1,rl_beg_of_line);
+    rl_bind_key(5,rl_end_of_line);
+    
     signal(SIGINT,sigint_handler);
     signal(SIGTSTP,sigtstp_handler);
     signal(SIGCHLD,sigchild_handler);
     signal(SIGTTOU,SIG_IGN);
+    
     foreground_pgid = 0;
     
     while(1){
