@@ -1,0 +1,3 @@
+g++ -Wall inf.cpp
+cd ../A1
+exit

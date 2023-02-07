@@ -1,0 +1,23 @@
+ls -l
+ls -l &
+ls -l &
+pwd
+exit
+clear
+exit
+ls -l
+clear
+clear
+clear
+clear
+clear
+pwd
+exit
+g++ -Wall inf.cpp
+./a.out
+clear
+ls -l
+./a.out
+exit
+./a.out
+./a.out
