@@ -2,7 +2,9 @@
 #include <readline/readline.h>
 
 shell_history::shell_history(){
-	FILE *fp = fopen(".history","r");
+	strcat(strcpy(history_file, getenv("HOME")), "/.myshell_history");
+
+	FILE *fp = fopen(history_file,"r");
 	if(!fp){
 		history_cnt=0;
 		history_idx=0;
@@ -19,6 +21,7 @@ shell_history::shell_history(){
 			if(history_cnt==1000)break;
 		}
 		history_idx = history_cnt;
+		fclose(fp);
 	}
 }
 
@@ -37,11 +40,11 @@ void shell_history::manage_history(){
 	dq.push_back(line);
 	history_cnt++;
 	history_idx = history_cnt;
-	FILE* fp = fopen(".history","a+");
-	// if(fp==NULL){
-	// 	printf("big problem\n");
-	// 	exit(0);
-	// }
+	FILE* fp = fopen(history_file,"a+");
+	if(fp==NULL){
+		perror("Unable to write to history");
+		exit(0);
+	}
 	fprintf(fp,"%s\n",line);
 	fflush(fp);
 	fclose(fp);
