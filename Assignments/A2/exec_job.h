@@ -1,7 +1,7 @@
 #ifndef _EXEC_JOB_H
 #define _EXEC_JOB_H
 #define MAX_ARGS 256
-
+#define MAX_RES_LEN 10000
 #include <stdlib.h>
 #include <unistd.h>
 #include "process.h"

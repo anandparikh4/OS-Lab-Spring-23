@@ -1,8 +1,10 @@
 #include "exec_job.h"
-// #include <iostream>
+#include <iostream>
+using namespace std;
 extern std::set<int> fg_procs,bg_run_procs,bg_stop_procs;
 extern void sigchld_blocker(int);
 extern int foreground_pgid;
+char buf[MAX_RES_LEN];
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
 void exec_job(process * job , int n_proc , int background){
@@ -13,6 +15,7 @@ void exec_job(process * job , int n_proc , int background){
     for(int i=0;i<n_proc;i++){
         int infd = connect_fd;
         int outfd = 1;
+        int testfd;
         if(i < n_proc-1){           // no pipes case automatically handled
             int fd[2];
             if(pipe(fd) < 0){
@@ -61,7 +64,7 @@ void exec_job(process * job , int n_proc , int background){
                 }
             }
         }
-        else 
+        else
             exec_proc(&job[i] , infd , outfd,background);
 
         // printf("Executed: %s\n",job[i].args[0]);
@@ -117,7 +120,6 @@ void exec_proc(process * p, int infd, int outfd,int background){    // execute p
             if(!background) tcsetpgrp(STDIN_FILENO , foreground_pgid);
         }
         sigchld_blocker(SIG_UNBLOCK);
-
         close(outfd);
 
         infd = open("/dev/tty", O_RDONLY);
