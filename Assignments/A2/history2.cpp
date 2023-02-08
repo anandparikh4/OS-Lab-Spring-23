@@ -82,13 +82,13 @@ void shell_history::manage_history(){
 }
 
 void shell_history :: get_history(){
-	char prompt[1024]="\033[34m",temp[1024];
+	char prompt[1024]="",temp[1024];
     if(getcwd(temp , 1024) == NULL){
         perror("getcwd");
         exit(0);
     }
 	strcat(prompt,temp);
-	strcat(prompt,"\033[0m");
+	// strcat(prompt,"\033[0m");
 	strcat(prompt,"$ ");
 	line = readline(prompt);
 	return;

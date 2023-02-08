@@ -57,9 +57,9 @@ void sigint_handler(int signum){
         perror("getcwd");
         exit(0);
     }
-    printf("\033[34m");
+    // printf("\033[34m");
     printf("%s" , cwd);
-    printf("\033[0m");
+    // printf("\033[0m");
     printf("$ ");
     fflush(stdout);
     return;
@@ -73,9 +73,9 @@ void sigtstp_handler(int signum){
         perror("getcwd");
         exit(0);
     }
-    printf("\033[34m");
+    // printf("\033[34m");
     printf("%s" , cwd);
-    printf("\033[0m");
+    // printf("\033[0m");
     printf("$ ");
     fflush(stdout);
     return;
