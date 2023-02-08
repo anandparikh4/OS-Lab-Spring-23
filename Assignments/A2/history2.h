@@ -16,6 +16,7 @@ class shell_history{
 		int history_cnt;
 		int history_idx;
 		char history_file[256];
+		char latest_command[4096];
 		shell_history();
 		~shell_history();
 		void manage_history();

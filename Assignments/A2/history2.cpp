@@ -3,9 +3,10 @@
 
 shell_history::shell_history(){
 	strcat(strcpy(history_file, getenv("HOME")), "/.myshell_history");
-
+	latest_command[0] = '\0';
 	FILE *fp = fopen(history_file,"r");
 	if(!fp){
+		fclose(fopen(history_file,"w"));
 		history_cnt=0;
 		history_idx=0;
 		dq.clear();
@@ -18,31 +19,39 @@ shell_history::shell_history(){
 			buff[strlen(buff)-1] = '\0';
 			dq.push_back(strdup(buff));
 			history_cnt++;
-			// if(history_cnt==MAX_COMMANDS)break;
+			if(history_cnt==MAX_COMMANDS)break;
 		}
-		int fl=0;
-		if(dq.size()>MAX_COMMANDS)	fl=1;
-		while(dq.size()>MAX_COMMANDS){
-			if(dq[0]!=NULL && dq[0][0]!=EOF)free(dq[0]);
-			dq.pop_front();
-			history_cnt--;
-		}
+		// int fl=0;
+		// if(dq.size()>MAX_COMMANDS)	fl=1;
+		// while(dq.size()>MAX_COMMANDS){
+		// 	if(dq[0]!=NULL && dq[0][0]!=EOF)free(dq[0]);
+		// 	dq.pop_front();
+		// 	history_cnt--;
+		// }
 		history_idx = history_cnt;
 		fclose(fp);
-		if(fl){
-			fp = fopen(history_file,"w");
-			if(fp){
-				for(int i=0;i<history_cnt;i++){
-					fprintf(fp,"%s\n",dq[i]);
-				}
-				fflush(fp);
-				fclose(fp);
-			}
-		}
+		// if(fl){
+		// 	fp = fopen(history_file,"w");
+		// 	if(fp){
+		// 		for(int i=0;i<history_cnt;i++){
+		// 			fprintf(fp,"%s\n",dq[i]);
+		// 		}
+		// 		fflush(fp);
+		// 		fclose(fp);
+		// 	}
+		// }
 	}
 }
 
 shell_history::~shell_history(){
+	remove(history_file);
+	FILE *fp = fopen(history_file,"a+");
+	for(auto &it:dq){
+		if(it!=NULL && strlen(it)>0 && it[0]!=EOF){
+			fprintf(fp,"%s\n",it);
+		}
+	}
+	fclose(fp);
 	for(int i=0;i<history_cnt;i++){
 		if(dq[i]!=NULL && strlen(dq[i])>0 && dq[i][0]!=EOF)free(dq[i]);
 	}
@@ -62,14 +71,14 @@ void shell_history::manage_history(){
 	dq.push_back(line);
 	history_cnt++;
 	history_idx = history_cnt;
-	FILE* fp = fopen(history_file,"a+");
-	if(fp==NULL){
-		perror("Unable to write to history");
-		exit(0);
-	}
-	fprintf(fp,"%s\n",line);
-	fflush(fp);
-	fclose(fp);
+	// FILE* fp = fopen(history_file,"a+");
+	// if(fp==NULL){
+	// 	perror("Unable to write to history");
+	// 	exit(0);
+	// }
+	// fprintf(fp,"%s\n",line);
+	// fflush(fp);
+	// fclose(fp);
 	return;
 }
 

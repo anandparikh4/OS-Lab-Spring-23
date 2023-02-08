@@ -20,6 +20,9 @@ int up_function(int s1,int s2){
 	if(history.history_idx==0){
 		return 0;
 	}
+    else if(history.history_cnt == history.history_idx){
+        strcpy(history.latest_command,rl_line_buffer);
+    }
 	history.history_idx--;
 	rl_replace_line(history.dq[history.history_idx],0);
 	rl_redisplay();
@@ -32,7 +35,7 @@ int down_function(int s1,int s2){
 		return 0;
 	}	
 	else if(history.history_idx == (history.history_cnt)-1){
-		rl_replace_line("",0); //check
+		rl_replace_line(history.latest_command,0); //check
 		rl_redisplay();
 		rl_end_of_line(s1,s2);
 		history.history_idx++;
