@@ -33,15 +33,15 @@ void exec_job(process * job , int n_proc , int background){
                     continue;
                 }
                 // Getcwd to get the current working directory
-                char cwd[1024];
-                if(getcwd(cwd , sizeof(cwd)) != NULL){
-                    printf("Current working directory: %s\n" , cwd);
-                }
-                else{
-                    perror("getcwd");
-                    // exit(0);
-                    continue;
-                }
+                // char cwd[1024];
+                // if(getcwd(cwd , sizeof(cwd)) != NULL){
+                //     printf("Current working directory: %s\n" , cwd);
+                // }
+                // else{
+                //     perror("getcwd");
+                //     // exit(0);
+                //     continue;
+                // }
             }
             else if(job[i].n_args > 2)
                 printf("Too many arguments to cd\n");
@@ -53,15 +53,15 @@ void exec_job(process * job , int n_proc , int background){
                     continue;
                 }
                 // Getcwd to get the current working directory
-                char cwd[1024];
-                if(getcwd(cwd , sizeof(cwd)) != NULL){
-                    printf("Current working directory: %s\n" , cwd);
-                }
-                else{
-                    perror("getcwd");
-                    // exit(0);
-                    continue;
-                }
+                // char cwd[1024];
+                // if(getcwd(cwd , sizeof(cwd)) != NULL){
+                //     printf("Current working directory: %s\n" , cwd);
+                // }
+                // else{
+                //     perror("getcwd");
+                //     // exit(0);
+                //     continue;
+                // }
             }
         }
         else
