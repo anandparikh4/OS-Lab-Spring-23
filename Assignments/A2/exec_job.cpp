@@ -4,6 +4,7 @@ using namespace std;
 extern std::set<int> fg_procs,bg_run_procs,bg_stop_procs;
 extern void sigchld_blocker(int);
 extern int foreground_pgid;
+extern int ctrl_z_received;
 char buf[MAX_RES_LEN];
 // extern void exec_proc(process * p, int infd, int outfd, int background);
 // execute the given job (list of processes)
@@ -78,6 +79,10 @@ void exec_job(process * job , int n_proc , int background){
     free(job);
     if(!background){
         while(!fg_procs.empty());
+        if(ctrl_z_received){
+            ctrl_z_received = 0;
+            killpg(foreground_pgid , SIGCONT);
+        }
         tcsetpgrp(STDIN_FILENO , getpid());
     }
     //foreground_pgid = 0;

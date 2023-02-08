@@ -15,6 +15,7 @@ using namespace std;
 int foreground_pgid;
 set <int> fg_procs,bg_run_procs,bg_stop_procs;
 shell_history history;
+int ctrl_z_received = 0;
 
 int up_function(int s1,int s2){
 	if(history.history_idx==0){
@@ -66,7 +67,7 @@ void sigint_handler(int signum){
 }
 
 void sigtstp_handler(int signum){
-    signal(SIGTSTP,sigint_handler);
+    signal(SIGTSTP,sigtstp_handler);
     printf("\n");
     char cwd[1024];
     if(getcwd(cwd , 1024) == NULL){
@@ -89,11 +90,18 @@ void sigchild_handler(int signum){
         if(cpid<=0)break;
         if(fg_procs.find(cpid)!=fg_procs.end()){
             fg_procs.erase(cpid);
-            if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
+            if(WIFSTOPPED(status)){
+                bg_stop_procs.insert(cpid);
+                ctrl_z_received = 1;
+            }
         }
         else if(bg_run_procs.find(cpid)!=bg_run_procs.end()){
             bg_run_procs.erase(cpid);
             if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
+        }
+        else if(bg_stop_procs.find(cpid)!=bg_stop_procs.end()){
+            bg_stop_procs.erase(cpid);
+            if(WIFCONTINUED(status))bg_run_procs.insert(cpid);
         }
     }    
 }
@@ -119,7 +127,7 @@ int main(){
     signal(SIGTSTP,sigtstp_handler);
     signal(SIGCHLD,sigchild_handler);
     signal(SIGTTOU,SIG_IGN);
-    
+
     foreground_pgid = 0;
 
     char **lsof = (char **)malloc(6*sizeof(char *));
