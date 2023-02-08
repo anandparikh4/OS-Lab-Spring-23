@@ -5,6 +5,7 @@
         "stdlib.h": "c",
         "stdio.h": "c",
         "string": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "iostream": "cpp"
     }
 }

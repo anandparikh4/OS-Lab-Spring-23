@@ -42,13 +42,6 @@ void remove_spaces(char *line){
 	//line = realloc(line,strlen(line));
 }
 
-// void init_proc(process * p){     // initialize process structure content
-//     for(int i=0;i<MAX_ARGS;i++){
-//         p->args[i] = NULL;
-//     }
-//     p->n_args = 0;
-//     return;
-// }
 
 // Function to remove back slashes from a string
 void remove_back_slashes(string &a){
@@ -106,10 +99,8 @@ char ** handle_wildcards(char **a, int &n){
             }
             else{
                 for(int j=0;j<glob_result.gl_pathc;j++){
-                    // printf("%s\n",glob_result.gl_pathv[j]);
                     m.push_back(glob_result.gl_pathv[j]);
                 }
-                // printf("Helll\n");
             }  
             globfree(&glob_result);
         }
@@ -119,10 +110,8 @@ char ** handle_wildcards(char **a, int &n){
     i=0;
     for(auto it = m.begin(); it != m.end(); it++){
         a[i++] = strdup((*it).c_str());
-        // cout<<a[i-1]<<endl;
     }
     a[i] = NULL;
-    // printf("Helll2\n");
     return a;
 }
 
@@ -148,8 +137,7 @@ process * parse(char *line , int * n_proc , int * background) {
             escape_char = 0;
     }
 
-    // commands = (char ***) malloc((pipes_count + 2) * sizeof(char **));
-    // commands[pipes_count+1] = NULL;
+
     job = (process *) malloc((pipes_count + 1) * sizeof(process));
     *n_proc = pipes_count + 1;
     // Loop over the commands
@@ -158,7 +146,7 @@ process * parse(char *line , int * n_proc , int * background) {
         inside_double_quotes = 0;
         escape_char = 0;
         arg_count = 0;
-        // init_proc(&job[i]);
+
         //Find the end of the command
         for (end = start; end < len; end++) {
             if (line[end] == '\'' && !inside_double_quotes && !escape_char)
@@ -189,7 +177,7 @@ process * parse(char *line , int * n_proc , int * background) {
         }
         if(line[j-1]!=' ')
             arg_count++;
-        // commands[i] = (char **) malloc((arg_count + 1) * sizeof(char *));
+
         job[i].args = (char **) malloc((arg_count+1) * sizeof(char *));
         job[i].n_args = arg_count;
 
@@ -224,45 +212,19 @@ process * parse(char *line , int * n_proc , int * background) {
                 job[i].n_args = k;
                 break;
             }
-            // if(job[i].args[k][0]=='\"' || job[i].args[k][0]=='\'')
-            //     remove_quotes(job[i].args[k]);
-            // else
-            //     remove_back_slashes(job[i].args[k]);
+
             start = j + 1;
             j = start;
         }
 
-        // job[i].args[job[i].n_args] = NULL;
         job[i].args=handle_wildcards(job[i].args,job[i].n_args);
-        // printf("Number of arguments: %d\n",job[i].n_args);
+
         if(*background==1)
             break;
         
         start = end + 1;
         end = start;
-        // printf("Number of arguments: %d\n",job[i].n_args);
-        // for(int p=0;p<job[i].n_args;p++){
-        //     printf("%s\n",job[i].args[p]);
-        // }
-        // printf("\n\n");
-    }
 
+    }
     return job;
 }
-
-
-// int main(){
-//     char *line = malloc(MAX_LINE_LEN * sizeof(char)); 
-//     // strcpy(line,"ls -l|grep 'hello     world'|wc -l -c");
-//     int max_line_len = MAX_LINE_LEN;
-//     printf("Enter the command: ");
-//     getline(&line, &max_line_len, stdin);
-//     char ***commands = parse(line);
-//     int i, j;
-
-//     for (i = 0; commands[i] != NULL; i++) {
-//         for (j = 0; commands[i][j] != NULL; j++)
-//             printf("%s ", commands[i][j]);
-//         printf("\nNumber of arguments = %d\n\n",j);
-//     }
-// }

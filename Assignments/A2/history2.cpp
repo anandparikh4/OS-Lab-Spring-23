@@ -19,7 +19,6 @@ shell_history::shell_history(){
 			buff[strlen(buff)-1] = '\0';
 			dq.push_back(strdup(buff));
 			history_cnt++;
-			// if(history_cnt==MAX_COMMANDS)break;
 		}
 		fclose(fp);
 		int fl=0;
@@ -30,16 +29,6 @@ shell_history::shell_history(){
 			history_cnt--;
 		}
 		history_idx = history_cnt;
-		// if(fl){
-		// 	fp = fopen(history_file,"w");
-		// 	if(fp){
-		// 		for(int i=0;i<history_cnt;i++){
-		// 			fprintf(fp,"%s\n",dq[i]);
-		// 		}
-		// 		fflush(fp);
-		// 		fclose(fp);
-		// 	}
-		// }
 	}
 }
 
@@ -70,14 +59,7 @@ void shell_history::manage_history(){
 	dq.push_back(line);
 	history_cnt++;
 	history_idx = history_cnt;
-	// FILE* fp = fopen(history_file,"a+");
-	// if(fp==NULL){
-	// 	perror("Unable to write to history");
-	// 	exit(0);
-	// }
-	// fprintf(fp,"%s\n",line);
-	// fflush(fp);
-	// fclose(fp);
+
 	return;
 }
 
@@ -88,7 +70,7 @@ void shell_history :: get_history(){
         exit(0);
     }
 	strcat(prompt,temp);
-	// strcat(prompt,"\033[0m");
+
 	strcat(prompt,"$ ");
 	line = readline(prompt);
 	return;

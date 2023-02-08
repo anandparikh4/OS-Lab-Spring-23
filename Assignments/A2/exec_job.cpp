@@ -33,42 +33,20 @@ void exec_job(process * job , int n_proc , int background){
                     // exit(0);
                     continue;
                 }
-                // Getcwd to get the current working directory
-                // char cwd[1024];
-                // if(getcwd(cwd , sizeof(cwd)) != NULL){
-                //     printf("Current working directory: %s\n" , cwd);
-                // }
-                // else{
-                //     perror("getcwd");
-                //     // exit(0);
-                //     continue;
-                // }
+
             }
             else if(job[i].n_args > 2)
                 printf("Too many arguments to cd\n");
             else{
-                // printf("cd %s  \t %d\n",job[i].args[1],job[i].n_args);
                 if(chdir(job[i].args[1]) < 0){
                     perror("chdir");
-                    // exit(0);
                     continue;
                 }
-                // Getcwd to get the current working directory
-                // char cwd[1024];
-                // if(getcwd(cwd , sizeof(cwd)) != NULL){
-                //     printf("Current working directory: %s\n" , cwd);
-                // }
-                // else{
-                //     perror("getcwd");
-                //     // exit(0);
-                //     continue;
-                // }
             }
         }
         else
             exec_proc(&job[i] , infd , outfd,background);
 
-        // printf("Executed: %s\n",job[i].args[0]);
     }
     for(int i=0;i<n_proc;i++){
         for(int j=0;j<job[i].n_args;j++){
@@ -85,7 +63,6 @@ void exec_job(process * job , int n_proc , int background){
         }
         tcsetpgrp(STDIN_FILENO , getpid());
     }
-    //foreground_pgid = 0;
     
     return;
 }
@@ -170,7 +147,7 @@ void redirect(process * proc , int infd , int outfd){
             i++;            // assuming next arg as input file path
             if(infd != STDIN_FILENO)
                 close(infd);
-            if((infd = open(proc->args[i], O_RDONLY)) < 0){      // ## CHECK permissions!
+            if((infd = open(proc->args[i], O_RDONLY)) < 0){    
                 perror("open");
                 exit(0);
             }
@@ -183,7 +160,7 @@ void redirect(process * proc , int infd , int outfd){
             i++;            // assuming next arg as output file path
             if(outfd != STDOUT_FILENO)
                 close(outfd);
-            if((outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0666)) < 0){        // ## CHECK permissions!
+            if((outfd = open(proc->args[i] , O_WRONLY | O_TRUNC | O_CREAT , 0666)) < 0){      
                 perror("open");
                 exit(0);
             }
@@ -208,14 +185,11 @@ void redirect(process * proc , int infd , int outfd){
     proc->args[k] = NULL;
     proc->n_args = final_nargs;
     k=0;
-    // free(final_args);
-    //printf("\t\tFinal args: ");
+
     while(proc->args[k]!=NULL){
-        // proc->args[k] = final_args[k];
-        //printf("%s " , proc->args[k]);
         k++;
     }
-    //printf("\n");
+
     if(infd != STDIN_FILENO){
         dup2(infd , STDIN_FILENO);
         close(infd);
