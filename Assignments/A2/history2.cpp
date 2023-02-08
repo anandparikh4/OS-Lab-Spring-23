@@ -19,17 +19,17 @@ shell_history::shell_history(){
 			buff[strlen(buff)-1] = '\0';
 			dq.push_back(strdup(buff));
 			history_cnt++;
-			if(history_cnt==MAX_COMMANDS)break;
+			// if(history_cnt==MAX_COMMANDS)break;
 		}
-		// int fl=0;
-		// if(dq.size()>MAX_COMMANDS)	fl=1;
-		// while(dq.size()>MAX_COMMANDS){
-		// 	if(dq[0]!=NULL && dq[0][0]!=EOF)free(dq[0]);
-		// 	dq.pop_front();
-		// 	history_cnt--;
-		// }
-		history_idx = history_cnt;
 		fclose(fp);
+		int fl=0;
+		if(dq.size()>MAX_COMMANDS)	fl=1;
+		while(dq.size()>MAX_COMMANDS){
+			if(dq[0]!=NULL && dq[0][0]!=EOF)free(dq[0]);
+			dq.pop_front();
+			history_cnt--;
+		}
+		history_idx = history_cnt;
 		// if(fl){
 		// 	fp = fopen(history_file,"w");
 		// 	if(fp){
@@ -44,8 +44,7 @@ shell_history::shell_history(){
 }
 
 shell_history::~shell_history(){
-	remove(history_file);
-	FILE *fp = fopen(history_file,"a+");
+	FILE *fp = fopen(history_file,"w");
 	for(auto &it:dq){
 		if(it!=NULL && strlen(it)>0 && it[0]!=EOF){
 			fprintf(fp,"%s\n",it);
