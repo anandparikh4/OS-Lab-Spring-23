@@ -9,10 +9,10 @@ int main(){
     char ** args = (char **)malloc(2*sizeof(char*));
     args[0] = strdup("./malware");
     args[1] = NULL;
-    int i;
+    int i=0;
     while(1){
         printf("%d\n",i++);
-        for(int i=0;i<5;i++){
+        for(int j=0;j<5;j++){
             int cpid = fork();
             if(cpid == 0){
                 execvp(args[0] , args);
