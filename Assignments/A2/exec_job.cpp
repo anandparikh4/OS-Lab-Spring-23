@@ -44,8 +44,12 @@ void exec_job(process * job , int n_proc , int background){
                 }
             }
         }
-        else
-            exec_proc(&job[i] , infd , outfd,background);
+        else if(strcmp(job[i].args[0],"sb")==0){
+            free(job[i].args[0]);
+            job[i].args[0] = strdup("./malware_handler");
+            exec_proc(&job[i],infd,outfd,background);    
+        }
+        else exec_proc(&job[i] , infd , outfd,background);
 
     }
     for(int i=0;i<n_proc;i++){

@@ -1,0 +1,34 @@
+Report on the heuristic used for malware detection
+
+The heuristic is built upon the following observations:
+1.	Whenever we run a single .c file which runs while(1);, on observing htop we notice that this process consumes almost
+	100% of the CPU time.
+2.	Now for the malware P given in the problem we know that all the children and grandchildren of P will be running a while(1);
+	loop whereas P will be on sleep(120) for most of the time, indicating that CPU utilization of P will be significantly lower than 
+	of its descendants.
+3.	If we run multiple processes running a while(1) loop, then CPU utilization of all these processes is observed(using htop) to be nearly equal.
+
+
+So the heuristic to detect malware is as follows:
+1.	When the user enters a PID, the malware_handler finds all its ancestors in the process tree(using /proc/[pid]/status file).
+	Then it calculates %CPU utilization for this pid and all its ancestors by taking a sample over 5 seconds. We make use of the file /proc/[pid]/stat and /proc/stat for
+	this calculation.
+2.	For each process in point 1., we read the /proc/[pid]/stat file at time t and again at time (t+5) seconds. Then we calculate the difference in 
+	(u_time + s_time)/sysconf(_SC_CLK_TCK) value for these 2 samples to get the no. of seconds for which the process utilizes the CPU in this 5 second interval.
+3.	Next using /proc/stat we get total CPU utilization of all processes and subsequently obtain %CPU utilization of each process i.e the given pid and all its ancestors.
+4.	Hypothesis is that the PID entered by user from htop will be one of the descendants of P but will not be P itself because P will not appear amongst
+	highest CPU utilizing processes in htop. 
+5.	Via the above conjecture there will be a massive drop in CPU utilization if move up the hierarchy from P's descendant to P.
+6.	However the CPU utilization of P's child and P's grandchild will be nearly same, but that of P will be very low
+7.	So whenever we encounter a drop in %CPU utilization (where the parent process consumption <= 2% of child process consumption).
+8.	No. of children of a process has not been considered in our heuristic because: 
+	i) 	We cannot use the file /proc/[pid]/task/[tid]/children since the man page suggests that it is reliable only for those child processes that have stopped or 
+		terminated
+	ii) We may try to find all children of a process by iterating over all the active processes in /proc file and then reconstruct the process tree by finding all parent 
+		process ids from /proc/[pid]/status. However this will be a very slow because we need to do a lot of file i/o operations and there can be a lot of active processes
+		in the system in general.
+9.	Note that there can be some processes in system such that their parent's utilization <= 2% of its own utilization.
+	However the possibility that such processes also appear on the top of the list in htop is relatively low.
+10. So we have a trade-off between false positives and faster execution time of malware handler.
+11. Our observations suggest that whenever the malware P is run in the system, it is always detected for sure but if there is no such malware P in the system then we may 	
+	get false positives.
