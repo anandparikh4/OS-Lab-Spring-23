@@ -2,7 +2,7 @@ Report on the heuristic used for malware detection
 
 The heuristic is built upon the following observations:
 1.	Whenever we run a single .c file which runs while(1);, on observing htop we notice that this process consumes almost
-	100% of the CPU time.
+	100% of the CPU time. So infinite loops do use up a lot of CPU time.
 2.	Now for the malware P given in the problem we know that all the children and grandchildren of P will be running a while(1);
 	loop whereas P will be on sleep(120) for most of the time, indicating that CPU utilization of P will be significantly lower than 
 	of its descendants.
