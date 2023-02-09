@@ -26,8 +26,7 @@ int main()
         perror("fcntl");
         exit(EXIT_FAILURE);
     }
-    int t=4;
-    while(t--){
+    while(1){
         dprintf(fd, "Hello World\n");
         sleep(10);
     }
