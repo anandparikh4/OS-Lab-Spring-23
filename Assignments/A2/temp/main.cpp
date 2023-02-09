@@ -5,80 +5,48 @@
 #include <set>
 #include <sys/signal.h>
 #include <iostream>
-#include <readline/readline.h>
+#include <termios.h>
+#include <deque>
 #include "parse.h" 
 #include "exec_job.h"
-#include "history2.h"
+#include "history.h"
 
 using namespace std;
 
 int foreground_pgid;
 set <int> fg_procs,bg_run_procs,bg_stop_procs;
-shell_history history;
-int ctrl_z_received = 0;
-
-int up_function(int s1,int s2){
-	if(history.history_idx==0){
-		return 0;
-	}
-    else if(history.history_cnt == history.history_idx){
-        strcpy(history.latest_command,rl_line_buffer);
-    }
-	history.history_idx--;
-	rl_replace_line(history.dq[history.history_idx],0);
-	rl_redisplay();
-	rl_end_of_line(s1,s2);
-    return 0;
-}
-
-int down_function(int s1,int s2){
-	if(history.history_idx == (history.history_cnt)){
-		return 0;
-	}	
-	else if(history.history_idx == (history.history_cnt)-1){
-		rl_replace_line(history.latest_command,0); //check
-		rl_redisplay();
-		rl_end_of_line(s1,s2);
-		history.history_idx++;
-	}
-	else{
-		rl_replace_line(history.dq[history.history_idx+1],0);
-		rl_redisplay();
-        rl_end_of_line(s1,s2);
-		history.history_idx++;
-	}
-    return 0;
-}
 
 void sigint_handler(int signum){
     signal(SIGINT,sigint_handler);
     printf("\n");
-    char cwd[1024];
+    char * cwd = (char *) malloc(1024 * sizeof(char));
     if(getcwd(cwd , 1024) == NULL){
         perror("getcwd");
         exit(0);
     }
-    // printf("\033[34m");
+    printf("\033[34m");
     printf("%s" , cwd);
-    // printf("\033[0m");
+    printf("\033[0m");
     printf("$ ");
     fflush(stdout);
+    free(cwd);
     return;
 }
 
 void sigtstp_handler(int signum){
-    signal(SIGTSTP,sigtstp_handler);
+    signal(SIGTSTP,sigint_handler);
     printf("\n");
-    char cwd[1024];
+    char * cwd = (char *) malloc(1024 * sizeof(char));
     if(getcwd(cwd , 1024) == NULL){
         perror("getcwd");
         exit(0);
     }
-    // printf("\033[34m");
+    printf("\033[34m");
     printf("%s" , cwd);
-    // printf("\033[0m");
+    printf("\033[0m");
     printf("$ ");
     fflush(stdout);
+    free(cwd);
     return;
 }
 
@@ -90,19 +58,13 @@ void sigchild_handler(int signum){
         if(cpid<=0)break;
         if(fg_procs.find(cpid)!=fg_procs.end()){
             fg_procs.erase(cpid);
-            if(WIFSTOPPED(status)){
-                bg_stop_procs.insert(cpid);
-                ctrl_z_received = 1;
-            }
+            if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
         }
         else if(bg_run_procs.find(cpid)!=bg_run_procs.end()){
             bg_run_procs.erase(cpid);
             if(WIFSTOPPED(status))bg_stop_procs.insert(cpid);
         }
-        else if(bg_stop_procs.find(cpid)!=bg_stop_procs.end()){
-            bg_stop_procs.erase(cpid);
-            if(WIFCONTINUED(status))bg_run_procs.insert(cpid);
-        }
+    
     }    
 }
 
@@ -117,43 +79,41 @@ int main(){
     fg_procs.clear();
     bg_run_procs.clear();
     bg_stop_procs.clear();
-    
-    rl_bind_keyseq("\\e[A",up_function);
-    rl_bind_keyseq("\\e[B",down_function);
-    rl_bind_key(1,rl_beg_of_line);
-    rl_bind_key(5,rl_end_of_line);
-    
     signal(SIGINT,sigint_handler);
     signal(SIGTSTP,sigtstp_handler);
     signal(SIGCHLD,sigchild_handler);
     signal(SIGTTOU,SIG_IGN);
-
     foreground_pgid = 0;
-
-    char **lsof = (char **)malloc(6*sizeof(char *));
+    deque<string> history;
+    int historyIndex = 0;
+    string currentLine = "";
+    char **lsof = (char **)malloc(8*sizeof(char *));
     lsof[0] = strdup("lsof");
-    lsof[1] = strdup("-t");
-    lsof[2] = strdup("-f");
-    lsof[3] = strdup("--");
-    lsof[5] = NULL;
+    lsof[1] = strdup("-e");
+    lsof[2] = strdup("/run/user/125/gvfs");
+    lsof[3] = strdup("-t");
+    lsof[4] = strdup("-f");
+    lsof[5] = strdup("--");
+    lsof[7] = NULL;
+
+    // rl_bind_key('1', rl_beg_of_line);
+    // rl_bind_key('9', rl_end_of_line);
     
     while(1){
-        history.get_history();
-        history.manage_history();
-        if(history.line==NULL)exit(0);
-        if(strcmp(history.line,"exit")==0)break;
+        currentLine.clear();
+        getHistory(history,historyIndex,currentLine);
+        if(currentLine.size() == 0)continue;
+        char *line = (char *)malloc((currentLine.size() + 1)*sizeof(char));
+        strcpy(line,currentLine.c_str());
+        if(strcmp(line,"exit")==0)break;
         process *job;
         int n_proc;
         int background = 0;
-        
-        if(history.line==NULL || strlen(history.line)==0){
-            if(history.line!=NULL)
-                free(history.line);
-            continue;
-        }
-        job = parse(history.line,&n_proc,&background);
+
+        job = parse(line,&n_proc,&background);
+        free(line);
         if(strcmp(job[0].args[0],"delep")==0){
-            lsof[4] = strdup(job[0].args[1]);
+            lsof[6] = strdup(job[0].args[1]);
             int infd=0,outfd,testfd;
             int fd[2];
             if(pipe(fd) < 0){
@@ -173,19 +133,38 @@ int main(){
             else{
                 close(outfd);
                 char buf[MAX_RES_LEN];
+                // int n = read(testfd , buf , MAX_RES_LEN);
+                // buf[n] = '\0';
+                // close(testfd);
+                // printf("%s",buf);
                 int n = read(testfd , buf , MAX_RES_LEN);
                 buf[n] = '\0';
                 close(testfd);
+                // close(outfd);
+                // close(STDIN_FILENO);
+                // close(STDOUT_FILENO);
+                // infd = open("/dev/tty", O_RDONLY);
+                // if (infd == -1) {
+                //     perror("open");
+                //     return;
+                // }
+                // outfd = open("/dev/tty", O_WRONLY);
+                // if (outfd == -1) {
+                //     perror("open");
+                //     return;
+                // }
+                // dup2(STDIN_FILENO,testfd);
                 // lsof -e /run/user/125/gvfs -t -f -- ./t3.txt
-                // lsof -t -f -- ./t3.txt
+
+                printf("%s",buf);
                 if(n <= 1)
-                    printf("No process has currently opened the file or held a lock.\n");
+                    printf("No such process\n");
                 else{
-                    printf("Processes currently opening the file or holding a lock over it:\n\nPIDs\n");
-                    printf("%s\n",buf);
                     printf("Do you want to kill all the processes using the file (yes/no)? ");
                     char ans[10];
                     fgets(ans,10,stdin);
+                    // fflush(stdin);
+                    // cin>>ans;
                     if(strcmp(ans,"yes\n") == 0){
                         char * token = strtok(buf , "\n");
                         while(token != NULL){
@@ -194,11 +173,12 @@ int main(){
                             kill(pid , SIGKILL);
                             token = strtok(NULL , "\n");
                         }
+                        // printf("job[0].args[6] = %s\n",job[0].args[6]);
                         remove(job[0].args[1]);
                     } 
                 }
             }
-            free(lsof[4]);
+            free(lsof[6]);
             for(int i=0;i<n_proc;i++){
                 for(int j=0;j<job[i].n_args;j++){
                     free(job[i].args[j]);
@@ -207,6 +187,6 @@ int main(){
             }
         }
         else
-            exec_job(job,n_proc,background);   
+            exec_job(job,n_proc,background);
     }
 }

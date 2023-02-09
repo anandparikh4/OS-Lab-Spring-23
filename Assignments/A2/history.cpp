@@ -1,129 +1,77 @@
 #include "history.h"
+#include <readline/readline.h>
 
-int getch() {
-    int ch;
-    struct termios t_old, t_new;
-    tcgetattr(STDIN_FILENO, &t_old);
-    t_new = t_old;
-    t_new.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &t_new);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &t_old);
-    return ch;
+shell_history::shell_history(){
+	strcat(strcpy(history_file, getenv("HOME")), "/.myshell_history");
+	latest_command[0] = '\0';
+	FILE *fp = fopen(history_file,"r");
+	if(!fp){
+		fclose(fopen(history_file,"w"));
+		history_cnt=0;
+		history_idx=0;
+		dq.clear();
+	}
+	else{
+		char buff[4096];
+		dq.clear();
+		history_cnt=0;
+		while(fgets(buff,sizeof(buff),fp)){
+			buff[strlen(buff)-1] = '\0';
+			dq.push_back(strdup(buff));
+			history_cnt++;
+		}
+		fclose(fp);
+		int fl=0;
+		if(dq.size()>MAX_COMMANDS)	fl=1;
+		while(dq.size()>MAX_COMMANDS){
+			if(dq[0]!=NULL && dq[0][0]!=EOF)free(dq[0]);
+			dq.pop_front();
+			history_cnt--;
+		}
+		history_idx = history_cnt;
+	}
 }
 
-void getHistory(deque<string> &history, int &historyIndex, string &currentLine){
-    char * cwd = (char *) malloc(1024 * sizeof(char));
-    if(getcwd(cwd , 1024) == NULL){
+shell_history::~shell_history(){
+	FILE *fp = fopen(history_file,"w");
+	for(auto &it:dq){
+		if(it!=NULL && strlen(it)>0 && it[0]!=EOF){
+			fprintf(fp,"%s\n",it);
+		}
+	}
+	fclose(fp);
+	for(int i=0;i<history_cnt;i++){
+		if(dq[i]!=NULL && strlen(dq[i])>0 && dq[i][0]!=EOF)free(dq[i]);
+	}
+}
+
+void shell_history::manage_history(){
+	if(line==NULL || strlen(line)==0)return;
+	if(history_cnt==MAX_COMMANDS){
+		if(dq[0]!=NULL && dq[0][0]!=EOF)free(dq[0]);
+		dq.pop_front();
+		history_cnt--;
+	}
+	if(dq.size()>0 && strcmp(dq[dq.size()-1],line)==0){
+		history_idx = history_cnt;
+		return;
+	}
+	dq.push_back(line);
+	history_cnt++;
+	history_idx = history_cnt;
+
+	return;
+}
+
+void shell_history :: get_history(){
+	char prompt[1024]="",temp[1024];
+    if(getcwd(temp , 1024) == NULL){
         perror("getcwd");
         exit(0);
     }
-    printf("\033[34m");
-    printf("%s" , cwd);
-    printf("\033[0m");
-    printf("$ ");
-    while(true){
-        int ch = getch();
-        // printf("%d",ch);
-        if(ch==1){
-            // printf("Ctrl+A\n");
-            printf("\033[");
-            printf("%d",currentLine.size());
-            printf("D");
-            continue;
-        }
-        else if(ch==2){
-            printf("\033[");
-            printf("%d",currentLine.size());
-            printf("C");
-            continue;
-        }
-        if (ch == 27) {
-            ch = getch();
-            if (ch == 91) {
-                ch = getch();
-                if (ch == 65) {
-                    // printf("hell\n");
-                    // Up arrow
-                    if (historyIndex > 0) {
-                        if(historyIndex==history.size() && !currentLine.empty() && history[historyIndex-1]!=currentLine){
-                            history.push_back(currentLine);
-                            if(history.size()>MAX_COMMANDS){
-                                history.pop_front();
-                                historyIndex--;
-                            }
-                        }    
-                        else if(!currentLine.empty())
-                            history[historyIndex] = currentLine;
-                        printf("\33[2K");
-                        printf("\r");
-                        if(historyIndex>0)
-                            historyIndex--;
-                        currentLine = history[historyIndex];
-                        printf("\033[34m");
-                        printf("%s" , cwd);
-                        printf("\033[0m");
-                        printf("$ %s",currentLine.c_str());
-                    }
-                } else if (ch == 66) {
-                    // Down arrow
-                    if(historyIndex==0 && history.size()==0)
-                        continue;
-                    if (historyIndex < (int)history.size()-1) {
-                        printf("\33[2K");
-                        printf("\r");
-                        // history[historyIndex] = currentLine;
-                        historyIndex++;
-                        currentLine = history[historyIndex];
-                        printf("\033[34m");
-                        printf("%s" , cwd);
-                        printf("\033[0m");
-                        printf("$ %s",currentLine.c_str());
-                        
-                    }
-                    else if(historyIndex==(int)history.size()-1){
-                        printf("\33[2K");
-                        printf("\r");
-                        historyIndex++;
-                        currentLine.clear();
-                        printf("\033[34m");
-                        printf("%s" , cwd);
-                        printf("\033[0m");
-                        printf("$ ");
-                    }
-                }
-            }
-        } else if (ch == '\n') {
-            if (!currentLine.empty()) {
-                if(history.size()>0 && history[history.size()-1]!=currentLine)
-                    history.push_back(currentLine);
-                else if(history.size()==0)
-                    history.push_back(currentLine);
-                if(history.size()>MAX_COMMANDS) history.pop_front();
-                historyIndex = (int)history.size();
-                printf("\n");
-                free(cwd);
-                return;
-            }
-            else {
-                free(cwd);
-                printf("\n");
-                return;
-            }   
-        } else {
-            
-            if(ch==127)
-            {
-                if(currentLine.size()>0){
-                    currentLine.pop_back();
-                    printf("\b \b");
-                }
-            }
-            else{
-                printf("%c",ch);
-                currentLine += (char)ch;
-            } 
-        }
-    }
-    free(cwd);
+	strcat(prompt,temp);
+
+	strcat(prompt,"$ ");
+	line = readline(prompt);
+	return;
 }

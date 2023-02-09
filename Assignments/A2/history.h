@@ -1,17 +1,25 @@
-#ifndef HISTORY_H
-#define HISTORY_H
+#ifndef HISTORY_2H
+#define HISTORY_2H
 
 #include <iostream>
-#include <deque>
+#include <vector>
 #include <unistd.h>
-#include <termios.h>
+#include <deque>
 using namespace std;
 
 #define MAX_COMMANDS 1000
 
-int getch();
-
-void getHistory(deque<string> &history, int &historyIndex, string &currentLine);
-
-
+class shell_history{
+	public:
+		deque <char *> dq;
+		char *line;
+		int history_cnt;
+		int history_idx;
+		char history_file[256];
+		char latest_command[4096];
+		shell_history();
+		~shell_history();
+		void manage_history();
+		void get_history();
+};
 #endif
