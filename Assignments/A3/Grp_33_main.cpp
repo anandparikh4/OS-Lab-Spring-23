@@ -1,28 +1,18 @@
-#include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include<bits/stdc++.h>
-#include <algorithm>
+#include <bits/stdc++.h>
 
 using namespace std;
-
-const int ARRAY_SIZE = 10;
 
 int main() {
 
     vector<int> left,right;
      ifstream File;
     File.open("graph.txt");
-    int num,side = 0;
-    while (File >> num){      
-        if(side == 0){
-            left.push_back(num);
-            side = 1;
-        }
-        else{
-            right.push_back(num);
-            side = 0;
-        }
+    int left_ele, right_ele;
+    while (File >> left_ele >> right_ele){      
+        left.push_back(left_ele);
+        right.push_back(right_ele);
     }
     File.close();
 

@@ -31,18 +31,19 @@ int main() {
     int *left_s = (int *)shmat(shm_id_1, nullptr, 0);
     int *right_s = (int *)shmat(shm_id_2, nullptr, 0);
 
-  
-
-    std::cout << "Array 2: ";
     for (int i =0; i < num_ele; i++) {
 		cout << left_s[i] << " " <<  right_s[i] << endl;
     }
      cout << "Sizes " << dim[1] << " " << dim[0] << endl;
-
     
     shmdt(left_s);
     shmdt(right_s);
     shmdt(dim);
+    // Delete the shared memory segment using shmctl
+    shmctl(shm_id_1, IPC_RMID, nullptr);
+    shmctl(shm_id_2, IPC_RMID, nullptr);
+    shmctl(shm_id_3, IPC_RMID, nullptr);
+
 
 
 return 0;
