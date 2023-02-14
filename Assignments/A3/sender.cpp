@@ -1,29 +1,76 @@
 #include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include<bits/stdc++.h>
+#include <algorithm>
+
+using namespace std;
 
 const int ARRAY_SIZE = 10;
 
 int main() {
-    // Create a unique key using ftok
-    key_t key = ftok(".", 'S');
+
+    vector<int> left,right;
+     ifstream File;
+    File.open("graph.txt");
+    int num,side = 0;
+    while (File >> num){      
+        if(side == 0){
+            left.push_back(num);
+            side = 1;
+        }
+        else{
+            right.push_back(num);
+            side = 0;
+        }
+    }
+    File.close();
+
+    int num_ele = left.size();
+
+     key_t key_3 = ftok(".", 'c');
 
     // Create a shared memory segment using shmget
-    int shm_id = shmget(key, ARRAY_SIZE * sizeof(int) * 2, IPC_CREAT | 0666);
+    int shm_id_3 = shmget(key_3, 2 * sizeof(int), IPC_CREAT | 0666);
+    
+    // Create a unique key using ftok
+    key_t key_1 = ftok(".", 'a');
+
+    // Create a shared memory segment using shmget
+    int shm_id_1 = shmget(key_1, num_ele * sizeof(int), IPC_CREAT | 0666);
+
+    key_t key_2 = ftok(".", 'b');
+
+    // Create a shared memory segment using shmget
+    int shm_id_2 = shmget(key_2, num_ele * sizeof(int) * 2, IPC_CREAT | 0666);
+
+    
+
 
     // Attach the shared memory segment to the process using shmat
-    int *shm_ptr = (int *)shmat(shm_id, nullptr, 0);
+    int *left_s = (int *)shmat(shm_id_1, nullptr, 0);
+    int *right_s = (int *)shmat(shm_id_2, nullptr, 0);
+    int *dim = (int *)shmat(shm_id_3, nullptr, 0);
 
-    // Initialize the two arrays in the shared memory segment
-    int array1[ARRAY_SIZE] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int array2[ARRAY_SIZE] = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-    for (int i = 0; i < ARRAY_SIZE; i++) {
-        shm_ptr[i] = array1[i];
-        shm_ptr[i + ARRAY_SIZE] = array2[i];
+    // left and right are vectors that store the edges: (left[i] , right[i]) is an edge
+    // uncomment last 4 lines to see the numbers in each vector and the number of elements (same in both vectors)
+
+    dim[0] = max(*max_element(left.begin(), left.end()),*max_element(right.begin(), right.end()))+1;
+    dim[1] = left.size();
+
+   
+    for(int i=0;i<num_ele;i++){
+        left_s[i] = left[i];
+        right_s[i] = right[i];
+        // cout << left[i] << " " <<  right[i] << endl;
     }
+    // cout << "Sizes " << left.size() << " " << right.size() << endl;
+    
 
+    
     // Detach the shared memory segment from the process
-    shmdt(shm_ptr);
-
+    shmdt(left_s);
+    shmdt(right_s);
+    shmdt(dim);
     return 0;
 }

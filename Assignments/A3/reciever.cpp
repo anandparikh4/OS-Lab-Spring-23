@@ -1,33 +1,49 @@
 #include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+using namespace std;
 
-const int ARRAY_SIZE = 10;
+
 
 int main() {
     // Create a unique key using ftok
-    key_t key = ftok(".", 'S');
+     
+    key_t key_3 = ftok(".", 'c');
 
-    // Access the shared memory segment using shmget
-    int shm_id = shmget(key, ARRAY_SIZE * sizeof(int) * 2, 0666);
+    // Create a shared memory segment using shmget
+    int shm_id_3 = shmget(key_3, 2 * sizeof(int), IPC_CREAT | 0666);
+
+    int *dim = (int *)shmat(shm_id_3, nullptr, 0);
+
+    int num_ele = dim[1] ;
+
+    key_t key_1 = ftok(".", 'a');
+
+    // Create a shared memory segment using shmget
+    int shm_id_1 = shmget(key_1, num_ele * sizeof(int), IPC_CREAT | 0666);
+
+    key_t key_2 = ftok(".", 'b');
+
+    // Create a shared memory segment using shmget
+    int shm_id_2 = shmget(key_2, num_ele * sizeof(int) * 2, IPC_CREAT | 0666);
 
     // Attach the shared memory segment to the process using shmat
-    int *shm_ptr = (int *)shmat(shm_id, nullptr, 0);
+    int *left_s = (int *)shmat(shm_id_1, nullptr, 0);
+    int *right_s = (int *)shmat(shm_id_2, nullptr, 0);
 
-    // Print the two arrays in the shared memory segment
-    std::cout << "Array 1: ";
-    for (int i = 0; i < ARRAY_SIZE; i++) {
-        std::cout << shm_ptr[i] << " ";
-    }
-    std::cout << std::endl;
+  
 
     std::cout << "Array 2: ";
-    for (int i =ARRAY_SIZE; i < ARRAY_SIZE * 2; i++) {
-		std::cout << shm_ptr[i] << " ";
-		}
-		std::cout << std::endl;
+    for (int i =0; i < num_ele; i++) {
+		cout << left_s[i] << " " <<  right_s[i] << endl;
+    }
+     cout << "Sizes " << dim[1] << " " << dim[0] << endl;
 
-		shmdt(shm_ptr);
+    
+    shmdt(left_s);
+    shmdt(right_s);
+    shmdt(dim);
+
 
 return 0;
 }
