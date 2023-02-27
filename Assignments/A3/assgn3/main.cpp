@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <cstring>
+#include <sys/signal.h>
 #include "graph.h"
 
 using namespace std;
@@ -15,10 +16,20 @@ using namespace std;
 // Conditions similar to (including) the above one are IGNORED as per the assignment problem statement
 // File locks can solve this problem
 
-int main(){
+vector <int> cpids;
+graph *G;
+void handle_sigint(int num){
+    for(auto it:cpids){
+        kill(it,SIGINT);
+    }
+    deactivate_graph(G,2);
+    exit(0);
+}
 
+
+int main(){
+    signal(SIGINT,handle_sigint);
     set_swap(0);
-    graph * G;
     G = activate_graph(1);       // create and attach graph
 
     ifstream File;
@@ -54,7 +65,7 @@ int main(){
         perror("execvp");
         exit(0);
     }
-
+    cpids.push_back(producer_pid);
     int consumer_pid[10];
     for(int i=0;i<10;i++){                  // execute 10 consumer child processes
         consumer_pid[i] = fork();
@@ -77,6 +88,7 @@ int main(){
             perror("execvp");
             exit(0);
         }
+        cpids.push_back(consumer_pid[i]);
     }
 
     for(int i=0;i<10;i++) wait(NULL);       // wait for each of the 10 children to finish, so PCBs can be cleared and shared memory can be freed safely
