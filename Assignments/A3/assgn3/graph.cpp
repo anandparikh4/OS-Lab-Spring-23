@@ -9,12 +9,13 @@ using namespace std;
 int swap_id;
 int * swap_val;
 
-// 0 nodes, 0 edges
+// init grapg with 0 nodes, 0 edges
 void clear_graph(graph * G){
     *(G->n) = 0;
     *(G->top) = 0;
 }
 
+// initialize swap value to 0 (default), since all small alphabet keys are used first
 void set_swap(int s){
     key_t swap_key = ftok("." , 'e');
     swap_id = shmget(swap_key , sizeof(int) , IPC_CREAT | 0666);
@@ -31,11 +32,13 @@ graph* activate_graph(int create_flag , int heads_max , int nodes_max){
     graph * G = (graph *)malloc(sizeof(graph));
 
     // get unique keys
+    // if swal value is 0 (default), then re-allocation has occurred even no. of times, so small aplhabet keys are used
     key_t heads_key = ftok("." , 'a');
     key_t nodes_key = ftok("." , 'b');
     key_t top_key = ftok("." , 'c');
     key_t n_key = ftok("." , 'd');
 
+    // if swal value is 1, then re-allocation has occurred odd no. of times, so capital alphabet keys are used
     if(*swap_val){
         heads_key = ftok("." , 'A');
         nodes_key = ftok("." , 'B');

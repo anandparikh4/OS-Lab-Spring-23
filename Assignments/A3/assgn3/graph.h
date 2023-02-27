@@ -16,7 +16,7 @@ struct head{                    // structure of head nodes in the so-called "adj
 
 typedef struct head head;
 
-struct graph{
+struct graph{                   // local memory graph structure used by each process to connect to shared memory graph
     int heads_id;
     int nodes_id;
     int top_id;

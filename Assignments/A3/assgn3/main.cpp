@@ -11,13 +11,15 @@
 using namespace std;
 
 // The code is written overlooking cases when the producer and some consumer(s) are accessing the shared memory simultaneously
-// It is possible that when the producer and a consumer are both working on the memory, the producer reallocates a new space (space full)
-// Then the old space is de-allocated but the consumer still tries to access it, leading to a disastrous segmentation fault
-// Conditions similar to (including) the above one are IGNORED as per the assignment problem statement
+// Race conditions arising in producer and consumer can potentially lead to segment faults/ other errors
+// But such issues have been ignored as per the assignment problem statement
 // File locks can solve this problem
 
 vector <int> cpids;
 graph *G;
+// The only normal way to terminate this process is if it is sent a SIGINT, (other abnormal ways like error in children can also cause it)
+// So, this process needs to handle SIGINT, where first it terminates (forcefully) the producer and all consumer processes
+// Then, the shared memory must be destroyed (marked for de-allocation) otherwise stale/unused shared memory stays forever, leading to a memory leak
 void handle_sigint(int num){
     for(auto it:cpids){
         kill(it,SIGINT);
@@ -107,7 +109,7 @@ int main(int argc, char * argv[]){
         cpids.push_back(consumer_pid[i]);
     }
 
-    for(int i=0;i<10;i++) wait(NULL);       // wait for each of the 10 children to finish, so PCBs can be cleared and shared memory can be freed safely
+    for(int i=0;i<11;i++) wait(NULL);       // wait for each of the 11 children to finish, so PCBs can be cleared and shared memory can be freed safely
 
     deactivate_graph(G,2);       // detach and destroy graph AND the swap key
     return 0;

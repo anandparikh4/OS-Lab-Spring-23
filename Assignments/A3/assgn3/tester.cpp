@@ -1,3 +1,5 @@
+// #include<fstream> // in the program
+
 // uncomment following code for testing whether the shared memory and graph data structure implementation work correctly
 // // TESTING
 //     ofstream F;
