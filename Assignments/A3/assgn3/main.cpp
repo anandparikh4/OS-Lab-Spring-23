@@ -27,10 +27,22 @@ void handle_sigint(int num){
 }
 
 
-int main(){
+int main(int argc, char * argv[]){
     signal(SIGINT,handle_sigint);
     set_swap(0);
     G = activate_graph(1);       // create and attach graph
+    int do_optimize = 0;
+    if(argc > 1 &&  argc < 3){
+        if(strcasecmp(argv[1],"-optimize") == 0){
+            do_optimize = 1;
+        }
+    }
+    else if(argc > 2){
+        cout<<"Too many arguments\n";
+        cout<<"Usage: ./main [-optimize]\n";
+        exit(0);
+    }
+
 
     ifstream File;
     File.open("graph.txt");     // read file for edge list and store temporarily in a local storage
@@ -79,12 +91,16 @@ int main(){
             sprintf(consumer_id , "%d" , i+1);
             char file_name[20];
             sprintf(file_name, "paths_%d.txt",i+1);
-            //uncomment below line for non-optimized version
-            //char * args[] = {strdup("./consumer") , consumer_id ,file_name,strdup("-optimize"),NULL};
-            
-            //comment below line for non-optimized version
-            char * args[] = {strdup("./consumer") , consumer_id ,file_name,strdup("-optimize"),NULL};
-            execvp(args[0] , args);
+            if(do_optimize == 1){
+                // cout<<"Optimized version\n";
+                char * args[] = {strdup("./consumer") , consumer_id ,file_name,strdup("-optimize"),NULL};
+                execvp(args[0] , args);
+            }
+            else{
+                // cout<<"Un-Optimized version\n";
+                char * args[] = {strdup("./consumer") , consumer_id ,file_name,NULL};
+                execvp(args[0] , args);
+            }
             perror("execvp");
             exit(0);
         }
