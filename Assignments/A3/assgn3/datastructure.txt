@@ -1,0 +1,51 @@
+1 - 2 3 4           r1 = [0,1] * 3
+2 - 1 3             r2 = [0,1] * 2
+3 - 5 1 2           r3 = [0,1] * 3 
+4 - 6 1             r4 = [0,1] * 2
+5 - 3               r5 = [0,1] * 1
+6 - 4               r6 = [0,1] * 1
+
+7 - 4
+
+addNode
+
+addEdge
+
+heads [1-d]  
+0     
+1   (int , struct node* , int)
+2                  
+3
+4
+5
+7 (7,  NULL , 0)
+
+nodes [1-d]            top = 0 (1st free space in adj_list)
+2   (int, struct node *)
+3   (int, struct node *)
+4   (NULL)
+1   ()
+3   (NULL)
+1
+2   
+1   (NULL)
+5   (NULL)
+6   
+
+1,2,3
+k
+
+[1,1]
+[2,3]
+[4,5,6]
+
+G
+
+vector<vector<int>>
+8
+9       
+10
+
+8 2
+8 3
+8 4
