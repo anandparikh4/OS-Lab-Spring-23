@@ -1,50 +1,20 @@
 #include <bits/stdc++.h>
+#include <pthread.h>
+// #include <semaphore.h>
+#include <time.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include "main.h"
 using namespace std;
 
-// Class of actions with action_id, user_id, timestamp, action_type
-class Action {
-    public:
-        int user_id;
-        int action_id;
-        long timestamp;
-        int action_type;
-        Action(int user_id, int action_id, int timestamp, int action_type) {
-            user_id = user_id;
-            action_id = action_id;
-            timestamp = timestamp;
-            action_type = action_type;
-        }
-};
-
-// Class of Node with user_id, degree and log of degree and number of actions and a priority bool
-class Node {
-    public:
-        int user_id;
-        int degree;
-        int num_actions;
-        int priority;
-        double log_degree;
-
-        Node(int user_id, int degree=0, int num_actions=0, int priority=0) {
-            user_id = user_id;
-            degree = degree;
-            // Calculate log base 2 of this->degree
-            log_degree = log2(this->degree);
-            num_actions = num_actions;
-            priority = priority;
-        }
-        // Copy constructor
-        Node(const Node &u) {
-            user_id = u.user_id;
-            degree = u.degree;
-            log_degree = u.log_degree;
-            num_actions = u.num_actions;
-            priority = u.priority;
-        }
-};
+// Vector of vectors to store the graph
+vector<vector<int>> graph(38000);
+// Map of users with user_id as key and Node object as value
+map<int, Node> users;
 
 // Read from an csv file, edges of a graphy, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
-void read_graph(vector<vector<int>> &graph, map<int, Node> &users) {
+void read_graph() {
     // Open the file
     ifstream file("musae_git_edges.csv");
     // Read the file line by line
@@ -76,13 +46,42 @@ void read_graph(vector<vector<int>> &graph, map<int, Node> &users) {
     file.close();
 }
 
+// Create a userSimulator thread function, which will choose 100 random nodes from the graph. Then for each node, generate n actions, n needs to be proportional to the log_degree of the node.
+void *userSimulator(void *arg) {
+    // Seed the random number generator
+    srand(time(0));
+    while(1){
+        // Choose 100 random nodes from the graph
+        vector<int> random_nodes;
+        for(int i=0; i<5; i++) {
+            int random_node = rand()%users.size();
+            random_nodes.push_back(random_node);
+        }
+        // For each node, generate n actions, n needs to be proportional to the log_degree of the node
+        for(int i=0; i<random_nodes.size(); i++) {
+            int n = ceil(users[random_nodes[i]].log_degree);
+            for(int j=0; j<n; j++) {
+                cout<<"hwebf"<<endl;
+                // Generate a random action type
+                int action_type = rand()%3;
+                // Generate a current timestamp
+                long timestamp = time(0);
+                // Create an Action object
+                Action action(random_nodes[i], ++users[random_nodes[i]].num_actions, timestamp, action_type);
+                action.print();
+                // Add the action to the wall and feed of the user
+                users[random_nodes[i]].wall.push_back(action);
+            }
+        }
+        // sleep(120);
+        break;
+    }
+    pthread_exit(NULL);
+}
+
 int main(){
-    // Vector of vectors to store the graph
-    vector<vector<int>> graph(38000);
-    // Map of users with user_id as key and Node object as value
-    map<int, Node> users;
     // Read the graph from the csv file
-    read_graph(graph, users);
+    read_graph();
     // Print the number of users in the graph
     cout << "Number of users in the graph: " << users.size() << endl;
     // Print the number of edges in the graph
@@ -91,10 +90,29 @@ int main(){
         num_edges += graph[i].size();
     }
     cout << "Number of edges in the graph: " << num_edges/2 << endl;
+    // Find maximum degree of a user
+    // int max_degree = 0;
+    // for(auto it=users.begin(); it!=users.end(); it++) {
+    //     max_degree = max(max_degree, it->second.degree);
+    // }
+    // cout << "Maximum degree of a user: " << max_degree << endl;
     
-
-
-
+    // Generate userSimulator thread
+    pthread_t userSimulator_thread;
+    if(pthread_create(&userSimulator_thread, NULL, userSimulator,NULL)<0) {
+        cout << "Error in creating userSimulator thread" << endl;
+        exit(0);
+    }    
+    pthread_join(userSimulator_thread, NULL);
+    // Check if the wall of a user has been updated
+    for(auto it=users.begin(); it!=users.end(); it++) {
+        // printf("hell\n");
+        if(it->second.wall.size() > 0) {
+            cout << "Wall of user " << it->first << " has been updated" << endl;
+        }
+    }
+    
+    
     return 0;
 }
             
