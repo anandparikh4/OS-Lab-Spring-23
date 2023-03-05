@@ -30,7 +30,8 @@ void *userSimulator(void *arg) {
                 users[random_nodes[i]].wall.push_back(action);
             }
         }
-        sleep(120);
+        // sleep(120);
+        break;
     }
     pthread_exit(NULL);
 }

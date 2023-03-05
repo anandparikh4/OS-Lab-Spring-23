@@ -7,8 +7,11 @@
 #include "defs.h"
 using namespace std;
 
-vector<vector<int>> graph(38000);
+vector<vector<int>> graph(37700);
 map<int, Node> users;
+
+#define PUSHUPDATE_THREAD_COUNT 25
+#define READPOST_THREAD_COUNT 10
 
 extern void * userSimulator(void *);
 extern void * pushUpdate(void *);
@@ -56,19 +59,27 @@ int main(){
     }
 
     // Generate 25 pushUpdate threads
-    pthread_t pushUpdate_thread[25];
-    pthread_attr_t pushUpdate_attr[25];
-    for(int i=0;i<25;i++){
-        pthread_attr_init(&pushUpdate_attr[i]);
-        pthread_create(&pushUpdate_thread[i] , &pushUpdate_attr[i] , pushUpdate , (void *)(uintptr_t)i);
+    pthread_t pushUpdate_thread[PUSHUPDATE_THREAD_COUNT];
+    pthread_attr_t pushUpdate_attr[PUSHUPDATE_THREAD_COUNT];
+    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+        if(pthread_attr_init(&pushUpdate_attr[i]) < 0){
+            exit_with_error("pushUpdate::pthread_attr_init() failed");
+        }
+        if(pthread_create(&pushUpdate_thread[i] , &pushUpdate_attr[i] , pushUpdate , (void *)(uintptr_t)i) < 0){
+            exit_with_error("pushUpdate::pthread_create() failed");
+        }
     }
 
     // Generate 10 readPost threads
-    pthread_t readPost_thread[10];
-    pthread_attr_t readPost_attr[10];
-    for(int i=0;i<10;i++){
-        pthread_attr_init(&readPost_attr[i]);
-        pthread_create(&readPost_thread[i] , &readPost_attr[i] , readPost , (void *)(uintptr_t)i);
+    pthread_t readPost_thread[READPOST_THREAD_COUNT];
+    pthread_attr_t readPost_attr[READPOST_THREAD_COUNT];
+    for(int i=0;i<READPOST_THREAD_COUNT;i++){
+        if(pthread_attr_init(&readPost_attr[i]) < 0){
+            exit_with_error("readPost::pthread_attr_init() failed");
+        }
+        if(pthread_create(&readPost_thread[i] , &readPost_attr[i] , readPost , (void *)(uintptr_t)i) < 0){
+            exit_with_error("readPost::pthread_create() failed");
+        }
     }
 
     // Join all threads
@@ -76,16 +87,34 @@ int main(){
         exit_with_error("userSimulator::pthread_join() failed");
     }
 
-    for(int i=0;i<25;i++){
-        pthread_join(pushUpdate_thread[i] , NULL);
+    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+        if(pthread_join(pushUpdate_thread[i] , NULL) < 0){
+            exit_with_error("pushUpdate::pthread_join() failed");
+        }
     }
 
-    for(int i=0;i<10;i++){
-        pthread_join(readPost_thread[i] , NULL);
+    for(int i=0;i<READPOST_THREAD_COUNT;i++){
+        if(pthread_join(readPost_thread[i] , NULL) < 0){
+            exit_with_error("readPost::pthread_join() failed");
+        }
     }
 
-    // Destroy all threads
-    
+    // Destroy all threads' attributes
+    if(pthread_attr_destroy(&userSimulator_attr) < 0){
+        exit_with_error("userSimulator::pthread_attr_ddestroy() failed");
+    }
+
+    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+        if(pthread_attr_destroy(&pushUpdate_attr[i])){
+            exit_with_error("pushUpdate::pthread_attr_destroy() failed");
+        }
+    }
+
+    for(int i=0;i<READPOST_THREAD_COUNT;i++){
+        if(pthread_attr_destroy(&readPost_attr[i])){
+            exit_with_error("readPost::pthread_attr_destroy() failed");
+        }
+    }
 
     return 0;
 }
