@@ -7,6 +7,9 @@
 #include "defs.h"
 using namespace std;
 
+// ## Fix #includes
+// ## Correct error checks in all pthread things from <0 to !=0
+
 vector<vector<int>> graph(37700);
 map<int, Node> users;
 

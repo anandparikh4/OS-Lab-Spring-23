@@ -49,8 +49,7 @@ void *userSimulator(void *arg){
 
         // if(pthread_mutex_lock(&global_lock.logfile_lock) < 0)
 
-        sleep(SLEEP_SECONDS);      // ## reset to this
-        // break;
+        sleep(SLEEP_SECONDS);
     }
     pthread_exit(NULL);
 }
