@@ -7,22 +7,21 @@
 #include "defs.h"
 using namespace std;
 
+#define PUSHUPDATE_THREAD_COUNT 25
+#define READPOST_THREAD_COUNT 10
+
 // ## Fix #includes
 // ## Correct error checks in all pthread things from <0 to !=0
 
 vector<vector<int>> graph(37700);
 map<int, Node> users;
-
-#define PUSHUPDATE_THREAD_COUNT 25
-#define READPOST_THREAD_COUNT 10
-
+struct global_lock global_lock;             // this global lock object contains all necessary things
+int curr_iter = 0;                          // current iteration of userSimulator pushing to shared queue
+queue<pair<int,vector<Action>>> shared;     // shared queue: pair.first is the owner (pushUpdate ID) that gets it
+                                            // and pair.second is the vector of Actions done on the feed queue of a single (given) node
 extern void * userSimulator(void *);
 extern void * pushUpdate(void *);
 extern void * readPost(void *);
-
-// this global lock object contains all necessary things
-struct global_lock global_lock;
-int curr_iter = 0;  // current iteration of userSimulator pushing to shared queue
 
 // Read from an csv file, edges of a graph, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
 void load_graph(){
