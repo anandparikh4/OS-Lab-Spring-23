@@ -37,7 +37,7 @@ class Node{
         // the lock to wait on for accessing this Node's feed queue
         pthread_mutex_t feed_lock;
         pthread_mutexattr_t feed_lock_attr;
-        // the condition to wait on for accessing this Node's feed queue
+        // the condition to wait on to participate in contention for this Node's lock
         pthread_cond_t feed_cond;
         pthread_condattr_t feed_cond_attr;
 
