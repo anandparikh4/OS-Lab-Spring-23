@@ -1,8 +1,5 @@
-main: main.o userSimulator.o pushUpdate.o readPost.o defs.o
-	g++ -o main main.o userSimulator.o pushUpdate.o readPost.o defs.o -lpthread
-
-main.o: main.cpp defs.h
-	g++ -c main.cpp
+main: main.cpp userSimulator.o pushUpdate.o readPost.o defs.o defs.h
+	g++ -o main main.cpp userSimulator.o pushUpdate.o readPost.o defs.o -lpthread
 
 userSimulator.o: userSimulator.cpp defs.h
 	g++ -c userSimulator.cpp

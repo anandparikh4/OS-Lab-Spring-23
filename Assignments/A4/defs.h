@@ -5,6 +5,12 @@
 #include <map>
 #include <string>
 
+#define RANDOM_NODE_COUNT 5     // ## Change to 100
+#define SLEEP_SECONDS 10        // ## Change to 120
+
+#define PUSHUPDATE_THREAD_COUNT 25
+#define READPOST_THREAD_COUNT 10
+
 void exit_with_error(std::string);
 
 // instead of using scattered global objects, put them in a struct, making it easier to handle
