@@ -1,0 +1,29 @@
+1) main.cpp:  to find max degree of any node
+    // // Find maximum degree of a user
+    // int max_degree = 0;
+    // int degree_sqaured_sum = 0;
+    // for(auto it=users.begin(); it!=users.end(); it++) {
+    //     degree_sqaured_sum += (it->second.degree) * (it->second.degree);
+    //     max_degree = max(max_degree, it->second.degree);
+    // }
+    // cout << "Maximum degree of a user: " << max_degree << endl;
+    // cout << "This complexity for getting neighbors priority: " << log2(users.size()) * degree_sqaured_sum << endl;    
+
+2) main.cpp: to check if user has been updated
+    // cout << "finishing" << endl;
+
+    // for(auto it=users.begin(); it!=users.end(); it++){     // Check if the wall of a user has been updated
+    //     if(it->second.wall.size() > 0) {
+    //         cout << "Wall of user " << it->first << " has been updated" << endl;
+    //     }
+    // }
+
+3) main.cpp: to print number of nodes and edges in graph
+    // cout << "Number of users in the graph: " << users.size() << endl;
+    // int num_edges = 0;
+    // for(int i=0; i<graph.size(); i++) {
+    //     num_edges += graph[i].size();
+    // }
+    // cout << "Number of edges in the graph: " << num_edges/2 << endl;
+
+    

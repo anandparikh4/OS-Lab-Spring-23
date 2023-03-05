@@ -6,7 +6,6 @@
 
 void exit_with_error(std::string);
 
-// Class of Actions with action_id, user_id, timestamp, action_type
 class Action{
     public:
         int user_id;
@@ -23,7 +22,6 @@ class Action{
         void print();
 };
 
-// Class of Node with user_id, degree and log of degree and number of actions and a priority bool
 class Node{
     public:
         int user_id;
@@ -40,6 +38,7 @@ class Node{
 
         ~Node();
         
+        void init();
         void print();
 };
 

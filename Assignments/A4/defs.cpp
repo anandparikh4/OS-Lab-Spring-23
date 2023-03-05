@@ -53,6 +53,11 @@ user_id(u.user_id), degree(u.degree), num_actions(u.num_actions), priority(u.pri
 Node::~Node()
 {}
 
+void Node::init(){
+    log_degree = log2(degree);
+    return;
+}
+
 void Node::print(){
     cout << "User ID: " << user_id << " Degree: " << degree << " Log Degree: " << log_degree << " Num Actions: " << num_actions << " Priority: " << priority << std::endl;
 }
