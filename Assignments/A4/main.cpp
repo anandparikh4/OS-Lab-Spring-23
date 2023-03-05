@@ -1,17 +1,16 @@
 #include <bits/stdc++.h>
 #include <pthread.h>
-// #include <semaphore.h>
 #include <time.h>
 #include <signal.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "main.h"
+#include "defs.h"
 using namespace std;
 
-// Vector of vectors to store the graph
 vector<vector<int>> graph(38000);
-// Map of users with user_id as key and Node object as value
 map<int, Node> users;
+
+extern void * userSimulator(void *);
 
 // Read from an csv file, edges of a graphy, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
 void read_graph() {
@@ -46,39 +45,6 @@ void read_graph() {
     file.close();
 }
 
-// Create a userSimulator thread function, which will choose 100 random nodes from the graph. Then for each node, generate n actions, n needs to be proportional to the log_degree of the node.
-void *userSimulator(void *arg) {
-    // Seed the random number generator
-    srand(time(0));
-    while(1){
-        // Choose 100 random nodes from the graph
-        vector<int> random_nodes;
-        for(int i=0; i<5; i++) {
-            int random_node = rand()%users.size();
-            random_nodes.push_back(random_node);
-        }
-        // For each node, generate n actions, n needs to be proportional to the log_degree of the node
-        for(int i=0; i<random_nodes.size(); i++) {
-            int n = ceil(users[random_nodes[i]].log_degree);
-            for(int j=0; j<n; j++) {
-                cout<<"hwebf"<<endl;
-                // Generate a random action type
-                int action_type = rand()%3;
-                // Generate a current timestamp
-                long timestamp = time(0);
-                // Create an Action object
-                Action action(random_nodes[i], ++users[random_nodes[i]].num_actions, timestamp, action_type);
-                action.print();
-                // Add the action to the wall and feed of the user
-                users[random_nodes[i]].wall.push_back(action);
-            }
-        }
-        // sleep(120);
-        break;
-    }
-    pthread_exit(NULL);
-}
-
 int main(){
     // Read the graph from the csv file
     read_graph();
@@ -99,20 +65,23 @@ int main(){
     
     // Generate userSimulator thread
     pthread_t userSimulator_thread;
-    if(pthread_create(&userSimulator_thread, NULL, userSimulator,NULL)<0) {
-        cout << "Error in creating userSimulator thread" << endl;
-        exit(0);
-    }    
-    pthread_join(userSimulator_thread, NULL);
-    // Check if the wall of a user has been updated
-    for(auto it=users.begin(); it!=users.end(); it++) {
-        // printf("hell\n");
-        if(it->second.wall.size() > 0) {
-            cout << "Wall of user " << it->first << " has been updated" << endl;
-        }
+    pthread_attr_t userSimulator_attr;
+    if(pthread_attr_init(&userSimulator_attr) < 0){
+        exit_with_error("userSimulator::pthread_attr_init() failed");
     }
-    
-    
+    if(pthread_create(&userSimulator_thread , &userSimulator_attr , userSimulator , NULL) < 0){
+        exit_with_error("userSimulator::pthread_create() failed");
+    }
+    if(pthread_join(userSimulator_thread, NULL)){
+        exit_with_error("userSimulator::pthread_join() failed");
+    }
+
+    // for(auto it=users.begin(); it!=users.end(); it++){     // Check if the wall of a user has been updated
+    //     if(it->second.wall.size() > 0) {
+    //         cout << "Wall of user " << it->first << " has been updated" << endl;
+    //     }
+    // }
+
     return 0;
 }
             
