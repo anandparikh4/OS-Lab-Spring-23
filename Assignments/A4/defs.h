@@ -2,6 +2,7 @@
 #define __DEFS_H
 
 #include <vector>
+#include <map>
 #include <string>
 
 void exit_with_error(std::string);
@@ -26,14 +27,22 @@ class Node{
     public:
         int user_id;
         int degree;
-        int num_actions;
-        int priority;
+        int sort_by;
         double log_degree;
+        int num_action[3];
+        std::map<int,int> priority;
         std::vector<Action> wall;
         std::vector<Action> feed;
-        
+
+        // the lock to wait on for accessing this Node's feed queue
+        pthread_mutex_t feed_lock;
+        pthread_mutexattr_t feed_lock_attr;
+        // the condition to wait on for accessing this Node's feed queue
+        pthread_cond_t feed_cond;
+        pthread_condattr_t feed_cond_attr;
+
         Node();
-        Node(int uid, int deg=0, int actions=0, int pri=0);
+        Node(int uid);
         Node(const Node &u);
 
         ~Node();

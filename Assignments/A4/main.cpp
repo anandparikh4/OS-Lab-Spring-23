@@ -45,6 +45,7 @@ void load_graph(){
 }
 
 int main(){
+    srand(time(NULL));  // seed time only once globally
 
     load_graph();   // load graph into memory
 

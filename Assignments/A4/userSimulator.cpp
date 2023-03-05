@@ -7,30 +7,30 @@
 #include "defs.h"
 using namespace std;
 
+#define RANDOM_NODE_COUNT 5     // ## Change to 100
+
 extern vector<vector<int>> graph;
 extern map<int, Node> users;
 
-void *userSimulator(void *arg) {
-    srand(time(0));
-
+void *userSimulator(void *arg){
     while(1){
-        vector<int> random_nodes;
-        for(int i=0; i<5; i++) {
+        for(int i=0; i<RANDOM_NODE_COUNT; i++){
             int random_node = rand()%users.size();
-            random_nodes.push_back(random_node);
-        }
+            int num_actions = ceil(users[random_node].log_degree);
 
-        for(int i=0; i<random_nodes.size(); i++) {
-            int n = ceil(users[random_nodes[i]].log_degree);
-            for(int j=0; j<n; j++) {
+            for(int j=0; j<num_actions; j++){
                 int action_type = rand()%3;
                 long timestamp = time(0);
-                Action action(random_nodes[i], ++users[random_nodes[i]].num_actions, timestamp, action_type);
+                Action action(random_node , ++users[random_node].num_action[action_type] , timestamp , action_type);
                 action.print();
-                users[random_nodes[i]].wall.push_back(action);
+
+                users[random_node].wall.push_back(action);     // Push to Wall queue of user
             }
+
+            
         }
-        // sleep(120);
+
+        // sleep(120);      // ## reset to this
         break;
     }
     pthread_exit(NULL);
