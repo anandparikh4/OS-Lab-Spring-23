@@ -16,15 +16,10 @@ extern map<int, Node> users;
 extern struct global_lock global_lock;
 extern queue<pair<int,vector<Action>>> shared;
 
-bool cmp(const vector<Action>& a, const vector<Action>& b){
-    return a.size() > b.size();
-}
-
 void *userSimulator(void *arg){
 
     while(1){
         
-        map<int,vector<Action>> all_actions;
         for(int i=0; i<RANDOM_NODE_COUNT; i++){
             int random_node = rand()%users.size();
             // cout << random_node << " " << users[random_node].degree << " " << users[random_node].log_degree << endl;
@@ -34,26 +29,20 @@ void *userSimulator(void *arg){
                 int action_type = rand()%3;
                 long timestamp = time(0);
                 Action action(random_node , ++users[random_node].num_action[action_type] , timestamp , action_type);
-                all_actions[i].push_back(action);
                 users[random_node].wall.push_back(action);     // Push to Wall queue of user
             }
         }
 
-        sort(all_actions.begin() , all_actions.end() , cmp);
 
         if(pthread_mutex_lock(&global_lock.shared_lock) < 0){
             exit_with_error("userSimulator::pthread_mutex_lock() failed");
         }
         curr_iter++;
-        // cout << "userSimulator has lock: " << curr_iter << endl;
+        cout << "userSimulator has lock: " << curr_iter << endl;
         // push all generated actions to shared queue
 
         // remove used elements
-        while(!shared.empty() && shared.front().first == -1) shared.pop();
         // add new elements
-        for(int i=0;i<all_actions.size();i++){
-            shared.push({(i+curr_iter)%25 , all_actions[i]});
-        }
 
         if(pthread_cond_broadcast(&global_lock.shared_cond) < 0){
             exit_with_error("userSimulator::pthread_cond_signal() failed");
