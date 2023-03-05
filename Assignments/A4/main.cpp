@@ -44,10 +44,27 @@ void load_graph(){
     file.close();
 }
 
+void precompute_priorities(){
+    cout << "entered here" << endl;
+    // int temp = 0;
+    for(int i=0;i<users.size();i++){            // each node acts as a common neigbour for any pair of ITS neighbors
+        for(int j=0;j<graph[i].size();j++){
+            for(int k=j+1;k<graph[i].size();k++){
+                users[graph[i][j]].priority[graph[i][k]]++;
+                users[graph[i][k]].priority[graph[i][j]]++;
+            }
+        }
+    }
+    // cout << temp << endl;
+    return;
+}
+
 int main(){
     srand(time(NULL));  // seed time only once globally
 
-    load_graph();   // load graph into memory
+    load_graph();       // load graph into memory
+
+    // precompute_priorities();    // precompute the priorities OF each node FOR each node
 
     // Generate userSimulator thread
     pthread_t userSimulator_thread;

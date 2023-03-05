@@ -90,10 +90,10 @@ Node::Node(const Node &u):
 user_id(u.user_id), degree(u.degree), log_degree(u.log_degree), sort_by(u.sort_by)
 {
     for(int i=0;i<3;i++) num_action[i] = u.num_action[i];
-    wall.clear();
-    for(int i=0;i<u.wall.size();i++) wall[i] = u.wall[i];
-    feed.clear();
-    for(int i=0;i<u.feed.size();i++) feed[i] = u.feed[i];
+    // The following way of direct copying works for STL containers
+    wall = u.wall;
+    feed = u.feed;
+    priority = u.priority;
 
     // the pthread mutexes, pthread conditionals (and their attributes) need to be initialized freshly 
     if(pthread_mutexattr_init(&feed_lock_attr) < 0){
@@ -115,7 +115,9 @@ Node::~Node()
 {
     wall.clear();
     feed.clear();
+    priority.clear();
 
+    // Destroy pthread mutexes, condition variables and their attributes
     if(pthread_mutex_destroy(&feed_lock) < 0){
         exit_with_error("~Node::pthread_mutex_destroy() failed");
     }

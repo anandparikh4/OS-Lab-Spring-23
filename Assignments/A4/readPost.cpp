@@ -9,6 +9,6 @@ using namespace std;
 
 void * readPost(void * param){
     int id = (intptr_t)param;
-    // cout << id << endl;
+    cout << id << endl;
     pthread_exit(0);
 }
