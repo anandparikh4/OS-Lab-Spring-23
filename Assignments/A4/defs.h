@@ -7,6 +7,25 @@
 
 void exit_with_error(std::string);
 
+// instead of using scattered global objects, put them in a struct, making it easier to handle
+struct global_lock{
+    // shared queue mutex, condition variable and their attributes
+    pthread_mutex_t shared_lock;
+    pthread_mutexattr_t shared_lock_attr;
+    pthread_cond_t shared_cond;
+    pthread_condattr_t shared_cond_attr;
+
+    // log file mutex, condition variable and their attributes
+    pthread_mutex_t logfile_lock;
+    pthread_mutexattr_t logfile_lock_attr;
+    pthread_cond_t logfile_cond;
+    pthread_condattr_t logfile_cond_attr;
+};
+
+void activate(pthread_mutex_t * , pthread_mutexattr_t * , pthread_cond_t * , pthread_condattr_t *);
+
+void deactivate(pthread_mutex_t * , pthread_mutexattr_t * , pthread_cond_t * , pthread_condattr_t *);
+
 class Action{
     public:
         int user_id;

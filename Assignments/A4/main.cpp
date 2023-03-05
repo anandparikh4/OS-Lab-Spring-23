@@ -17,6 +17,10 @@ extern void * userSimulator(void *);
 extern void * pushUpdate(void *);
 extern void * readPost(void *);
 
+// this global lock object contains all necessary things
+struct global_lock global_lock;
+int curr_iter = 0;  // current iteration of userSimulator pushing to shared queue
+
 // Read from an csv file, edges of a graph, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
 void load_graph(){
     ifstream file("musae_git_edges.csv");
@@ -65,6 +69,9 @@ int main(){
     load_graph();       // load graph into memory
 
     // precompute_priorities();    // precompute the priorities OF each node FOR each node
+
+    activate(&(global_lock.shared_lock) , &(global_lock.shared_lock_attr) , &(global_lock.shared_cond) , &(global_lock.shared_cond_attr));
+    activate(&(global_lock.logfile_lock) , &(global_lock.logfile_lock_attr) , &(global_lock.logfile_cond) , &(global_lock.logfile_cond_attr));
 
     // Generate userSimulator thread
     pthread_t userSimulator_thread;
@@ -133,6 +140,9 @@ int main(){
             exit_with_error("readPost::pthread_attr_destroy() failed");
         }
     }
+
+    deactivate(&(global_lock.shared_lock) , &(global_lock.shared_lock_attr) , &(global_lock.shared_cond) , &(global_lock.shared_cond_attr));
+    deactivate(&(global_lock.logfile_lock) , &(global_lock.logfile_lock_attr) , &(global_lock.logfile_cond) , &(global_lock.logfile_cond_attr));
 
     return 0;
 }

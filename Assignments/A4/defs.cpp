@@ -12,6 +12,36 @@ void exit_with_error(string s){
     exit(0);
 }
 
+void activate(pthread_mutex_t * mutex_t, pthread_mutexattr_t * mutexattr_t, pthread_cond_t * cond_t, pthread_condattr_t * condattr_t){
+    if(pthread_mutexattr_init(mutexattr_t) < 0){
+        exit_with_error("Node::pthread_mutexattr_init() failed");
+    }
+    if(pthread_mutex_init(mutex_t , mutexattr_t) < 0){
+        exit_with_error("Node::pthread_mutex_init() failed");
+    }
+    if(pthread_condattr_init(condattr_t) < 0){
+        exit_with_error("Node::pthread_condattr_init() failed");
+    }
+    if(pthread_cond_init(cond_t , condattr_t) < 0){
+        exit_with_error("Node::pthread_cond_init() failed");
+    }
+}
+
+void deactivate(pthread_mutex_t * mutex_t, pthread_mutexattr_t * mutexattr_t, pthread_cond_t * cond_t, pthread_condattr_t * condattr_t){
+    if(pthread_mutex_destroy(mutex_t) < 0){
+        exit_with_error("~Node::pthread_mutex_destroy() failed");
+    }
+    if(pthread_mutexattr_destroy(mutexattr_t) < 0){
+        exit_with_error("~Node::pthread_mutexattr_destroy() failed");
+    }
+    if(pthread_cond_destroy(cond_t) < 0){
+        exit_with_error("~Node::pthread_cond_destroy() failed");
+    }
+    if(pthread_condattr_destroy(condattr_t) < 0){
+        exit_with_error("~Node::pthread_condattr_destroy() failed");
+    }
+}
+
 // Class Action 
 
 Action::Action():
@@ -45,18 +75,7 @@ user_id(0), degree(0) , log_degree(0) , sort_by(0)
     priority.clear();
 
     // even the default constructor needs to have this, since destructor will destroy anyways
-    if(pthread_mutexattr_init(&feed_lock_attr) < 0){
-        exit_with_error("Node::pthread_mutexattr_init() failed");
-    }
-    if(pthread_mutex_init(&feed_lock , &feed_lock_attr) < 0){
-        exit_with_error("Node::pthread_mutex_init() failed");
-    }
-    if(pthread_condattr_init(&feed_cond_attr) < 0){
-        exit_with_error("Node::pthread_condattr_init() failed");
-    }
-    if(pthread_cond_init(&feed_cond , &feed_cond_attr) < 0){
-        exit_with_error("Node::pthread_cond_init() failed");
-    }
+    activate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 // Overloaded constructor
@@ -71,18 +90,7 @@ user_id(uid)
     priority.clear();
 
     // initialize pthread mutexes, condition variables and their attributes
-    if(pthread_mutexattr_init(&feed_lock_attr) < 0){
-        exit_with_error("Node::pthread_mutexattr_init() failed");
-    }
-    if(pthread_mutex_init(&feed_lock , &feed_lock_attr) < 0){
-        exit_with_error("Node::pthread_mutex_init() failed");
-    }
-    if(pthread_condattr_init(&feed_cond_attr) < 0){
-        exit_with_error("Node::pthread_condattr_init() failed");
-    }
-    if(pthread_cond_init(&feed_cond , &feed_cond_attr) < 0){
-        exit_with_error("Node::pthread_cond_init() failed");
-    }
+    activate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 // Make a full deep copy of everything in the Copy constructor
@@ -96,18 +104,7 @@ user_id(u.user_id), degree(u.degree), log_degree(u.log_degree), sort_by(u.sort_b
     priority = u.priority;
 
     // the pthread mutexes, pthread conditionals (and their attributes) need to be initialized freshly 
-    if(pthread_mutexattr_init(&feed_lock_attr) < 0){
-        exit_with_error("Node::pthread_mutexattr_init() failed");
-    }
-    if(pthread_mutex_init(&feed_lock , &feed_lock_attr) < 0){
-        exit_with_error("Node::pthread_mutex_init() failed");
-    }
-    if(pthread_condattr_init(&feed_cond_attr) < 0){
-        exit_with_error("Node::pthread_condattr_init() failed");
-    }
-    if(pthread_cond_init(&feed_cond , &feed_cond_attr) < 0){
-        exit_with_error("Node::pthread_cond_init() failed");
-    }
+    activate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 // Destructor
@@ -118,18 +115,7 @@ Node::~Node()
     priority.clear();
 
     // Destroy pthread mutexes, condition variables and their attributes
-    if(pthread_mutex_destroy(&feed_lock) < 0){
-        exit_with_error("~Node::pthread_mutex_destroy() failed");
-    }
-    if(pthread_mutexattr_destroy(&feed_lock_attr) < 0){
-        exit_with_error("~Node::pthread_mutexattr_destroy() failed");
-    }
-    if(pthread_cond_destroy(&feed_cond) < 0){
-        exit_with_error("~Node::pthread_cond_destroy() failed");
-    }
-    if(pthread_condattr_destroy(&feed_cond_attr) < 0){
-        exit_with_error("~Node::pthread_condattr_destroy() failed");
-    }
+    deactivate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 void Node::init(){
