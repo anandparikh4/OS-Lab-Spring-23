@@ -8,6 +8,7 @@
 using namespace std;
 
 // ## Fix #includes
+// ## Fix the parameters (number of threads, sleep time etc.)
 // ## Change #define to const int wherever possible
 // ## Correct error checks in all pthread things from <0 to !=0
 
