@@ -5,9 +5,13 @@
 #include <map>
 #include <string>
 #include <pthread.h>
+#include <iostream>
+#include <fstream>
 
-#define PUSHUPDATE_THREAD_COUNT 25
+#define PUSHUPDATE_THREAD_COUNT 5   // ## Change to 25
 #define READPOST_THREAD_COUNT 10
+#define RANDOM_NODE_COUNT 10         // ## Change to 100
+#define SLEEP_SECONDS 7        // ## Change to 120
 
 void exit_with_error(std::string);
 
@@ -44,6 +48,7 @@ class Action{
         ~Action();
 
         void print();
+        friend std::ostream& operator<<(std::ostream& os, const Action &action);
 };
 
 class Node{
@@ -67,6 +72,7 @@ class Node{
         
         void init();
         void print();
+        friend std::ostream& operator<<(std::ostream& os, const Node &node);
 };
 
 #endif

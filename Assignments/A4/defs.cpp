@@ -110,12 +110,20 @@ void Action::print() {
     cout << "User ID: " << user_id << " Action ID: " << action_id << " Timestamp: " << timestamp << " Action Type: " << action_type << std::endl;
 }
 
+ostream& operator<<(ostream& os, const Action &action)
+{
+    os << "User ID: " << action.user_id << "| Type: " << action.action_type << "| Action ID: " << action.action_id << "| Timestamp: " <<  action.timestamp;
+    return os;
+}
+
 // Class Node
 
 // Default constructor
 Node::Node(): 
-user_id(0), degree(0) , log_degree(0) , sort_by(0)
+user_id(0)
 {
+    degree = log_degree = 0;
+    sort_by = rand()%2;
     for(int i=0;i<3;i++) num_action[i] = 0;
     wall.clear();
     feed.clear();
@@ -160,4 +168,12 @@ void Node::init(){
 
 void Node::print(){
     cout << "User ID: " << user_id << " Degree: " << degree << " Log Degree: " << log_degree << " Sort By: " << sort_by << " Number of actions: " << num_action[0] << "," << num_action[1] << "," << num_action[2] << std::endl;
+}
+
+ostream& operator<<(ostream& os, const Node &node)
+{
+    os << "User ID: " << node.user_id << "| Degree: " << node.degree << "| Sort By: ";
+    if(node.sort_by == 0) os << " Priority";
+    else os << " Chronological";
+    return os;
 }

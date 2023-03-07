@@ -7,21 +7,24 @@
 #include "defs.h"
 using namespace std;
 
-#define RANDOM_NODE_COUNT 5     // ## Change to 100
-#define SLEEP_SECONDS 3        // ## Change to 120
-
 extern vector<vector<int>> graph;
 extern map<int, Node> users;
+extern my_semaphore write_logfile;
+extern ofstream logfile;
 
 my_semaphore write_shared(1),read_shared(0);
-vector<int> shared_vec(25);
-
 int curr_iter = 0;
+vector<vector<Action>> shared(RANDOM_NODE_COUNT);
+
+bool cmp(const vector<Action> &a , const vector<Action> &b){
+    return a.size() > b.size();
+}
 
 void *userSimulator(void *arg){
 
     while(1){
-        
+        vector<vector<Action>> temp_shared(RANDOM_NODE_COUNT);
+
         for(int i=0; i<RANDOM_NODE_COUNT; i++){
             int random_node = rand()%users.size();
             // cout << random_node << " " << users[random_node].degree << " " << users[random_node].log_degree << endl;
@@ -32,18 +35,31 @@ void *userSimulator(void *arg){
                 long timestamp = time(0);
                 Action action(random_node , ++users[random_node].num_action[action_type] , timestamp , action_type);
                 users[random_node].wall.push_back(action);     // Push to Wall queue of user
+                temp_shared[i].push_back(action);
             }
         }
 
+        sort(temp_shared.begin() , temp_shared.end() , cmp);
+
         write_shared._wait();
-
-        for(int i=0;i<26;i++) shared_vec[i] = i + 25 * curr_iter;
+        // write to shared
         curr_iter++;
-        cout << curr_iter << endl;
-
+        for(int i=0;i<RANDOM_NODE_COUNT;i++){
+            shared[(i+curr_iter)%RANDOM_NODE_COUNT] = temp_shared[i];         
+        }
         read_shared._signal();
+
+        write_logfile._wait();
+        // write to log file
+        logfile << "---------------------------------------------------------------------------\n";
+        logfile << "userSimulator iteration #" << curr_iter << " : " << endl;
+        for(int i=0;i<RANDOM_NODE_COUNT;i++){
+            for(int j=0;j<temp_shared[i].size();j++) logfile << temp_shared[i][j] << endl;
+        }
+        write_logfile._signal();
 
         sleep(SLEEP_SECONDS);
     }
+
     pthread_exit(NULL);
 }

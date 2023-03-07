@@ -8,16 +8,19 @@
 using namespace std;
 
 // ## Fix #includes
+// ## Change #define to const int wherever possible
 // ## Correct error checks in all pthread things from <0 to !=0
-
-vector<vector<int>> graph(37700);
-map<int, Node> users;
 
 extern void * userSimulator(void *);
 extern void * pushUpdate(void *);
 extern void * readPost(void *);
 
-// Read from an csv file, edges of a graph, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
+vector<vector<int>> graph(37700);
+map<int, Node> users;
+ofstream logfile;
+my_semaphore write_logfile(1);
+
+// Read from a csv file, edges of a graph, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
 void load_graph(){
     ifstream file("musae_git_edges.csv");
     string line;
@@ -65,6 +68,8 @@ int main(){
     load_graph();       // load graph into memory
 
     // precompute_priorities();    // precompute the priorities OF each node FOR each node
+
+    logfile.open("sns.log" , std::ios_base::app);
 
     // Generate userSimulator thread
     pthread_t userSimulator_thread;
@@ -133,6 +138,8 @@ int main(){
             exit_with_error("readPost::pthread_attr_destroy() failed");
         }
     }
+
+    logfile.close();
 
     return 0;
 }
