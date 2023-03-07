@@ -1,23 +1,181 @@
 ---------------------------------------------------------------------------
 pushUpdate[4] iteration #: 1
-User ID: 716| Type: 2| Action ID: 1| Timestamp: 1678190818
-User ID: 716| Type: 1| Action ID: 1| Timestamp: 1678190818
-User ID: 716| Type: 0| Action ID: 1| Timestamp: 1678190818
-User ID: 716| Type: 1| Action ID: 2| Timestamp: 1678190818
-User ID: 24726| Type: 2| Action ID: 1| Timestamp: 1678190818
+Min size of shared vector with thread id 4 is 10
+Max size of shared vector with thread id 4 is 40
+---------------------------
+Node 0 : 
+User ID: 27416| Type: 1| Action ID: 1| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 2| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 1| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 3| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 2| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 4| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 5| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 3| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 4| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 5| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 6| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 1| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 2| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 6| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 7| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 7| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 8| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 8| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 3| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 9| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 10| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 4| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 11| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 9| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 10| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 5| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 12| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 11| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 6| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 12| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 13| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 14| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 7| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 13| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 8| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 9| Timestamp: 1678200027
+User ID: 27416| Type: 2| Action ID: 10| Timestamp: 1678200027
+User ID: 27416| Type: 1| Action ID: 14| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 15| Timestamp: 1678200027
+User ID: 27416| Type: 0| Action ID: 16| Timestamp: 1678200027
+Node 1 : 
+User ID: 4145| Type: 1| Action ID: 1| Timestamp: 1678200027
+User ID: 4145| Type: 2| Action ID: 1| Timestamp: 1678200027
+User ID: 4145| Type: 2| Action ID: 2| Timestamp: 1678200027
+User ID: 4145| Type: 1| Action ID: 2| Timestamp: 1678200027
+User ID: 4145| Type: 1| Action ID: 3| Timestamp: 1678200027
+User ID: 4145| Type: 1| Action ID: 4| Timestamp: 1678200027
+User ID: 4145| Type: 0| Action ID: 1| Timestamp: 1678200027
+User ID: 4145| Type: 2| Action ID: 3| Timestamp: 1678200027
+User ID: 4145| Type: 1| Action ID: 5| Timestamp: 1678200027
+User ID: 4145| Type: 1| Action ID: 6| Timestamp: 1678200027
 ---------------------------------------------------------------------------
 pushUpdate[4] iteration #: 2
-User ID: 21907| Type: 1| Action ID: 1| Timestamp: 1678190825
-User ID: 21907| Type: 0| Action ID: 1| Timestamp: 1678190825
-User ID: 21907| Type: 1| Action ID: 2| Timestamp: 1678190825
-User ID: 21907| Type: 1| Action ID: 3| Timestamp: 1678190825
+Min size of shared vector with thread id 4 is 20
+Max size of shared vector with thread id 4 is 30
+---------------------------
+Node 0 : 
+User ID: 30025| Type: 1| Action ID: 1| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 2| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 1| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 3| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 1| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 2| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 2| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 3| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 3| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 4| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 5| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 4| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 4| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 6| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 5| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 6| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 7| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 5| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 6| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 8| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 9| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 10| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 7| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 8| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 9| Timestamp: 1678200034
+User ID: 30025| Type: 2| Action ID: 7| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 10| Timestamp: 1678200034
+User ID: 30025| Type: 0| Action ID: 11| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 11| Timestamp: 1678200034
+User ID: 30025| Type: 1| Action ID: 12| Timestamp: 1678200034
+Node 1 : 
+User ID: 8094| Type: 0| Action ID: 1| Timestamp: 1678200034
+User ID: 8094| Type: 0| Action ID: 2| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 1| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 1| Timestamp: 1678200034
+User ID: 8094| Type: 0| Action ID: 3| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 2| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 2| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 3| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 3| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 4| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 5| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 4| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 5| Timestamp: 1678200034
+User ID: 8094| Type: 0| Action ID: 4| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 6| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 6| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 7| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 8| Timestamp: 1678200034
+User ID: 8094| Type: 1| Action ID: 9| Timestamp: 1678200034
+User ID: 8094| Type: 2| Action ID: 7| Timestamp: 1678200034
 ---------------------------------------------------------------------------
 pushUpdate[4] iteration #: 3
-User ID: 26200| Type: 1| Action ID: 1| Timestamp: 1678190832
-User ID: 26200| Type: 0| Action ID: 1| Timestamp: 1678190832
-User ID: 26200| Type: 2| Action ID: 1| Timestamp: 1678190832
-User ID: 26200| Type: 0| Action ID: 2| Timestamp: 1678190832
-User ID: 26200| Type: 2| Action ID: 2| Timestamp: 1678190832
-User ID: 26200| Type: 1| Action ID: 2| Timestamp: 1678190832
-User ID: 30964| Type: 1| Action ID: 1| Timestamp: 1678190832
-User ID: 30964| Type: 2| Action ID: 1| Timestamp: 1678190832
+Min size of shared vector with thread id 4 is 20
+Max size of shared vector with thread id 4 is 40
+---------------------------
+Node 0 : 
+User ID: 22780| Type: 0| Action ID: 1| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 1| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 1| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 2| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 2| Timestamp: 1678200041
+User ID: 22780| Type: 0| Action ID: 2| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 3| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 4| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 5| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 3| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 6| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 4| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 7| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 5| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 8| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 6| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 9| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 10| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 11| Timestamp: 1678200041
+User ID: 22780| Type: 0| Action ID: 3| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 7| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 8| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 12| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 9| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 10| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 11| Timestamp: 1678200041
+User ID: 22780| Type: 0| Action ID: 4| Timestamp: 1678200041
+User ID: 22780| Type: 0| Action ID: 5| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 13| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 14| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 15| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 16| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 17| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 12| Timestamp: 1678200041
+User ID: 22780| Type: 2| Action ID: 18| Timestamp: 1678200041
+User ID: 22780| Type: 0| Action ID: 6| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 13| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 14| Timestamp: 1678200041
+User ID: 22780| Type: 1| Action ID: 15| Timestamp: 1678200041
+User ID: 22780| Type: 0| Action ID: 7| Timestamp: 1678200041
+Node 1 : 
+User ID: 19252| Type: 2| Action ID: 1| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 1| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 2| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 3| Timestamp: 1678200041
+User ID: 19252| Type: 2| Action ID: 2| Timestamp: 1678200041
+User ID: 19252| Type: 2| Action ID: 3| Timestamp: 1678200041
+User ID: 19252| Type: 2| Action ID: 4| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 4| Timestamp: 1678200041
+User ID: 19252| Type: 1| Action ID: 1| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 5| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 6| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 7| Timestamp: 1678200041
+User ID: 19252| Type: 2| Action ID: 5| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 8| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 9| Timestamp: 1678200041
+User ID: 19252| Type: 2| Action ID: 6| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 10| Timestamp: 1678200041
+User ID: 19252| Type: 2| Action ID: 7| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 11| Timestamp: 1678200041
+User ID: 19252| Type: 0| Action ID: 12| Timestamp: 1678200041

@@ -44,8 +44,18 @@ void * pushUpdate(void * param){
         pU_group._signal();
 
         prev_iter = curr_iter;
-        for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++) temp_shared[i] = shared[id+i*PUSHUPDATE_THREAD_COUNT];     // ## Change 2 to 4
-
+        int min_size, max_size;
+        for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++){
+            temp_shared[i] = shared[id+i*PUSHUPDATE_THREAD_COUNT];     // ## Change 2 to 4
+            if(i==0){
+                min_size = temp_shared[i].size();
+                max_size = temp_shared[i].size();
+            }
+            else{
+                min_size = min(min_size , (int)temp_shared[i].size());
+                max_size = max(max_size , (int)temp_shared[i].size());
+            }   
+        }
         pU_group._wait();
         finish++;
         done[id] = true;
@@ -53,6 +63,7 @@ void * pushUpdate(void * param){
             start = 0;
             finish = 0;
             for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done[i] = false;
+            cout<<"All pushUpdate threads have finished their work for iteration #"<<prev_iter<<endl;
             write_shared._signal();
         }
         pU_group._signal();
@@ -60,7 +71,11 @@ void * pushUpdate(void * param){
         // writing to respective test files
         testfile << "---------------------------------------------------------------------------\n";
         testfile << "pushUpdate[" << id << "] iteration #: " << prev_iter << endl;
+        testfile << "Min size of shared vector with thread id " << id << " is " << min_size << endl;
+        testfile << "Max size of shared vector with thread id " << id << " is " << max_size << endl;
+        testfile <<"---------------------------"<<endl;
         for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++){
+            testfile<<"Node "<<i<<" : "<<endl;
             for(int j=0;j<temp_shared[i].size();j++) testfile << temp_shared[i][j] << endl;
         }
 
