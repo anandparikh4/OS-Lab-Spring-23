@@ -21,15 +21,16 @@ vector<vector<Action>> inform;
 int start_read = 0;
 int finish_read = 0;
 int written = 0;
-bool done[PUSHUPDATE_THREAD_COUNT] = {false};
-string extn = ".pU_txt";
+bool done_pu[PUSHUPDATE_THREAD_COUNT] = {false};
+string extn_pu = ".pU_txt";
+int test_count = 0;
 
 void * pushUpdate(void * param){
     int id = (intptr_t)param;
     int prev_iter = 0;
     string file_name;
     file_name.push_back('a' + id);
-    file_name += extn;
+    file_name += extn_pu;
     vector<vector<Action>> temp_shared(RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT);
     ofstream testfile;
     testfile.open(file_name , std::ios_base::app);
@@ -38,7 +39,7 @@ void * pushUpdate(void * param){
 
         while(1){
             pU_group._wait();
-            if(done[id]){
+            if(done_pu[id]){
                 pU_group._signal();
                 continue;
             }
@@ -79,13 +80,15 @@ void * pushUpdate(void * param){
 
         // All pushUpdate threads have SEQUENTIAL access to this code
         // write to "inform" queue
+        test_count++;
+        cout << "pushUpdate[" << id << "] iteration #: " << prev_iter << "| count = "  << test_count << endl;
 
         written++;
-        done[id] = true;
+        done_pu[id] = true;
         if(written == PUSHUPDATE_THREAD_COUNT){
             written = 0;
-            for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done[i] = false;
-            read_inform._wait();
+            for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done_pu[i] = false;
+            read_inform._signal();
         }
         pU_group._signal();
 
