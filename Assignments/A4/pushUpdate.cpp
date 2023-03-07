@@ -10,31 +10,35 @@ using namespace std;
 extern int curr_iter;
 extern vector<vector<int>> graph;
 extern map<int, Node> users;
-extern struct global_lock global_lock;
+extern my_semaphore shared_sem,logfile_sem,rP_group_sem;
+
+extern my_semaphore write_to_shared,read_from_shared;
+my_semaphore pU_group_sem;
+int rc = 0;
+int done = 0;
 
 void * pushUpdate(void * param){
     int id = (intptr_t)param;
-    int prev_iter = 0;
-    
-    if(pthread_mutex_lock(&global_lock.shared_lock) < 0){
-        exit_with_error("pushUpdate::pthread_mutex_lock() failed");
-    }
-    
+
     while(1){
-        while(curr_iter <= prev_iter){
-            if(pthread_cond_wait(&global_lock.shared_cond , &global_lock.shared_lock) < 0){
-                exit_with_error("pushUpdate::pthread_cond_wait() failed");
-            }
+        pU_group_sem._wait();
+        if(rc == 0 && done == 0){
+            read_from_shared._wait();
         }
-        prev_iter = curr_iter;
-        cout << "pushUpdate[" << id << "] has lock: " << curr_iter << endl;
-        // read from shared queue
-        if(pthread_cond_broadcast(&global_lock.shared_cond) < 0){
-            exit_with_error("pushUpdate::pthread_cond_broadcast() failed");
+        rc++;
+        pU_group_sem._signal();
+
+        // read
+        for(int i=0;i<100;i++) printf("%c" , 'a' + id);
+
+        pU_group_sem._wait();
+        rc--;
+        done++;
+        if(rc == 0 && done == 25){
+            done = 0;
+            write_to_shared._signal();
         }
-        if(pthread_cond_wait(&global_lock.shared_cond , &global_lock.shared_lock) < 0){
-            exit_with_error("pushUpdate::pthread_cond_wait() failed");
-        }
+        pU_group_sem._signal();
     }
 
     pthread_exit(0);

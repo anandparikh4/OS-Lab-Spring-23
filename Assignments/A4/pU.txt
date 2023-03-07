@@ -1,0 +1,29 @@
+start = 0
+finish = 0
+done[25] = {0}
+
+while(1){
+    group.wait()
+    if(done[id]){
+        group.signal()
+        continue
+    }
+    if(start == 0){
+        read.wait()
+    }
+    start++
+    group.signal()
+
+    // read
+
+    group.wait()
+    finish++
+    done[id] = true
+    if(finish == n){
+        start = 0
+        finish = 0
+        for(i : [0,24]) done[i] = false
+        write.signal()
+    }
+    group.signal()
+}

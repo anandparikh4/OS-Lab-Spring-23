@@ -4,33 +4,31 @@
 #include <vector>
 #include <map>
 #include <string>
-
-#define RANDOM_NODE_COUNT 5     // ## Change to 100
-#define SLEEP_SECONDS 10        // ## Change to 120
+#include <pthread.h>
 
 #define PUSHUPDATE_THREAD_COUNT 25
 #define READPOST_THREAD_COUNT 10
 
 void exit_with_error(std::string);
 
-// instead of using scattered global objects, put them in a struct, making it easier to handle
-struct global_lock{
-    // shared queue mutex, condition variable and their attributes
-    pthread_mutex_t shared_lock;
-    pthread_mutexattr_t shared_lock_attr;
-    pthread_cond_t shared_cond;
-    pthread_condattr_t shared_cond_attr;
+class my_semaphore{
+    private:
+        int value, wakeups;
+        pthread_mutex_t mutex;
+        pthread_mutexattr_t mutexattr;
+        pthread_cond_t cond;
+        pthread_condattr_t condattr;
 
-    // log file mutex, condition variable and their attributes
-    pthread_mutex_t logfile_lock;
-    pthread_mutexattr_t logfile_lock_attr;
-    pthread_cond_t logfile_cond;
-    pthread_condattr_t logfile_cond_attr;
+    public:
+        my_semaphore(int val);
+        my_semaphore(const my_semaphore &s);
+
+        ~my_semaphore();
+
+        void _wait();
+
+        void _signal();
 };
-
-void activate(pthread_mutex_t * , pthread_mutexattr_t * , pthread_cond_t * , pthread_condattr_t *);
-
-void deactivate(pthread_mutex_t * , pthread_mutexattr_t * , pthread_cond_t * , pthread_condattr_t *);
 
 class Action{
     public:
@@ -59,12 +57,7 @@ class Node{
         std::vector<Action> wall;
         std::vector<Action> feed;
 
-        // the lock to wait on for accessing this Node's feed queue
-        pthread_mutex_t feed_lock;
-        pthread_mutexattr_t feed_lock_attr;
-        // the condition to wait on to participate in contention for this Node's lock
-        pthread_cond_t feed_cond;
-        pthread_condattr_t feed_cond_attr;
+        my_semaphore feedsem;
 
         Node();
         Node(int uid);

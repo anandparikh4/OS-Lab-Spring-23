@@ -12,37 +12,106 @@ void exit_with_error(string s){
     exit(0);
 }
 
-void activate(pthread_mutex_t * mutex_t, pthread_mutexattr_t * mutexattr_t, pthread_cond_t * cond_t, pthread_condattr_t * condattr_t){
-    if(pthread_mutexattr_init(mutexattr_t) < 0){
-        exit_with_error("Node::pthread_mutexattr_init() failed");
+// Class my_semaphore
+
+/*
+class my_semaphore{
+    public:
+        int value, wakeups;
+        pthread_mutex_t mutex;
+        pthread_mutexattr_t mutexattr;
+        pthread_cond_t cond;
+        pthread_condattr_t condattr;
+
+        my_semaphore(int val = 1);
+        my_semaphore(const my_semaphore &s);
+
+        ~my_semaphore();
+
+        void _wait();
+
+        void _signal();
+};
+*/
+
+// Default overloaded constructor
+my_semaphore::my_semaphore(int val = 0):
+value(val),wakeups(0)
+{
+    if(pthread_mutexattr_init(&mutexattr) < 0){
+        exit_with_error("my_semaphore::pthread_mutexattr_init() failed");
     }
-    if(pthread_mutex_init(mutex_t , mutexattr_t) < 0){
-        exit_with_error("Node::pthread_mutex_init() failed");
+    if(pthread_mutex_init(&mutex , &mutexattr) < 0){
+        exit_with_error("my_semaphore::pthread_mutex_init() failed");
     }
-    if(pthread_condattr_init(condattr_t) < 0){
-        exit_with_error("Node::pthread_condattr_init() failed");
+    if(pthread_condattr_init(&condattr) < 0){
+        exit_with_error("my_semaphore::pthread_condattr_init() failed");
     }
-    if(pthread_cond_init(cond_t , condattr_t) < 0){
-        exit_with_error("Node::pthread_cond_init() failed");
+    if(pthread_cond_init(&cond , &condattr) < 0){
+        exit_with_error("my_semaphore::pthread_cond_init() failed");
     }
 }
 
-void deactivate(pthread_mutex_t * mutex_t, pthread_mutexattr_t * mutexattr_t, pthread_cond_t * cond_t, pthread_condattr_t * condattr_t){
-    if(pthread_mutex_destroy(mutex_t) < 0){
-        exit_with_error("~Node::pthread_mutex_destroy() failed");
+// Copy constructor - make a deep copy of all mutex: condition variable and their attributes; copy only the value and wakeups
+my_semaphore::my_semaphore(const my_semaphore &s):
+value(s.value),wakeups(s.wakeups)
+{
+    if(pthread_mutexattr_init(&mutexattr) < 0){
+        exit_with_error("my_semaphore::pthread_mutexattr_init() failed");
     }
-    if(pthread_mutexattr_destroy(mutexattr_t) < 0){
-        exit_with_error("~Node::pthread_mutexattr_destroy() failed");
+    if(pthread_mutex_init(&mutex , &mutexattr) < 0){
+        exit_with_error("my_semaphore::pthread_mutex_init() failed");
     }
-    if(pthread_cond_destroy(cond_t) < 0){
-        exit_with_error("~Node::pthread_cond_destroy() failed");
+    if(pthread_condattr_init(&condattr) < 0){
+        exit_with_error("my_semaphore::pthread_condattr_init() failed");
     }
-    if(pthread_condattr_destroy(condattr_t) < 0){
-        exit_with_error("~Node::pthread_condattr_destroy() failed");
+    if(pthread_cond_init(&cond , &condattr) < 0){
+        exit_with_error("my_semaphore::pthread_cond_init() failed");
     }
 }
 
-// Class Action 
+// Destructor
+my_semaphore::~my_semaphore(){
+    if(pthread_mutex_destroy(&mutex) < 0){
+        exit_with_error("my_semaphore::pthread_mutex_destroy() failed");
+    }
+    if(pthread_mutexattr_destroy(&mutexattr) < 0){
+        exit_with_error("my_semaphore::pthread_mutexattr_destroy() failed");
+    }
+    if(pthread_cond_destroy(&cond) < 0){
+        exit_with_error("my_semaphore::pthread_cond_destroy() failed");
+    }
+    if(pthread_condattr_destroy(&condattr) < 0){
+        exit_with_error("my_semaphore::pthread_condattr_destroy() failed");
+    }
+}
+
+// semaphore wait
+void my_semaphore::_wait(){
+    pthread_mutex_lock(&mutex);
+    value--;
+    if(value < 0){
+        while(wakeups == 0){
+            pthread_cond_wait(&cond , &mutex);
+        }
+        wakeups--;
+    }
+    if(wakeups > 0) pthread_cond_broadcast(&cond);
+    pthread_mutex_unlock(&mutex);
+}
+
+// semaphore signal
+void my_semaphore::_signal(){
+    pthread_mutex_lock(&mutex);
+    value++;
+    if(value <= 0){
+        wakeups++;
+        pthread_cond_broadcast(&cond);
+    }
+    pthread_mutex_unlock(&mutex);
+}
+
+// Class Action
 
 Action::Action():
 user_id(0), action_id(0), timestamp(0), action_type(0)
@@ -73,9 +142,6 @@ user_id(0), degree(0) , log_degree(0) , sort_by(0)
     wall.clear();
     feed.clear();
     priority.clear();
-
-    // even the default constructor needs to have this, since destructor will destroy anyways
-    activate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 // Overloaded constructor
@@ -88,9 +154,6 @@ user_id(uid)
     wall.clear();
     feed.clear();
     priority.clear();
-
-    // initialize pthread mutexes, condition variables and their attributes
-    activate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 // Make a full deep copy of everything in the Copy constructor
@@ -102,9 +165,6 @@ user_id(u.user_id), degree(u.degree), log_degree(u.log_degree), sort_by(u.sort_b
     wall = u.wall;
     feed = u.feed;
     priority = u.priority;
-
-    // the pthread mutexes, pthread conditionals (and their attributes) need to be initialized freshly 
-    activate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 // Destructor
@@ -113,9 +173,6 @@ Node::~Node()
     wall.clear();
     feed.clear();
     priority.clear();
-
-    // Destroy pthread mutexes, condition variables and their attributes
-    deactivate(&feed_lock , &feed_lock_attr , &feed_cond , &feed_cond_attr);
 }
 
 void Node::init(){

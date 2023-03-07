@@ -12,20 +12,7 @@ using namespace std;
 
 vector<vector<int>> graph(37700);
 map<int, Node> users;
-struct global_lock global_lock;             // this global lock object contains all necessary things
-int curr_iter = 0;                          // current iteration of userSimulator pushing to shared queue
-queue<pair<int,vector<Action>>> shared;     // shared queue: pair.first is the owner (pushUpdate ID) that gets it
-                                            // and pair.second is the vector of Actions done on the feed queue of a single (given) node
-
-
-queue<vector<int>> shared_node_freq;               // shared_node_freq is a sorted vector in decreasing order of frequency of nodes in the shared queue
-                                            // this is used to decide which thread gets which node's feed queue to push updates to
-                                            // this is read by pushUpdate threads
-                                            // this is updated by userSimulator thread
-
-int actions_remaining = 0;                  // actions_remaining is the number of actions remaining from the previous iteration of userSimulator
-                                            // this is read and updated by userSimulator thread
-
+my_semaphore shared_sem(0),logfile_sem(1),pU_group_sem(1),rP_group_sem(1);
 
 extern void * userSimulator(void *);
 extern void * pushUpdate(void *);
@@ -79,9 +66,6 @@ int main(){
     load_graph();       // load graph into memory
 
     // precompute_priorities();    // precompute the priorities OF each node FOR each node
-
-    activate(&(global_lock.shared_lock) , &(global_lock.shared_lock_attr) , &(global_lock.shared_cond) , &(global_lock.shared_cond_attr));
-    activate(&(global_lock.logfile_lock) , &(global_lock.logfile_lock_attr) , &(global_lock.logfile_cond) , &(global_lock.logfile_cond_attr));
 
     // Generate userSimulator thread
     pthread_t userSimulator_thread;
@@ -150,9 +134,6 @@ int main(){
             exit_with_error("readPost::pthread_attr_destroy() failed");
         }
     }
-
-    deactivate(&(global_lock.shared_lock) , &(global_lock.shared_lock_attr) , &(global_lock.shared_cond) , &(global_lock.shared_cond_attr));
-    deactivate(&(global_lock.logfile_lock) , &(global_lock.logfile_lock_attr) , &(global_lock.logfile_cond) , &(global_lock.logfile_cond_attr));
 
     return 0;
 }

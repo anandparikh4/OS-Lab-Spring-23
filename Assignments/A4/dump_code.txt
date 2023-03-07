@@ -26,4 +26,77 @@
     // }
     // cout << "Number of edges in the graph: " << num_edges/2 << endl;
 
-    
+4) original pushUpdate
+    // void * pushUpdate(void * param){
+    //     int id = (intptr_t)param;
+    //     int prev_iter = 0;
+        
+    //     if(pthread_mutex_lock(&global_lock.shared_lock) < 0){
+    //         exit_with_error("pushUpdate::pthread_mutex_lock() failed");
+    //     }
+        
+    //     while(1){
+    //         while(curr_iter <= prev_iter){
+    //             if(pthread_cond_wait(&global_lock.shared_cond , &global_lock.shared_lock) < 0){
+    //                 exit_with_error("pushUpdate::pthread_cond_wait() failed");
+    //             }
+    //         }
+            
+    //         prev_iter = curr_iter;
+    //         cout << "pushUpdate[" << id << "] has lock: " << curr_iter << endl;
+    //         // read from shared queue
+    //         if(pthread_cond_broadcast(&global_lock.shared_cond) < 0){
+    //             exit_with_error("pushUpdate::pthread_cond_broadcast() failed");
+    //         }
+
+    //         while(curr_iter <= prev_iter){
+    //             if(pthread_cond_wait(&global_lock.shared_cond , &global_lock.shared_lock) < 0){
+    //                 exit_with_error("pushUpdate::pthread_cond_wait() failed");
+    //             }
+    //         }
+    //     }
+
+    //     pthread_exit(0);
+    // }
+
+5) userSimulator old code:
+
+        // extern queue<pair<int,vector<Action>>> shared;
+        // extern queue<vector<int>> shared_node_freq;
+        // extern int actions_remaining;
+
+        // while(actions_remaining == RANDOM_NODE_COUNT || shared.size() > RANDOM_NODE_COUNT){
+        //     if(pthread_mutex_lock(&global_lock.shared_lock) < 0){
+        //         exit_with_error("userSimulator::pthread_mutex_lock() failed");
+        //     }
+        //     while(actions_remaining && shared.front().first == PUSHUPDATE_THREAD_COUNT){
+        //         shared.pop();
+        //         actions_remaining--;
+        //     }
+        //     if(pthread_cond_broadcast(&global_lock.shared_cond) < 0){
+        //         exit_with_error("userSimulator::pthread_cond_signal() failed");
+        //     }
+        //     if(pthread_mutex_unlock(&global_lock.shared_lock) < 0){
+        //         exit_with_error("userSimulator::pthread_mutex_unlock() failed");
+        //     }
+        // }
+        // shared_node_freq.clear();
+        // vector<vector<Action>> curr_batch(RANDOM_NODE_COUNT);
+
+        // push all generated actions to shared queue
+
+        // remove used elements
+        // if(actions_remaining>0){
+        //     while(actions_remaining && shared.front().first == PUSHUPDATE_THREAD_COUNT){
+        //         shared.pop();
+        //         actions_remaining--;
+        //     }
+        // }
+        // if(actions_remaining==0){
+        //     actions_remaining = RANDOM_NODE_COUNT;
+        //     shared_node_freq.pop();
+        // }    
+        // // add new elements
+        // for(int i=0; i<RANDOM_NODE_COUNT; i++){
+        //     shared.push({0, curr_batch[i]});
+        // }
