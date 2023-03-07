@@ -69,6 +69,32 @@ int main(){
     load_graph();       // load graph into memory
 
     // precompute_priorities();    // precompute the priorities OF each node FOR each node
+    
+    // logfile.open("sns.txt", std::ios_base::app);
+    // Select 100 random nodes from the graph
+    // vector<int> random_nodes(100);
+    // for(int j=0;j<=10;j++){
+    //     for(int i=0;i<100;i++){
+    //         int temp = rand()%users.size();
+    //         random_nodes[i]=temp;
+    //     }
+    //     int tot_nodes = 0;
+    //     set<int> s;
+    //     for(int i=0;i<100;i++){
+    //         tot_nodes += graph[random_nodes[i]].size();
+    //         for(int j=0;j<graph[random_nodes[i]].size();j++){
+    //             s.insert(graph[random_nodes[i]][j]);
+    //         }
+    //     }
+    //     logfile<<"--------------------------------------------\n";
+    //     logfile << "Total Number of Neighbours: " << tot_nodes << "\n";
+    //     logfile << "Total Number of Unique Neighbours: " << s.size() << "\n";
+    //     logfile << "Nodes Decreased: " << tot_nodes - s.size() << "\n";
+    //     logfile << "Percentage of Nodes Decreased: " << (tot_nodes - s.size())*100.0/tot_nodes << "\n\n\n";
+    // }
+    // logfile.close();
+
+
 
     logfile.open("sns.log" , std::ios_base::app);
 
