@@ -28,7 +28,7 @@ void *userSimulator(void *arg){
         for(int i=0; i<RANDOM_NODE_COUNT; i++){
             int random_node = rand()%users.size();
             // cout << random_node << " " << users[random_node].degree << " " << users[random_node].log_degree << endl;
-            int num_actions = ceil(users[random_node].log_degree);
+            int num_actions = ACTIONS_PROPORTIONALITY_CONSTANT*floor(1+users[random_node].log_degree);
             
             for(int j=0; j<num_actions; j++){
                 int action_type = rand()%3;
@@ -45,6 +45,8 @@ void *userSimulator(void *arg){
         write_shared._wait();
         // write to shared
         curr_iter++;
+        //Minimum number of actions in a node's wall
+        cout<<"Minimum number of actions in a node's wall : "<<temp_shared[RANDOM_NODE_COUNT-1].second.size()<<endl;
         for(int i=0;i<RANDOM_NODE_COUNT;i++){
             shared[(i+curr_iter)%RANDOM_NODE_COUNT] = temp_shared[i].second;    // round-robin load balancing        
         }
@@ -55,6 +57,7 @@ void *userSimulator(void *arg){
         logfile << "---------------------------------------------------------------------------\n";
         logfile << "userSimulator iteration #" << curr_iter << " : " << endl;
         for(int i=0;i<RANDOM_NODE_COUNT;i++){
+            logfile<<"Node "<<i<<" : "<<endl;
             for(int j=0;j<temp_shared[i].second.size();j++) logfile << temp_shared[i].second[j] << endl;
         }
         write_logfile._signal();

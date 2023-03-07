@@ -74,7 +74,10 @@ void my_semaphore::_wait(){
         }
         wakeups--;
     }
-    if(wakeups > 0) pthread_cond_broadcast(&cond);
+    if(wakeups > 0){
+        cout<<"Broadcasting"<<endl;
+        pthread_cond_broadcast(&cond);
+    } 
     pthread_mutex_unlock(&mutex);
 }
 
