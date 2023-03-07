@@ -12,7 +12,6 @@ using namespace std;
 
 vector<vector<int>> graph(37700);
 map<int, Node> users;
-my_semaphore shared_sem(0),logfile_sem(1),pU_group_sem(1),rP_group_sem(1);
 
 extern void * userSimulator(void *);
 extern void * pushUpdate(void *);

@@ -12,9 +12,8 @@ using namespace std;
 
 extern vector<vector<int>> graph;
 extern map<int, Node> users;
-extern my_semaphore shared_sem,logfile_sem,pU_group_sem,rP_group_sem;
 
-my_semaphore write_to_shared(1),read_from_shared(0);
+my_semaphore write_shared(1),read_shared(0);
 
 int curr_iter = 0;
 
@@ -35,14 +34,14 @@ void *userSimulator(void *arg){
             }
         }
 
-        write_to_shared._wait();
+        write_shared._wait();
 
         curr_iter++;
         cout << endl;
-        for(int i=0;i<100;i++) printf("%c" , 'z');
+        for(int i=0;i<1000;i++) printf("%c" , 'z');
         cout << endl;
 
-        for(int i=0;i<25;i++) read_from_shared._signal();
+        for(int i=0;i<25;i++) read_shared._signal();
 
         sleep(SLEEP_SECONDS);
     }
