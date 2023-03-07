@@ -8,12 +8,13 @@
 using namespace std;
 
 #define RANDOM_NODE_COUNT 5     // ## Change to 100
-#define SLEEP_SECONDS 10        // ## Change to 120
+#define SLEEP_SECONDS 3        // ## Change to 120
 
 extern vector<vector<int>> graph;
 extern map<int, Node> users;
 
 my_semaphore write_shared(1),read_shared(0);
+vector<int> shared_vec(25);
 
 int curr_iter = 0;
 
@@ -36,12 +37,11 @@ void *userSimulator(void *arg){
 
         write_shared._wait();
 
+        for(int i=0;i<26;i++) shared_vec[i] = i + 25 * curr_iter;
         curr_iter++;
-        cout << endl;
-        for(int i=0;i<1000;i++) printf("%c" , 'z');
-        cout << endl;
+        cout << curr_iter << endl;
 
-        for(int i=0;i<25;i++) read_shared._signal();
+        read_shared._signal();
 
         sleep(SLEEP_SECONDS);
     }

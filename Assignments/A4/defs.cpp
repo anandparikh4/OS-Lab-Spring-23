@@ -12,30 +12,8 @@ void exit_with_error(string s){
     exit(0);
 }
 
-// Class my_semaphore
-
-/*
-class my_semaphore{
-    public:
-        int value, wakeups;
-        pthread_mutex_t mutex;
-        pthread_mutexattr_t mutexattr;
-        pthread_cond_t cond;
-        pthread_condattr_t condattr;
-
-        my_semaphore(int val = 1);
-        my_semaphore(const my_semaphore &s);
-
-        ~my_semaphore();
-
-        void _wait();
-
-        void _signal();
-};
-*/
-
 // Default overloaded constructor
-my_semaphore::my_semaphore(int val = 0):
+my_semaphore::my_semaphore(int val = 1):
 value(val),wakeups(0)
 {
     if(pthread_mutexattr_init(&mutexattr) < 0){

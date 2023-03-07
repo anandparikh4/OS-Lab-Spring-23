@@ -10,15 +10,20 @@ using namespace std;
 extern int curr_iter;
 extern vector<vector<int>> graph;
 extern map<int, Node> users;
+extern vector<int> shared_vec;
 
 extern my_semaphore write_shared,read_shared;
 my_semaphore pU_group(1);
 int start = 0;
 int finish = 0;
-bool done[25] = {false};
+bool done[PUSHUPDATE_THREAD_COUNT] = {false};
+string extn = ".txt";
 
 void * pushUpdate(void * param){
     int id = (intptr_t)param;
+    string file_name;
+    file_name.push_back('a'+id);
+    file_name += extn;
 
     while(1){
         pU_group._wait();
@@ -33,7 +38,10 @@ void * pushUpdate(void * param){
         pU_group._signal();
 
         // read
-        for(int i=0;i<1000;i++) printf("%c" , 'a' + id);
+        ofstream File;
+        File.open(file_name);
+        File << shared_vec[id] << endl;
+        File.close();
 
         pU_group._wait();
         finish++;
@@ -41,7 +49,7 @@ void * pushUpdate(void * param){
         if(finish == PUSHUPDATE_THREAD_COUNT){
             start = 0;
             finish = 0;
-            for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done[id] = 0;
+            for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done[i] = false;
             write_shared._signal();
         }
         pU_group._signal();
