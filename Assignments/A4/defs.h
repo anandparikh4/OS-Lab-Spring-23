@@ -11,7 +11,7 @@
 #define PUSHUPDATE_THREAD_COUNT 5   // ## Change to 25
 #define READPOST_THREAD_COUNT 10
 #define RANDOM_NODE_COUNT 10         // ## Change to 100
-#define SLEEP_SECONDS 10        // ## Change to 120
+#define SLEEP_SECONDS 7        // ## Change to 120
 
 void exit_with_error(std::string);
 

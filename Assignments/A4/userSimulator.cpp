@@ -12,9 +12,9 @@ extern map<int, Node> users;
 extern my_semaphore write_logfile;
 extern ofstream logfile;
 
+vector<vector<Action>> shared(RANDOM_NODE_COUNT);
 my_semaphore write_shared(1),read_shared(0);
 int curr_iter = 0;
-vector<vector<Action>> shared(RANDOM_NODE_COUNT);
 
 bool cmp(const pair<int,vector<Action>> &a , const pair<int,vector<Action>> &b){
     return a.first > b.first;
