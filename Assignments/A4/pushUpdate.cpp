@@ -60,6 +60,7 @@ void * pushUpdate(void * param){
         if(finish_read == PUSHUPDATE_THREAD_COUNT){
             start_read = 0;
             finish_read = 0;
+            cout<<"All pushUpdate threads have finished their work for iteration #"<<prev_iter<<endl;
             write_shared._signal();
         }
         pU_group._signal();
