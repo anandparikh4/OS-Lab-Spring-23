@@ -25,7 +25,7 @@ void *userSimulator(void *arg){
 
     while(1){
         for(int batch = 0;batch<NUM_BATCHES;batch++){        
-            vector<pair<int,vector<Action>>> temp_shared(BATCH_SIZE);
+            vector<vector<Action>> temp_shared(BATCH_SIZE);
 
             for(int i=0; i<BATCH_SIZE; i++){
                 int random_node = rand()%users.size();
@@ -37,9 +37,9 @@ void *userSimulator(void *arg){
                     long timestamp = time(0);
                     Action action(random_node , ++users[random_node].num_action[action_type] , timestamp , action_type);
                     users[random_node].wall.push_back(action);     // Push to Wall queue of user
-                    temp_shared[i].second.push_back(action);
+                    temp_shared[i].push_back(action);
                 }
-                temp_shared[i].first = temp_shared[i].second.size() * graph[random_node].size();
+                // temp_shared[i].first = temp_shared[i].second.size() * graph[random_node].size();
             }
 
             // sort(temp_shared.begin() , temp_shared.end() , cmp);        // sort by decreasing number of total number of pushes
@@ -50,7 +50,7 @@ void *userSimulator(void *arg){
             //Minimum number of actions in a node's wall
             // cout<<"Minimum number of actions in a node's wall : "<<temp_shared[BATCH_SIZE-1].second.size()<<endl;
             for(int i=0;i<BATCH_SIZE;i++){
-                shared[(i+curr_uS_iter)%BATCH_SIZE] = temp_shared[i].second;    // round-robin load balancing        
+                shared[(i+curr_uS_iter)%BATCH_SIZE] = temp_shared[i];    // round-robin load balancing        
             }
             read_shared._signal();
 
@@ -60,7 +60,7 @@ void *userSimulator(void *arg){
             logfile << "userSimulator iteration #" << curr_uS_iter << " : " << endl;
             for(int i=0;i<BATCH_SIZE;i++){
                 logfile<<"Node "<<i<<" : "<<endl;
-                for(int j=0;j<temp_shared[i].second.size();j++) logfile << temp_shared[i].second[j] << endl;
+                for(int j=0;j<temp_shared[i].size();j++) logfile << temp_shared[i][j] << endl;
             }
             write_logfile._signal();
 

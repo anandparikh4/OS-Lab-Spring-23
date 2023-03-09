@@ -22,6 +22,12 @@ int finish = 0;
 bool done_rp[READPOST_THREAD_COUNT] = {false};
 string extn_rp = ".rP_txt";
 
+// cmp function for sorting the feed of a user on the basis of priority of the poster node
+bool cmp(const Action &a, const Action &b, const int c){
+    return users[c].priority[a.user_id] > users[c].priority[b.user_id];
+}
+
+
 void * readPost(void * param){
     int id = (intptr_t)param;
     int prev_iter = 0;
@@ -75,12 +81,22 @@ void * readPost(void * param){
         // testfile << "Size of temp_inform = " << temp_inform.size() << endl;
         for(auto i:temp_inform){
             users[i].feedsem._wait();
-            testfile << "User " << i << " has " << users[i].feed.size() << " posts in his feed"<<endl;
-            for(auto x:users[i].feed){
-                testfile << x << "\n";
-            }
-            testfile<<"----------------------------------------------"<<endl;
-            users[i].feed.clear();
+            if(users[i].feed.size()){
+                testfile << "User " << i << " has " << users[i].feed.size() << " posts in his feed"<<endl;
+                if(users[i].sort_by==0){
+                    sort(users[i].feed.begin(),users[i].feed.end(),[&](const Action &a, const Action &b){
+                        return users[i].priority[a.user_id] > users[i].priority[b.user_id];
+                    });
+                }
+                // testfile << "Sort Status = " << ((users[i].sort_by==0)?"Yes":"No") << endl;
+                // testfile << "Zero element priority = " << users[i].priority[users[i].feed[0].user_id] << endl;
+                // testfile << "Last element priority = " << users[i].priority[users[i].feed[users[i].feed.size()-1].user_id] << endl;
+                for(auto x:users[i].feed){
+                    testfile << x << "\n";
+                }
+                testfile<<"----------------------------------------------"<<endl;
+                users[i].feed.clear();
+            } 
             users[i].feedsem._signal();
         }
         // cout<<"readPost["<<id<<"] has finished its work for iteration #"<<prev_iter<<endl;
