@@ -17,7 +17,7 @@ extern void * pushUpdate(void *);
 extern void * readPost(void *);
 
 vector<vector<int>> graph(37700);
-map<int, Node> users;
+vector<Node> users(37700);
 ofstream logfile;
 my_semaphore write_logfile(1);
 
@@ -35,10 +35,10 @@ void load_graph(){
         v = stoi(line);
         graph[u].push_back(v);
         graph[v].push_back(u);
-        if(users.find(u) == users.end()){
+        if(users[u].user_id == 0){
             users[u] = Node(u);
         }
-        if(users.find(v) == users.end()){
+        if(users[v].user_id == 0){
             users[v] = Node(v);
         }
         users[u].degree++;
@@ -49,13 +49,17 @@ void load_graph(){
 }
 
 void precompute_priorities(){
-    cout << "entered here" << endl;
     // int temp = 0;
+    set<int> temp;
     for(int i=0;i<users.size();i++){            // each node acts as a common neigbour for any pair of ITS neighbors
-        for(int j=0;j<graph[i].size();j++){
-            for(int k=j+1;k<graph[i].size();k++){
-                users[graph[i][j]].priority[graph[i][k]]++;
-                users[graph[i][k]].priority[graph[i][j]]++;
+        temp.clear();
+        for(auto j:graph[i]){
+            temp.insert(j);
+        }
+        for(auto j:graph[i]){
+            for(auto k:graph[j]){
+                if(temp.find(k) != temp.end())
+                    users[i].priority[j]++;
             }
         }
     }
@@ -67,9 +71,25 @@ int main(){
     srand(time(NULL));  // seed time only once globally
 
     load_graph();       // load graph into memory
-
-    // precompute_priorities();    // precompute the priorities OF each node FOR each node
-    
+    time_t start_time = time(0),end_time;
+    cout<<"Start Time:"<<start_time<<endl;
+    precompute_priorities();    // precompute the priorities OF each node FOR each node
+    end_time = time(0);
+    cout<<"Finish Compute Time:"<<end_time<<endl;
+    int max_priority = 0;
+    int user_a, user_b;
+    for(int i=0;i<users.size();i++){
+        for(auto j:users[i].priority){
+            if(j.second > max_priority){
+                max_priority = j.second;
+                user_a = i;
+                user_b = j.first;
+            }
+        }
+    }
+    cout << "Max Priority: " << max_priority << endl;
+    cout << "Users: " << user_a << " " << user_b << endl;
+    cout<<"Compute Time:"<<end_time - start_time<<endl;
     // logfile.open("sns.txt", std::ios_base::app);
     // Select 100 random nodes from the graph
     // vector<int> random_nodes(100);
@@ -96,77 +116,77 @@ int main(){
 
 
 
-    logfile.open("sns.log" , std::ios_base::app);
+    // logfile.open("sns.log" , std::ios_base::app);
 
-    // Generate userSimulator thread
-    pthread_t userSimulator_thread;
-    pthread_attr_t userSimulator_attr;
-    if(pthread_attr_init(&userSimulator_attr) < 0){
-        exit_with_error("userSimulator::pthread_attr_init() failed");
-    }
-    if(pthread_create(&userSimulator_thread , &userSimulator_attr , userSimulator , NULL) < 0){
-        exit_with_error("userSimulator::pthread_create() failed");
-    }
+    // // Generate userSimulator thread
+    // pthread_t userSimulator_thread;
+    // pthread_attr_t userSimulator_attr;
+    // if(pthread_attr_init(&userSimulator_attr) < 0){
+    //     exit_with_error("userSimulator::pthread_attr_init() failed");
+    // }
+    // if(pthread_create(&userSimulator_thread , &userSimulator_attr , userSimulator , NULL) < 0){
+    //     exit_with_error("userSimulator::pthread_create() failed");
+    // }
 
-    // Generate 25 pushUpdate threads
-    pthread_t pushUpdate_thread[PUSHUPDATE_THREAD_COUNT];
-    pthread_attr_t pushUpdate_attr[PUSHUPDATE_THREAD_COUNT];
-    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
-        if(pthread_attr_init(&pushUpdate_attr[i]) < 0){
-            exit_with_error("pushUpdate::pthread_attr_init() failed");
-        }
-        if(pthread_create(&pushUpdate_thread[i] , &pushUpdate_attr[i] , pushUpdate , (void *)(uintptr_t)i) < 0){
-            exit_with_error("pushUpdate::pthread_create() failed");
-        }
-    }
+    // // Generate 25 pushUpdate threads
+    // pthread_t pushUpdate_thread[PUSHUPDATE_THREAD_COUNT];
+    // pthread_attr_t pushUpdate_attr[PUSHUPDATE_THREAD_COUNT];
+    // for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+    //     if(pthread_attr_init(&pushUpdate_attr[i]) < 0){
+    //         exit_with_error("pushUpdate::pthread_attr_init() failed");
+    //     }
+    //     if(pthread_create(&pushUpdate_thread[i] , &pushUpdate_attr[i] , pushUpdate , (void *)(uintptr_t)i) < 0){
+    //         exit_with_error("pushUpdate::pthread_create() failed");
+    //     }
+    // }
 
-    // Generate 10 readPost threads
-    pthread_t readPost_thread[READPOST_THREAD_COUNT];
-    pthread_attr_t readPost_attr[READPOST_THREAD_COUNT];
-    for(int i=0;i<READPOST_THREAD_COUNT;i++){
-        if(pthread_attr_init(&readPost_attr[i]) < 0){
-            exit_with_error("readPost::pthread_attr_init() failed");
-        }
-        if(pthread_create(&readPost_thread[i] , &readPost_attr[i] , readPost , (void *)(uintptr_t)i) < 0){
-            exit_with_error("readPost::pthread_create() failed");
-        }
-    }
+    // // Generate 10 readPost threads
+    // pthread_t readPost_thread[READPOST_THREAD_COUNT];
+    // pthread_attr_t readPost_attr[READPOST_THREAD_COUNT];
+    // for(int i=0;i<READPOST_THREAD_COUNT;i++){
+    //     if(pthread_attr_init(&readPost_attr[i]) < 0){
+    //         exit_with_error("readPost::pthread_attr_init() failed");
+    //     }
+    //     if(pthread_create(&readPost_thread[i] , &readPost_attr[i] , readPost , (void *)(uintptr_t)i) < 0){
+    //         exit_with_error("readPost::pthread_create() failed");
+    //     }
+    // }
 
-    // Join all threads
-    if(pthread_join(userSimulator_thread, NULL)){
-        exit_with_error("userSimulator::pthread_join() failed");
-    }
+    // // Join all threads
+    // if(pthread_join(userSimulator_thread, NULL)){
+    //     exit_with_error("userSimulator::pthread_join() failed");
+    // }
 
-    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
-        if(pthread_join(pushUpdate_thread[i] , NULL) < 0){
-            exit_with_error("pushUpdate::pthread_join() failed");
-        }
-    }
+    // for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+    //     if(pthread_join(pushUpdate_thread[i] , NULL) < 0){
+    //         exit_with_error("pushUpdate::pthread_join() failed");
+    //     }
+    // }
 
-    for(int i=0;i<READPOST_THREAD_COUNT;i++){
-        if(pthread_join(readPost_thread[i] , NULL) < 0){
-            exit_with_error("readPost::pthread_join() failed");
-        }
-    }
+    // for(int i=0;i<READPOST_THREAD_COUNT;i++){
+    //     if(pthread_join(readPost_thread[i] , NULL) < 0){
+    //         exit_with_error("readPost::pthread_join() failed");
+    //     }
+    // }
 
-    // Destroy all threads' attributes
-    if(pthread_attr_destroy(&userSimulator_attr) < 0){
-        exit_with_error("userSimulator::pthread_attr_ddestroy() failed");
-    }
+    // // Destroy all threads' attributes
+    // if(pthread_attr_destroy(&userSimulator_attr) < 0){
+    //     exit_with_error("userSimulator::pthread_attr_ddestroy() failed");
+    // }
 
-    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
-        if(pthread_attr_destroy(&pushUpdate_attr[i])){
-            exit_with_error("pushUpdate::pthread_attr_destroy() failed");
-        }
-    }
+    // for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+    //     if(pthread_attr_destroy(&pushUpdate_attr[i])){
+    //         exit_with_error("pushUpdate::pthread_attr_destroy() failed");
+    //     }
+    // }
 
-    for(int i=0;i<READPOST_THREAD_COUNT;i++){
-        if(pthread_attr_destroy(&readPost_attr[i])){
-            exit_with_error("readPost::pthread_attr_destroy() failed");
-        }
-    }
+    // for(int i=0;i<READPOST_THREAD_COUNT;i++){
+    //     if(pthread_attr_destroy(&readPost_attr[i])){
+    //         exit_with_error("readPost::pthread_attr_destroy() failed");
+    //     }
+    // }
 
-    logfile.close();
+    // logfile.close();
 
     return 0;
 }
