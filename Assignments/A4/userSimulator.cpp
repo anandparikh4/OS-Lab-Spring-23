@@ -40,7 +40,7 @@ void *userSimulator(void *arg){
             temp_shared[i].first = temp_shared[i].second.size() * graph[random_node].size();
         }
 
-        sort(temp_shared.begin() , temp_shared.end() , cmp);        // sort by decreasing number of total number of pushes
+        // sort(temp_shared.begin() , temp_shared.end() , cmp);        // sort by decreasing number of total number of pushes
 
         write_shared._wait();
         // write to shared

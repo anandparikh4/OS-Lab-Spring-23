@@ -17,7 +17,8 @@ extern my_semaphore write_shared,read_shared;
 
 my_semaphore write_inform(1),read_inform(0);
 my_semaphore pU_group(1);
-vector<vector<Action>> inform;
+vector<int> inform;
+set<int> feed_updates;
 int start_read = 0;
 int finish_read = 0;
 int written = 0;
@@ -61,7 +62,7 @@ void * pushUpdate(void * param){
         if(finish_read == PUSHUPDATE_THREAD_COUNT){
             start_read = 0;
             finish_read = 0;
-            cout<<"All pushUpdate threads have finished their work for iteration #"<<prev_iter<<endl;
+            cout<<"All pushUpdate threads have finished their reading for iteration #"<<prev_iter<<endl;
             write_shared._signal();
         }
         pU_group._signal();
@@ -69,8 +70,24 @@ void * pushUpdate(void * param){
         // writing to respective test files
         testfile << "---------------------------------------------------------------------------\n";
         testfile << "pushUpdate[" << id << "] iteration #: " << prev_iter << endl;
+        map<int, int> temp_feed_updates;  // Stores the nodes that will be updated in the current iteration
         for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++){
-            for(int j=0;j<temp_shared[i].size();j++) testfile << temp_shared[i][j] << endl;
+            int user_id = temp_shared[i][0].user_id;
+            for(auto x: graph[user_id]){
+                temp_feed_updates[x] |= (1<<i);
+            }
+        }
+
+        for(auto x: temp_feed_updates){
+            users[x.first].feedsem._wait();
+            for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++){
+                if(x.second & (1<<i)){
+                    for(int j=0;j<temp_shared[i].size();j++){
+                        users[x.first].feed.push_back(temp_shared[i][j]);
+                    }
+                }
+            }
+            users[x.first].feedsem._signal();
         }
 
         pU_group._wait();
@@ -82,12 +99,22 @@ void * pushUpdate(void * param){
         // write to "inform" queue
         test_count++;
         cout << "pushUpdate[" << id << "] iteration #: " << prev_iter << "| count = "  << test_count << endl;
-
+        for(auto x: temp_feed_updates){
+            feed_updates.insert(x.first);
+        }
         written++;
         done_pu[id] = true;
         if(written == PUSHUPDATE_THREAD_COUNT){
             written = 0;
             for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done_pu[i] = false;
+            inform.clear();
+            cout<<"Inform size: "<<feed_updates.size()<<endl;
+            for(auto x: feed_updates){
+                inform.push_back(x);
+                // cout<<"Size of feed of "<<x<<" is "<<users[x].feed.size()<<endl;
+            } 
+            feed_updates.clear();
+            cout<<"All pushUpdate threads have finished their writing for iteration #"<<prev_iter<<endl;
             read_inform._signal();
         }
         pU_group._signal();

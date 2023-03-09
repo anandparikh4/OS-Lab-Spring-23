@@ -12,7 +12,7 @@
 #define READPOST_THREAD_COUNT 10
 #define RANDOM_NODE_COUNT 10         // ## Change to 100
 #define SLEEP_SECONDS 10        // ## Change to 120
-#define ACTIONS_PROPORTIONALITY_CONSTANT 10
+#define ACTIONS_PROPORTIONALITY_CONSTANT 1
 
 void exit_with_error(std::string);
 
