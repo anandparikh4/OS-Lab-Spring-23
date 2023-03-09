@@ -8,7 +8,7 @@
 using namespace std;
 
 extern vector<vector<int>> graph;
-extern map<int, Node> users;
+extern vector<Node> users;
 extern my_semaphore write_logfile;
 extern ofstream logfile;
 

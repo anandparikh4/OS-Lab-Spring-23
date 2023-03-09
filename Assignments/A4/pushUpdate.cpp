@@ -8,7 +8,7 @@
 using namespace std;
 
 extern vector<vector<int>> graph;
-extern map<int, Node> users;
+extern vector<Node> users;
 extern int curr_iter;
 extern vector<vector<Action>> shared;
 extern ofstream logfile;
@@ -55,7 +55,7 @@ void * pushUpdate(void * param){
         // All pushUpdate threads have CONCURRENT access to this code
         // read from "shared" queue
         prev_iter = curr_iter;
-        for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++) temp_shared[i] = shared[id+i*PUSHUPDATE_THREAD_COUNT];     // ## Change 2 to 4
+        for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++) temp_shared[i] = shared[id+i*PUSHUPDATE_THREAD_COUNT];
 
         pU_group._wait();
         finish_read++;

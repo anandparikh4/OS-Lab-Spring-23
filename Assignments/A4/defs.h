@@ -8,11 +8,11 @@
 #include <iostream>
 #include <fstream>
 
-#define PUSHUPDATE_THREAD_COUNT 5   // ## Change to 25
-#define READPOST_THREAD_COUNT 10
-#define RANDOM_NODE_COUNT 10         // ## Change to 100
-#define SLEEP_SECONDS 10        // ## Change to 120
-#define ACTIONS_PROPORTIONALITY_CONSTANT 1
+const int PUSHUPDATE_THREAD_COUNT = 5;              // ## Change to 25
+const int READPOST_THREAD_COUNT = 10;               // ## Change to 10
+const int RANDOM_NODE_COUNT = 20;                   // ## Change to 100
+const int SLEEP_SECONDS = 10;                       // ## Change to 120
+const int ACTIONS_PROPORTIONALITY_CONSTANT = 1;     // ## Change to 10 
 
 void exit_with_error(std::string);
 
@@ -20,9 +20,8 @@ class my_semaphore{
     private:
         int value, wakeups;
         pthread_mutex_t mutex;
-        pthread_mutexattr_t mutexattr;
         pthread_cond_t cond;
-        pthread_condattr_t condattr;
+        // using default (NULL) attributes for pthread_mutexattr_t and pthread_condattr_t
 
     public:
         my_semaphore(int val);

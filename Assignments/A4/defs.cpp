@@ -16,16 +16,10 @@ void exit_with_error(string s){
 my_semaphore::my_semaphore(int val = 1):
 value(val),wakeups(0)
 {
-    if(pthread_mutexattr_init(&mutexattr) < 0){
-        exit_with_error("my_semaphore::pthread_mutexattr_init() failed");
-    }
-    if(pthread_mutex_init(&mutex , &mutexattr) < 0){
+    if(pthread_mutex_init(&mutex , NULL) != 0){
         exit_with_error("my_semaphore::pthread_mutex_init() failed");
     }
-    if(pthread_condattr_init(&condattr) < 0){
-        exit_with_error("my_semaphore::pthread_condattr_init() failed");
-    }
-    if(pthread_cond_init(&cond , &condattr) < 0){
+    if(pthread_cond_init(&cond , NULL) != 0){
         exit_with_error("my_semaphore::pthread_cond_init() failed");
     }
 }
@@ -34,62 +28,64 @@ value(val),wakeups(0)
 my_semaphore::my_semaphore(const my_semaphore &s):
 value(s.value),wakeups(s.wakeups)
 {
-    if(pthread_mutexattr_init(&mutexattr) < 0){
-        exit_with_error("my_semaphore::pthread_mutexattr_init() failed");
-    }
-    if(pthread_mutex_init(&mutex , &mutexattr) < 0){
+    if(pthread_mutex_init(&mutex , NULL) != 0){
         exit_with_error("my_semaphore::pthread_mutex_init() failed");
     }
-    if(pthread_condattr_init(&condattr) < 0){
-        exit_with_error("my_semaphore::pthread_condattr_init() failed");
-    }
-    if(pthread_cond_init(&cond , &condattr) < 0){
+    if(pthread_cond_init(&cond , NULL) != 0){
         exit_with_error("my_semaphore::pthread_cond_init() failed");
     }
 }
 
 // Destructor
 my_semaphore::~my_semaphore(){
-    if(pthread_mutex_destroy(&mutex) < 0){
+    if(pthread_mutex_destroy(&mutex) != 0){
         exit_with_error("my_semaphore::pthread_mutex_destroy() failed");
     }
-    if(pthread_mutexattr_destroy(&mutexattr) < 0){
-        exit_with_error("my_semaphore::pthread_mutexattr_destroy() failed");
-    }
-    if(pthread_cond_destroy(&cond) < 0){
+    if(pthread_cond_destroy(&cond) != 0){
         exit_with_error("my_semaphore::pthread_cond_destroy() failed");
-    }
-    if(pthread_condattr_destroy(&condattr) < 0){
-        exit_with_error("my_semaphore::pthread_condattr_destroy() failed");
     }
 }
 
 // semaphore wait
 void my_semaphore::_wait(){
-    pthread_mutex_lock(&mutex);
+    if(pthread_mutex_lock(&mutex) != 0){
+        exit_with_error("my_semaphore::_wait::pthread_mutex_lock() failed");
+    }
     value--;
     if(value < 0){
         while(wakeups == 0){
-            pthread_cond_wait(&cond , &mutex);
+            if(pthread_cond_wait(&cond , &mutex) != 0){
+                exit_with_error("my_semaphore::_wait::pthread_cond_wait() failed");
+            }
         }
         wakeups--;
     }
     if(wakeups > 0){
         cout<<"Broadcasting"<<endl;
-        pthread_cond_broadcast(&cond);
+        if(pthread_cond_broadcast(&cond) != 0){
+            exit_with_error("my_semaphore::_wait::pthread_cond_broadcast() failed");
+        }
     } 
-    pthread_mutex_unlock(&mutex);
+    if(pthread_mutex_unlock(&mutex) != 0){
+        exit_with_error("my_semaphore::_wait::pthread_mutex_unlock() failed");
+    }
 }
 
 // semaphore signal
 void my_semaphore::_signal(){
-    pthread_mutex_lock(&mutex);
+    if(pthread_mutex_lock(&mutex) != 0){
+        exit_with_error("my_semaphore::pthread_mutex_lock() failed");
+    }
     value++;
     if(value <= 0){
         wakeups++;
-        pthread_cond_broadcast(&cond);
+        if(pthread_cond_broadcast(&cond) != 0){
+            exit_with_error("my_semaphore::pthread_cond_broadcast() failed");
+        }
     }
-    pthread_mutex_unlock(&mutex);
+    if(pthread_mutex_unlock(&mutex) != 0){
+        exit_with_error("my_semaphore::pthread_mutex_unlock() failed");
+    }
 }
 
 // Class Action

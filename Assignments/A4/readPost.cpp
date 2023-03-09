@@ -8,7 +8,7 @@
 using namespace std;
 
 extern vector<vector<int>> graph;
-extern map<int, Node> users;
+extern vector<Node> users;
 extern int curr_iter;
 extern ofstream logfile;
 extern my_semaphore write_logfile;
@@ -56,7 +56,7 @@ void * readPost(void * param){
         // Read concurrently from "inform" queue
         for(int i=0;i<ceil(((double)inform.size())/READPOST_THREAD_COUNT);i++){
             if((id+i*READPOST_THREAD_COUNT) >= inform.size()) break;
-            temp_inform.push_back(inform[id+i*READPOST_THREAD_COUNT]);     // ## Change 2 to 4
+            temp_inform.push_back(inform[id+i*READPOST_THREAD_COUNT]);
         }
         rP_group._wait();
         finish++;
