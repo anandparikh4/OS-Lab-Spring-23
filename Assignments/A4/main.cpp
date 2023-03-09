@@ -20,6 +20,7 @@ vector<vector<int>> graph(37700);
 vector<Node> users(37700);
 ofstream logfile;
 my_semaphore write_logfile(1);
+my_semaphore write_stdout(1);
 
 // Read from a csv file, edges of a graph, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
 void load_graph(){
@@ -72,7 +73,7 @@ int main(){
 
     load_graph();       // load graph into memory
     time_t start_time = time(0),end_time;
-    cout<<"Start Time:"<<start_time<<endl;
+    cout<<"Start Compute Time:"<<start_time<<endl;
     precompute_priorities();    // precompute the priorities OF each node FOR each node
     end_time = time(0);
     cout<<"Finish Compute Time:"<<end_time<<endl;

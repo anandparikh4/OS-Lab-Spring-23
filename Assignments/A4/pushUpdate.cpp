@@ -9,11 +9,12 @@ using namespace std;
 
 extern vector<vector<int>> graph;
 extern vector<Node> users;
-extern int curr_iter;
+extern int curr_uS_iter;
 extern vector<vector<Action>> shared;
 extern ofstream logfile;
 extern my_semaphore write_logfile;
 extern my_semaphore write_shared,read_shared;
+extern my_semaphore write_stdout;
 
 my_semaphore write_inform(1),read_inform(0);
 my_semaphore pU_group(1);
@@ -32,7 +33,7 @@ void * pushUpdate(void * param){
     string file_name;
     file_name.push_back('a' + id);
     file_name += extn_pu;
-    vector<vector<Action>> temp_shared(RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT);
+    vector<vector<Action>> temp_shared(BATCH_SIZE / PUSHUPDATE_THREAD_COUNT);
     ofstream testfile;
     testfile.open(file_name , std::ios_base::app);
 
@@ -54,15 +55,15 @@ void * pushUpdate(void * param){
 
         // All pushUpdate threads have CONCURRENT access to this code
         // read from "shared" queue
-        prev_iter = curr_iter;
-        for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++) temp_shared[i] = shared[id+i*PUSHUPDATE_THREAD_COUNT];
+        prev_iter = curr_uS_iter;
+        for(int i=0;i<BATCH_SIZE / PUSHUPDATE_THREAD_COUNT;i++) temp_shared[i] = shared[id+i*PUSHUPDATE_THREAD_COUNT];
 
         pU_group._wait();
         finish_read++;
         if(finish_read == PUSHUPDATE_THREAD_COUNT){
             start_read = 0;
             finish_read = 0;
-            cout<<"All pushUpdate threads have finished their reading for iteration #"<<prev_iter<<endl;
+            // cout<<"All pushUpdate threads have finished their reading for iteration #"<<prev_iter<<endl;
             write_shared._signal();
         }
         pU_group._signal();
@@ -71,7 +72,7 @@ void * pushUpdate(void * param){
         testfile << "---------------------------------------------------------------------------\n";
         testfile << "pushUpdate[" << id << "] iteration #: " << prev_iter << endl;
         map<int, int> temp_feed_updates;  // Stores the nodes that will be updated in the current iteration
-        for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++){
+        for(int i=0;i<BATCH_SIZE / PUSHUPDATE_THREAD_COUNT;i++){
             int user_id = temp_shared[i][0].user_id;
             for(auto x: graph[user_id]){
                 temp_feed_updates[x] |= (1<<i);
@@ -80,7 +81,7 @@ void * pushUpdate(void * param){
 
         for(auto x: temp_feed_updates){
             users[x.first].feedsem._wait();
-            for(int i=0;i<RANDOM_NODE_COUNT / PUSHUPDATE_THREAD_COUNT;i++){
+            for(int i=0;i<BATCH_SIZE / PUSHUPDATE_THREAD_COUNT;i++){
                 if(x.second & (1<<i)){
                     for(int j=0;j<temp_shared[i].size();j++){
                         users[x.first].feed.push_back(temp_shared[i][j]);
@@ -98,7 +99,7 @@ void * pushUpdate(void * param){
         // All pushUpdate threads have SEQUENTIAL access to this code
         // write to "inform" queue
         test_count++;
-        cout << "pushUpdate[" << id << "] iteration #: " << prev_iter << "| count = "  << test_count << endl;
+        // cout << "pushUpdate[" << id << "] iteration #: " << prev_iter << "| count = "  << test_count << endl;
         for(auto x: temp_feed_updates){
             feed_updates.insert(x.first);
         }
@@ -108,13 +109,13 @@ void * pushUpdate(void * param){
             written = 0;
             for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++) done_pu[i] = false;
             inform.clear();
-            cout<<"Inform size: "<<feed_updates.size()<<endl;
+            // cout<<"Inform size: "<<feed_updates.size()<<endl;
             for(auto x: feed_updates){
                 inform.push_back(x);
                 // cout<<"Size of feed of "<<x<<" is "<<users[x].feed.size()<<endl;
             } 
             feed_updates.clear();
-            cout<<"All pushUpdate threads have finished their writing for iteration #"<<prev_iter<<endl;
+            // cout<<"All pushUpdate threads have finished their writing for iteration #"<<prev_iter<<endl;
             read_inform._signal();
         }
         pU_group._signal();
@@ -122,6 +123,10 @@ void * pushUpdate(void * param){
         // write_logfile._wait();
         // // write to logfile
         // write_logfile._signal();
+
+        write_stdout._wait();
+        cout << "pushUpdate[" << id << "]" << ": iteration #" << prev_iter << endl;
+        write_stdout._signal();
     }
 
     testfile.close();

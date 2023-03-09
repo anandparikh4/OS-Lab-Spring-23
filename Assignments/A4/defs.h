@@ -13,6 +13,8 @@ const int READPOST_THREAD_COUNT = 10;               // ## Change to 10
 const int RANDOM_NODE_COUNT = 20;                   // ## Change to 100
 const int SLEEP_SECONDS = 10;                       // ## Change to 120
 const int ACTIONS_PROPORTIONALITY_CONSTANT = 1;     // ## Change to 10 
+const int NUM_BATCHES = 4;                          // ## Change to 4
+const int BATCH_SIZE = RANDOM_NODE_COUNT/NUM_BATCHES;
 
 void exit_with_error(std::string);
 

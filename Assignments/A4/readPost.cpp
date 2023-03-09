@@ -9,10 +9,10 @@ using namespace std;
 
 extern vector<vector<int>> graph;
 extern vector<Node> users;
-extern int curr_iter;
 extern ofstream logfile;
 extern my_semaphore write_logfile;
 extern my_semaphore write_inform,read_inform;
+extern my_semaphore write_stdout;
 extern int test_count;
 extern vector<int> inform;
 
@@ -48,7 +48,7 @@ void * readPost(void * param){
         start++;
         rP_group._signal();
 
-        prev_iter = curr_iter;
+        prev_iter = test_count / PUSHUPDATE_THREAD_COUNT;
         // All readPost threads have CONCURRENT access to this code
         // read from "inform" queue
         temp_count = test_count;
@@ -65,7 +65,7 @@ void * readPost(void * param){
             start = 0;
             finish = 0;
             for(int i=0;i<READPOST_THREAD_COUNT;i++) done_rp[i] = false;
-            cout<<"All readPost threads have finished their reading for iteration #"<<prev_iter<<endl;
+            // cout<<"All readPost threads have finished their reading for iteration #"<<prev_iter<<endl;
             write_inform._signal();
         }
         rP_group._signal();
@@ -83,10 +83,15 @@ void * readPost(void * param){
             users[i].feed.clear();
             users[i].feedsem._signal();
         }
-        cout<<"readPost["<<id<<"] has finished its work for iteration #"<<prev_iter<<endl;
+        // cout<<"readPost["<<id<<"] has finished its work for iteration #"<<prev_iter<<endl;
+
         // write_logfile._wait();
         // // write to logfile
         // write_logfile._signal();
+
+        write_stdout._wait();
+        cout << "readPost[" << id << "]" << ": iteration #" << prev_iter << endl;
+        write_stdout._signal();
     }
     
     pthread_exit(0);
