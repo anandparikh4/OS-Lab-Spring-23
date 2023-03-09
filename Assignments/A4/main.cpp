@@ -90,8 +90,9 @@ int main(){
     cout << "Max Priority: " << max_priority << endl;
     cout << "Users: " << user_a << " " << user_b << endl;
     cout<<"Compute Time:"<<end_time - start_time<<endl;
+    
     // logfile.open("sns.txt", std::ios_base::app);
-    // Select 100 random nodes from the graph
+    // // Select 100 random nodes from the graph
     // vector<int> random_nodes(100);
     // for(int j=0;j<=10;j++){
     //     for(int i=0;i<100;i++){
@@ -116,77 +117,77 @@ int main(){
 
 
 
-    // logfile.open("sns.log" , std::ios_base::app);
+    logfile.open("sns.log" , std::ios_base::app);
 
-    // // Generate userSimulator thread
-    // pthread_t userSimulator_thread;
-    // pthread_attr_t userSimulator_attr;
-    // if(pthread_attr_init(&userSimulator_attr) < 0){
-    //     exit_with_error("userSimulator::pthread_attr_init() failed");
-    // }
-    // if(pthread_create(&userSimulator_thread , &userSimulator_attr , userSimulator , NULL) < 0){
-    //     exit_with_error("userSimulator::pthread_create() failed");
-    // }
+    // Generate userSimulator thread
+    pthread_t userSimulator_thread;
+    pthread_attr_t userSimulator_attr;
+    if(pthread_attr_init(&userSimulator_attr) < 0){
+        exit_with_error("userSimulator::pthread_attr_init() failed");
+    }
+    if(pthread_create(&userSimulator_thread , &userSimulator_attr , userSimulator , NULL) < 0){
+        exit_with_error("userSimulator::pthread_create() failed");
+    }
 
-    // // Generate 25 pushUpdate threads
-    // pthread_t pushUpdate_thread[PUSHUPDATE_THREAD_COUNT];
-    // pthread_attr_t pushUpdate_attr[PUSHUPDATE_THREAD_COUNT];
-    // for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
-    //     if(pthread_attr_init(&pushUpdate_attr[i]) < 0){
-    //         exit_with_error("pushUpdate::pthread_attr_init() failed");
-    //     }
-    //     if(pthread_create(&pushUpdate_thread[i] , &pushUpdate_attr[i] , pushUpdate , (void *)(uintptr_t)i) < 0){
-    //         exit_with_error("pushUpdate::pthread_create() failed");
-    //     }
-    // }
+    // Generate 25 pushUpdate threads
+    pthread_t pushUpdate_thread[PUSHUPDATE_THREAD_COUNT];
+    pthread_attr_t pushUpdate_attr[PUSHUPDATE_THREAD_COUNT];
+    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+        if(pthread_attr_init(&pushUpdate_attr[i]) < 0){
+            exit_with_error("pushUpdate::pthread_attr_init() failed");
+        }
+        if(pthread_create(&pushUpdate_thread[i] , &pushUpdate_attr[i] , pushUpdate , (void *)(uintptr_t)i) < 0){
+            exit_with_error("pushUpdate::pthread_create() failed");
+        }
+    }
 
-    // // Generate 10 readPost threads
-    // pthread_t readPost_thread[READPOST_THREAD_COUNT];
-    // pthread_attr_t readPost_attr[READPOST_THREAD_COUNT];
-    // for(int i=0;i<READPOST_THREAD_COUNT;i++){
-    //     if(pthread_attr_init(&readPost_attr[i]) < 0){
-    //         exit_with_error("readPost::pthread_attr_init() failed");
-    //     }
-    //     if(pthread_create(&readPost_thread[i] , &readPost_attr[i] , readPost , (void *)(uintptr_t)i) < 0){
-    //         exit_with_error("readPost::pthread_create() failed");
-    //     }
-    // }
+    // Generate 10 readPost threads
+    pthread_t readPost_thread[READPOST_THREAD_COUNT];
+    pthread_attr_t readPost_attr[READPOST_THREAD_COUNT];
+    for(int i=0;i<READPOST_THREAD_COUNT;i++){
+        if(pthread_attr_init(&readPost_attr[i]) < 0){
+            exit_with_error("readPost::pthread_attr_init() failed");
+        }
+        if(pthread_create(&readPost_thread[i] , &readPost_attr[i] , readPost , (void *)(uintptr_t)i) < 0){
+            exit_with_error("readPost::pthread_create() failed");
+        }
+    }
 
-    // // Join all threads
-    // if(pthread_join(userSimulator_thread, NULL)){
-    //     exit_with_error("userSimulator::pthread_join() failed");
-    // }
+    // Join all threads
+    if(pthread_join(userSimulator_thread, NULL)){
+        exit_with_error("userSimulator::pthread_join() failed");
+    }
 
-    // for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
-    //     if(pthread_join(pushUpdate_thread[i] , NULL) < 0){
-    //         exit_with_error("pushUpdate::pthread_join() failed");
-    //     }
-    // }
+    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+        if(pthread_join(pushUpdate_thread[i] , NULL) < 0){
+            exit_with_error("pushUpdate::pthread_join() failed");
+        }
+    }
 
-    // for(int i=0;i<READPOST_THREAD_COUNT;i++){
-    //     if(pthread_join(readPost_thread[i] , NULL) < 0){
-    //         exit_with_error("readPost::pthread_join() failed");
-    //     }
-    // }
+    for(int i=0;i<READPOST_THREAD_COUNT;i++){
+        if(pthread_join(readPost_thread[i] , NULL) < 0){
+            exit_with_error("readPost::pthread_join() failed");
+        }
+    }
 
-    // // Destroy all threads' attributes
-    // if(pthread_attr_destroy(&userSimulator_attr) < 0){
-    //     exit_with_error("userSimulator::pthread_attr_ddestroy() failed");
-    // }
+    // Destroy all threads' attributes
+    if(pthread_attr_destroy(&userSimulator_attr) < 0){
+        exit_with_error("userSimulator::pthread_attr_ddestroy() failed");
+    }
 
-    // for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
-    //     if(pthread_attr_destroy(&pushUpdate_attr[i])){
-    //         exit_with_error("pushUpdate::pthread_attr_destroy() failed");
-    //     }
-    // }
+    for(int i=0;i<PUSHUPDATE_THREAD_COUNT;i++){
+        if(pthread_attr_destroy(&pushUpdate_attr[i])){
+            exit_with_error("pushUpdate::pthread_attr_destroy() failed");
+        }
+    }
 
-    // for(int i=0;i<READPOST_THREAD_COUNT;i++){
-    //     if(pthread_attr_destroy(&readPost_attr[i])){
-    //         exit_with_error("readPost::pthread_attr_destroy() failed");
-    //     }
-    // }
+    for(int i=0;i<READPOST_THREAD_COUNT;i++){
+        if(pthread_attr_destroy(&readPost_attr[i])){
+            exit_with_error("readPost::pthread_attr_destroy() failed");
+        }
+    }
 
-    // logfile.close();
+    logfile.close();
 
     return 0;
 }
