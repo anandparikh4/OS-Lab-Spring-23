@@ -1,10 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
-#include <errno.h>
 #include "defs.h"
-
 using namespace std;
 
 void exit_with_error(string s){

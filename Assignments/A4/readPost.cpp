@@ -1,9 +1,3 @@
-#include <bits/stdc++.h>
-#include <pthread.h>
-#include <time.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include "defs.h"
 using namespace std;
 
@@ -13,7 +7,7 @@ extern ofstream logfile;
 extern my_semaphore write_logfile;
 extern my_semaphore write_inform,read_inform;
 extern int test_count;
-extern vector<int> inform;
+extern vector<int> * inform;
 
 my_semaphore rP_group(1);
 int start = 0;
@@ -59,9 +53,9 @@ void * readPost(void * param){
         // temp_count = test_count;
         vector<int> temp_inform;
         // Read concurrently from "inform" queue
-        for(int i=0;i<ceil(((double)inform.size())/READPOST_THREAD_COUNT);i++){
-            if((id+i*READPOST_THREAD_COUNT) >= inform.size()) break;
-            temp_inform.push_back(inform[id+i*READPOST_THREAD_COUNT]);
+        for(int i=0;i<ceil(((double)inform->size())/READPOST_THREAD_COUNT);i++){
+            if((id+i*READPOST_THREAD_COUNT) >= inform->size()) break;
+            temp_inform.push_back((*inform)[id+i*READPOST_THREAD_COUNT]);
         }
         rP_group._wait();
         finish++;
@@ -71,6 +65,7 @@ void * readPost(void * param){
             finish = 0;
             for(int i=0;i<READPOST_THREAD_COUNT;i++) done_rp[i] = false;
             // cout<<"All readPost threads have finished their reading for iteration #"<<prev_iter<<endl;
+            delete inform;
             write_inform._signal();
         }
         rP_group._signal();

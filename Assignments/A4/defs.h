@@ -1,19 +1,26 @@
 #ifndef __DEFS_H
 #define __DEFS_H
 
-#include <vector>
-#include <map>
-#include <string>
-#include <pthread.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <time.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <errno.h>
+#include <vector>
+#include <string>
+#include <set>
+#include <map>
+#include <cmath>
+#include <algorithm>
 
-const int PUSHUPDATE_THREAD_COUNT = 25;              // ## Change to 25
-const int READPOST_THREAD_COUNT = 10;               // ## Change to 10
-const int RANDOM_NODE_COUNT = 100;                   // ## Change to 100
-const int SLEEP_SECONDS = 120;                       // ## Change to 120
-const int ACTIONS_PROPORTIONALITY_CONSTANT = 10;     // ## Change to 10 
-const int NUM_BATCHES = 4;                          // ## Change to 4
+const int PUSHUPDATE_THREAD_COUNT = 25;                 // ## Change to 25
+const int READPOST_THREAD_COUNT = 10;                   // ## Change to 10
+const int RANDOM_NODE_COUNT = 100;                      // ## Change to 100
+const int SLEEP_SECONDS = 120;                          // ## Change to 120
+const int ACTIONS_PROPORTIONALITY_CONSTANT = 10;        // ## Change to 10 
+const int NUM_BATCHES = 4;                              // ## Change to 4
 const int BATCH_SIZE = RANDOM_NODE_COUNT/NUM_BATCHES;
 
 void exit_with_error(std::string);

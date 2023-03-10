@@ -1,16 +1,5 @@
-#include <bits/stdc++.h>
-#include <pthread.h>
-#include <time.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include "defs.h"
 using namespace std;
-
-// ## Fix #includes
-// ## Fix the parameters (number of threads, sleep time etc.)
-// ## Change #define to const int wherever possible
-// ## Correct error checks in all pthread things from <0 to !=0
 
 extern void * userSimulator(void *);
 extern void * pushUpdate(void *);
