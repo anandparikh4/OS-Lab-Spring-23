@@ -10,9 +10,6 @@ vector<vector<Action> * > shared(BATCH_SIZE);
 my_semaphore write_shared(1),read_shared(0);
 int curr_uS_iter = 0;
 
-bool cmp(const pair<int,vector<Action>> &a , const pair<int,vector<Action>> &b){
-    return a.first > b.first;
-}
 
 void *userSimulator(void *arg){
 
