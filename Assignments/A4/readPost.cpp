@@ -12,7 +12,6 @@ extern vector<Node> users;
 extern ofstream logfile;
 extern my_semaphore write_logfile;
 extern my_semaphore write_inform,read_inform;
-extern my_semaphore write_stdout;
 extern int test_count;
 extern vector<int> inform;
 
@@ -31,12 +30,12 @@ bool cmp(const Action &a, const Action &b, const int c){
 void * readPost(void * param){
     int id = (intptr_t)param;
     int prev_iter = 0;
-    string file_name;
-    file_name.push_back('0' + id);
-    file_name += extn_rp;
-    ofstream testfile;
-    testfile.open(file_name , std::ios_base::app);
-    int temp_count = 0;
+    // string file_name;
+    // file_name.push_back('0' + id);
+    // file_name += extn_rp;
+    // ofstream testfile;
+    // testfile.open(file_name , std::ios_base::app);
+    // int temp_count = 0;
 
     while(1){
         
@@ -57,7 +56,7 @@ void * readPost(void * param){
         prev_iter = test_count / PUSHUPDATE_THREAD_COUNT;
         // All readPost threads have CONCURRENT access to this code
         // read from "inform" queue
-        temp_count = test_count;
+        // temp_count = test_count;
         vector<int> temp_inform;
         // Read concurrently from "inform" queue
         for(int i=0;i<ceil(((double)inform.size())/READPOST_THREAD_COUNT);i++){
@@ -75,14 +74,12 @@ void * readPost(void * param){
             write_inform._signal();
         }
         rP_group._signal();
-
-        testfile << "---------------------------------------------------------------------------\n";
-        testfile << "readPost[" << id << "] iteration #: " << prev_iter << "| count = " << temp_count << endl;
+        stringstream ss;
+        ss << "readPost[" << id << "] iteration #: " << prev_iter << "\n";
         // testfile << "Size of temp_inform = " << temp_inform.size() << endl;
         for(auto i:temp_inform){
             users[i].feedsem._wait();
             if(users[i].feed.size()){
-                testfile << "User " << i << " has " << users[i].feed.size() << " posts in his feed"<<endl;
                 if(users[i].sort_by==0){
                     sort(users[i].feed.begin(),users[i].feed.end(),[&](const Action &a, const Action &b){
                         return users[i].priority[a.user_id] > users[i].priority[b.user_id];
@@ -91,23 +88,29 @@ void * readPost(void * param){
                 // testfile << "Sort Status = " << ((users[i].sort_by==0)?"Yes":"No") << endl;
                 // testfile << "Zero element priority = " << users[i].priority[users[i].feed[0].user_id] << endl;
                 // testfile << "Last element priority = " << users[i].priority[users[i].feed[users[i].feed.size()-1].user_id] << endl;
+                ss << "User " << i << " has " << users[i].feed.size() << " posts in his feed."<<"\n";
+                ss << "Reading feed of user in " << ((users[i].sort_by==0)?"Priority based":"Chronological") << " order."<<"\n";
                 for(auto x:users[i].feed){
-                    testfile << x << "\n";
+                    ss << "I read action number " << x.action_id << " of type "<< x.action_type << " posted by user " << x.user_id << " at time " << x.timestamp;
+                    if(users[i].sort_by==0) ss << " with priority " << users[i].priority[x.user_id]<<"\n";
+                    else    ss<<"\n";
                 }
-                testfile<<"----------------------------------------------"<<endl;
+                ss<<"--------------------------------------------"<<"\n";
                 users[i].feed.clear();
             } 
             users[i].feedsem._signal();
         }
+        ss << "---------------------------------------------------------------------------"<<endl;
         // cout<<"readPost["<<id<<"] has finished its work for iteration #"<<prev_iter<<endl;
 
-        // write_logfile._wait();
-        // // write to logfile
-        // write_logfile._signal();
+        write_logfile._wait();
+        // write to logfile
+        logfile << ss.str();
+        cout << "Completed: readPost[" << id << "]" << ": iteration #" << prev_iter << endl;
+        write_logfile._signal();
 
-        write_stdout._wait();
-        cout << "readPost[" << id << "]" << ": iteration #" << prev_iter << endl;
-        write_stdout._signal();
+        // write_stdout._wait();
+        // write_stdout._signal();
     }
     
     pthread_exit(0);

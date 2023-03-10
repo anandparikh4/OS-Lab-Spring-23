@@ -20,7 +20,6 @@ vector<vector<int>> graph(37700);
 vector<Node> users(37700);
 ofstream logfile;
 my_semaphore write_logfile(1);
-my_semaphore write_stdout(1);
 
 // Read from a csv file, edges of a graph, of the form (u,v) in each line and store in a vector of vectors and also intialise a map of users with user_id as key and Node object as value and fill it up with the users in the graph
 void load_graph(){
@@ -72,26 +71,40 @@ int main(){
     srand(time(NULL));  // seed time only once globally
 
     load_graph();       // load graph into memory
-    time_t start_time = time(0),end_time;
-    cout<<"Start Compute Time:"<<start_time<<endl;
-    precompute_priorities();    // precompute the priorities OF each node FOR each node
-    end_time = time(0);
-    cout<<"Finish Compute Time:"<<end_time<<endl;
-    int max_priority = 0;
-    int user_a, user_b;
-    for(int i=0;i<users.size();i++){
-        for(auto j:users[i].priority){
-            if(j.second > max_priority){
-                max_priority = j.second;
-                user_a = i;
-                user_b = j.first;
-            }
+
+    ifstream priority_file;
+    priority_file.open("priorities.txt",std::ios_base::in);
+    if(priority_file.is_open()){
+        int u,v,p;
+        while(priority_file >> u >> v >> p){
+            users[u].priority[v] = p;
         }
     }
-    cout << "Max Priority: " << max_priority << endl;
-    cout << "Users: " << user_a << " " << user_b << endl;
-    cout<<"Compute Time:"<<end_time - start_time<<endl;
-    
+    else{
+        time_t start_time = time(0),end_time;
+        cout<<"Start Compute Time:"<<start_time<<endl;
+        precompute_priorities();    // precompute the priorities OF each node FOR each node
+        end_time = time(0);
+        cout<<"Finish Compute Time:"<<end_time<<endl;
+        int max_priority = 0;
+        int user_a, user_b;
+        ofstream prior_file;
+        prior_file.open("priorities.txt",std::ios_base::out);
+        for(int i=0;i<users.size();i++){
+            for(auto j:users[i].priority){
+                if(j.second > max_priority){
+                    max_priority = j.second;
+                    user_a = i;
+                    user_b = j.first;
+                }
+                prior_file << i << " " << j.first << " " << j.second << "\n";
+            }
+        }
+        prior_file.close();
+        cout << "Max Priority: " << max_priority << endl;
+        cout << "Users: " << user_a << " " << user_b << endl;
+        cout<<"Compute Time:"<<end_time - start_time<<endl;
+    }
     // logfile.open("sns.txt", std::ios_base::app);
     // // Select 100 random nodes from the graph
     // vector<int> random_nodes(100);

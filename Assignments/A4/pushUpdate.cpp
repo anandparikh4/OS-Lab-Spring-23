@@ -14,7 +14,6 @@ extern vector<vector<Action>> shared;
 extern ofstream logfile;
 extern my_semaphore write_logfile;
 extern my_semaphore write_shared,read_shared;
-extern my_semaphore write_stdout;
 
 my_semaphore write_inform(1),read_inform(0);
 my_semaphore pU_group(1);
@@ -24,18 +23,18 @@ int start_read = 0;
 int finish_read = 0;
 int written = 0;
 bool done_pu[PUSHUPDATE_THREAD_COUNT] = {false};
-string extn_pu = ".pU_txt";
+// string extn_pu = ".pU_txt";
 int test_count = 0;
 
 void * pushUpdate(void * param){
     int id = (intptr_t)param;
     int prev_iter = 0;
-    string file_name;
-    file_name.push_back('a' + id);
-    file_name += extn_pu;
+    // string file_name;
+    // file_name.push_back('a' + id);
+    // file_name += extn_pu;
     vector<vector<Action>> temp_shared(BATCH_SIZE / PUSHUPDATE_THREAD_COUNT);
-    ofstream testfile;
-    testfile.open(file_name , std::ios_base::app);
+    // ofstream testfile;
+    // testfile.open(file_name , std::ios_base::app);
 
     while(1){
 
@@ -68,9 +67,6 @@ void * pushUpdate(void * param){
         }
         pU_group._signal();
 
-        // writing to respective test files
-        testfile << "---------------------------------------------------------------------------\n";
-        testfile << "pushUpdate[" << id << "] iteration #: " << prev_iter << endl;
         map<int, int> temp_feed_updates;  // Stores the nodes that will be updated in the current iteration
         for(int i=0;i<BATCH_SIZE / PUSHUPDATE_THREAD_COUNT;i++){
             int user_id = temp_shared[i][0].user_id;
@@ -120,15 +116,21 @@ void * pushUpdate(void * param){
         }
         pU_group._signal();
 
-        // write_logfile._wait();
-        // // write to logfile
-        // write_logfile._signal();
+        write_logfile._wait();
+        // write to logfile
+        logfile << "pushUpdate[" << id << "]" << ": iteration #" << prev_iter << "\n";
+        for(int i=0;i<BATCH_SIZE / PUSHUPDATE_THREAD_COUNT;i++){
+            logfile << "Read " << temp_shared[i].size() << " actions from shared queue of the user " << temp_shared[i][0].user_id << "\n";
+            logfile << "Updated the feed of " << graph[temp_shared[i][0].user_id].size() << " neighbours of the user " << temp_shared[i][0].user_id << "\n";
+        }
+        logfile << "---------------------------------------------------------------------------"<<endl;
+        cout << "Completed: pushUpdate[" << id << "]" << ": iteration #" << prev_iter << endl;
+        write_logfile._signal();
 
-        write_stdout._wait();
-        cout << "pushUpdate[" << id << "]" << ": iteration #" << prev_iter << endl;
-        write_stdout._signal();
+        // write_stdout._wait();
+        // write_stdout._signal();
     }
 
-    testfile.close();
+    // testfile.close();
     pthread_exit(0);
 }

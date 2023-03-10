@@ -11,7 +11,6 @@ extern vector<vector<int>> graph;
 extern vector<Node> users;
 extern my_semaphore write_logfile;
 extern ofstream logfile;
-extern my_semaphore write_stdout;
 
 vector<vector<Action>> shared(BATCH_SIZE);
 my_semaphore write_shared(1),read_shared(0);
@@ -56,17 +55,17 @@ void *userSimulator(void *arg){
 
             write_logfile._wait();
             // write to log file
-            logfile << "---------------------------------------------------------------------------\n";
-            logfile << "userSimulator iteration #" << curr_uS_iter << " : " << endl;
+            logfile << "userSimulator iteration #" << curr_uS_iter << " : " << "\n";
             for(int i=0;i<BATCH_SIZE;i++){
-                logfile<<"Node "<<i<<" : "<<endl;
-                for(int j=0;j<temp_shared[i].size();j++) logfile << temp_shared[i][j] << endl;
+                logfile<<"Node "<<i<<" : "<<"\n";
+                for(int j=0;j<temp_shared[i].size();j++) logfile << temp_shared[i][j] << "\n";
             }
+            logfile << "---------------------------------------------------------------------------"<<endl;
+            cout << "Completed: userSimulator: iteration #" << curr_uS_iter<< endl;
             write_logfile._signal();
 
-            write_stdout._wait();
-            cout << "userSimulator: iteration #" << curr_uS_iter<< endl;
-            write_stdout._signal();
+            // write_stdout._wait();
+            // write_stdout._signal();
         }
 
         sleep(SLEEP_SECONDS);
