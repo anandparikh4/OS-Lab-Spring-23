@@ -13,12 +13,8 @@ my_semaphore rP_group(1);
 int start = 0;
 int finish = 0;
 bool done_rp[READPOST_THREAD_COUNT] = {false};
-string extn_rp = ".rP_txt";
+// string extn_rp = ".rP_txt";
 
-// cmp function for sorting the feed of a user on the basis of priority of the poster node
-bool cmp(const Action &a, const Action &b, const int c){
-    return users[c].priority[a.user_id] > users[c].priority[b.user_id];
-}
 
 
 void * readPost(void * param){
