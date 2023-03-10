@@ -114,8 +114,17 @@ void * pushUpdate(void * param){
         // write to logfile
         logfile << "pushUpdate[" << id << "]" << ": iteration #" << prev_iter << "\n";
         for(int i=0;i<BATCH_SIZE / PUSHUPDATE_THREAD_COUNT;i++){
-            logfile << "Read " << temp_shared[i]->size() << " actions from shared queue of the user " << (*temp_shared[i])[0].user_id << "\n";
-            logfile << "Updated the feed of " << graph[(*temp_shared[i])[0].user_id].size() << " neighbours of the user " << (*temp_shared[i])[0].user_id << "\n";
+            // logfile << "Read " << temp_shared[i]->size() << " actions from shared queue of the user " << (*temp_shared[i])[0].user_id << "\n";
+            logfile << "Read following actions from shared queue of the user " << (*temp_shared[i])[0].user_id << ":\n";
+            for(int j=0;j<temp_shared[i]->size();j++){
+                logfile << "Read action-> " << (*temp_shared[i])[j] << "\n";
+            }
+            logfile << "Updated the feed of " << graph[(*temp_shared[i])[0].user_id].size() << " neighbours of the user " << (*temp_shared[i])[0].user_id << " with the above actions.\n";
+            logfile << "Neighbours of the user " << (*temp_shared[i])[0].user_id << " are: \n";
+            for(auto x: graph[(*temp_shared[i])[0].user_id]){
+                logfile << x << " ";
+            }
+            logfile << "\n";
             delete(temp_shared[i]);
         }
         logfile << "---------------------------------------------------------------------------"<<endl;
