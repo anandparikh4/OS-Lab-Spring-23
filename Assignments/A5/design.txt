@@ -1,0 +1,40 @@
+
+Struct room{
+    guest id
+    start time
+    end time = time(0)
+    total time += end - start
+    int occupancy
+}
+
+Set <struct , priority >
+
+set < n
+set.insert();
+
+set == n
+set.begin(), prior < curr
+set.pop()
+set.insert() , Guest thread <- set iterator
+
+occ == 1
+occ == 2, priority , infinity
+
+priority , infinity, cleaner
+cleaner.signal()
+
+
+Interrupt handler -> goto Statement;
+alarm -> Networks
+
+3 semaphores
+
+
+
+
+
+
+Create a priority(min heap) queue for guests currently in the hotel, sorted with their priority.
+So, if the top guest has less priority kick them out and insert the arriving guest.
+
+While inserting, if the occupancy count becomes 2, we can insert in the priority queue with priority infinity, so that no other guest can get that room.
