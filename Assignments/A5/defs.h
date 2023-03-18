@@ -29,3 +29,8 @@ class Room{
 };
 
 int gen_rand(int min, int max);
+
+struct cmp {
+    // Operator() overloading
+    bool operator()(const pair<int,Room> &a, const pair<int,Room> &b);
+};
