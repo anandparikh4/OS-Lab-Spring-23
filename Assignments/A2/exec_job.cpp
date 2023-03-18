@@ -60,7 +60,13 @@ void exec_job(process * job , int n_proc , int background){
     }
     free(job);
     if(!background){
-        while(!fg_procs.empty());
+        sigset_t empty_mask;
+        sigemptyset(&empty_mask);
+        sigchld_blocker(SIG_BLOCK);
+        while(!fg_procs.empty()){
+            sigsuspend(&empty_mask);
+        } 
+        sigchld_blocker(SIG_UNBLOCK);
         if(ctrl_z_received){
             ctrl_z_received = 0;
             killpg(foreground_pgid , SIGCONT);
