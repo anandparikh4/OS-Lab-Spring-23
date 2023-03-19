@@ -1,6 +1,6 @@
 #include "defs.h"
 
-extern int N;
+extern int N,Y;
 extern set<pair<int,Room>,cmp> rooms;
 extern vector<int> evicted;
 extern sem_t hotel_open,hotel_close,cleaner_book;
@@ -36,9 +36,8 @@ void* cleaner(void* arg){
         if(cleaner_finish == N){
             cleaner_start = 0;
             cleaner_finish = 0;
-            for(int i=0;i<N;i++){
-                rooms.insert({0,Room(i)});
-            }
+            for(int i=0;i<N;i++) rooms.insert({0,Room(i)});
+            for(int i=0;i<Y;i++) evicted[i] = 0;
             sem_post(&hotel_open);
         }
         sem_post(&cleaner_book); 
