@@ -25,13 +25,12 @@ class Room{
     int tot_duration;
     int occupancy;
 
-    Room(): guest_id(-1), room_id(-1), start_time(-1), tot_duration(0), occupancy(0) {}
+    Room();
     
-    Room(int room_num): room_id(room_num), guest_id(-1), start_time(-1), tot_duration(0), occupancy(0) {}
+    Room(int room_num);
 
-    Room(const Room & R): room_id(R.room_id) , guest_id(R.guest_id) , start_time(R.start_time) , tot_duration(R.tot_duration) , occupancy(R.occupancy) {}
+    Room(const Room & R);
 
-    ~Room() {}
 
     friend ostream& operator<<(ostream& os, const Room& room);
 };

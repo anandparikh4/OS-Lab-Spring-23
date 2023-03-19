@@ -18,6 +18,13 @@ void signal_blocker(int sig,int state){
     sigprocmask(state , &sig_set , NULL);
 }
 
+Room::Room(): guest_id(-1), room_id(-1), start_time(-1), tot_duration(0), occupancy(0) {}
+
+Room::Room(int room_num): guest_id(-1), room_id(room_num), start_time(-1), tot_duration(0), occupancy(0) {}
+
+Room::Room(const Room & R): guest_id(R.guest_id), room_id(R.room_id), start_time(R.start_time), tot_duration(R.tot_duration), occupancy(R.occupancy) {}
+
+
 ostream& operator<<(ostream& os, const Room& room){
     os << "Room " << room.room_id << " : " << room.guest_id << " " << room.start_time << " " << room.tot_duration << " " << room.occupancy << "\n";
     return os;
