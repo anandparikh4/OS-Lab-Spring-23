@@ -5,6 +5,7 @@
 
 #define GUEST_SLEEP_TIME 10,20
 #define GUEST_STAY_TIME 10,30
+#define PROPORTIONALITY_CONSTANT 1
 
 const int infinity = 1e9+7; 
 
@@ -32,5 +33,5 @@ int gen_rand(int min, int max);
 
 struct cmp {
     // Operator() overloading
-    bool operator()(const pair<int,Room> &a, const pair<int,Room> &b);
+    bool operator()(const pair<int,Room> &a, const pair<int,Room> &b) const;
 };

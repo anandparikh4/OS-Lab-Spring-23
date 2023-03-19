@@ -12,8 +12,11 @@ int gen_rand(int min, int max){
     return min + (rand() % (max - min + 1));
 }
 
-bool cmp::operator()(const pair<int,Room> &a, const pair<int,Room> &b){
+bool cmp::operator()(const pair<int,Room> &a, const pair<int,Room> &b) const{
     if(a.first == b.first){
+        if(a.second.occupancy == b.second.occupancy){
+            return a.second.room_id < b.second.room_id;
+        }
         return a.second.occupancy < b.second.occupancy;
     }
     return a.first < b.first;

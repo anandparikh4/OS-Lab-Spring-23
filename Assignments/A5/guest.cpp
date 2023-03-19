@@ -1,7 +1,9 @@
 #include "defs.h"
 
-extern set<pair<int,Room>> rooms;
+extern int N;
+extern set<pair<int,Room>,cmp> rooms;
 extern vector<int> evicted;
+extern sem_t hotel_open,hotel_close,guest_book;
 
 void* guest(void* arg){
     int guest_id = ((intptr_t)arg);
