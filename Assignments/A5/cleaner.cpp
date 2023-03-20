@@ -31,7 +31,7 @@ void* cleaner(void* arg){
         sleep(PROPORTIONALITY_CONSTANT * room.tot_duration);
 
         sem_wait(&cleaner_book);
-        cout << "Cleaner ID: " << cleaner_id << " cleans room ID: " << room.room_id << " for " << PROPORTIONALITY_CONSTANT * room.tot_duration << " seconds" << endl;
+        cout << "Cleaner ID-" << cleaner_id << " cleans room ID-" << room.room_id << " for " << PROPORTIONALITY_CONSTANT * room.tot_duration << " seconds" << endl;
         cleaner_finish++;
         if(cleaner_finish == N){
             cleaner_start = 0;

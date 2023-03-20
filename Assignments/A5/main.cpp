@@ -10,19 +10,22 @@ set<pair<int,Room>,cmp> rooms;
 vector<int> evicted;
 vector<int> priority;
 sem_t hotel_open,hotel_close,cleaner_book,guest_book;
-pthread_t *cleaner_threads,*guest_threads;
+sigset_t sigusr1_set;
+pthread_t *guest_threads , *cleaner_threads;
 
 int main(){
     srand(time(NULL));
 
     signal(SIGUSR1 , sigusr1_handler);
-    signal(SIGALRM , sigalrm_handler);
 
-    cout<<"Enter number of rooms: ";
+    sigemptyset(&sigusr1_set);
+    sigaddset(&sigusr1_set , SIGUSR1);
+
+    cout<<"\nEnter number of rooms: ";
     cin>>N;
-    cout<<"Enter number of cleaners: ";
+    cout<<"\nEnter number of cleaners: ";
     cin>>X;
-    cout<<"Enter number of guests: ";
+    cout<<"\nEnter number of guests: ";
     cin>>Y;
 
     evicted.resize(Y);
@@ -57,8 +60,6 @@ int main(){
         pthread_create(&cleaner_threads[i], &attr, cleaner, (void *)(uintptr_t)i);
     }
 
-    
-
     // // main simulating guests
     // for(int i=0;i<3;i++){
     //     sem_wait(&hotel_open);
@@ -83,13 +84,12 @@ int main(){
         pthread_join(cleaner_threads[i], NULL);
     }
 
-    free(guest_threads);
-    free(cleaner_threads);
-
     sem_destroy(&hotel_open);
     sem_destroy(&hotel_close);
     sem_destroy(&cleaner_book);
     sem_destroy(&guest_book);
+    free(guest_threads);
+    free(cleaner_threads);
 
     return 0;
 }

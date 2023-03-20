@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 #include <unistd.h>
-#include <signal.h>
 #include <semaphore.h>
 
 #define GUEST_SLEEP_TIME 10,20
@@ -13,8 +12,6 @@ using namespace std;
 
 void sigusr1_handler(int sig);
 
-void sigalrm_handler(int sig);
-
 void signal_blocker(int sig,int state);
 
 class Room{
@@ -24,14 +21,9 @@ class Room{
     int start_time;
     int tot_duration;
     int occupancy;
-    pthread_t tid;      // thread id of the corresponding guest id
 
     Room();
-    
     Room(int room_num);
-
-    Room(const Room & R);
-
 
     friend ostream& operator<<(ostream& os, const Room& room);
 };

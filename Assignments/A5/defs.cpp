@@ -2,28 +2,19 @@
 
 void sigusr1_handler(int sig){
     signal(SIGUSR1 , sigusr1_handler);
-    // cout << "Inside SIGUSR1 handler" << endl;
-    alarm(0);
-    return;
-}
-
-void sigalrm_handler(int sig){
-    signal(SIGALRM , sigalrm_handler);
     return;
 }
 
 void signal_blocker(int sig,int state){
-    sigset_t sig_set;
-    sigemptyset(&sig_set);
-    sigaddset(&sig_set , sig);
-    sigprocmask(state , &sig_set , NULL);
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset , sig);
+    pthread_sigmask(state , &sigset , NULL);
 }
 
-Room::Room(): guest_id(-1), room_id(-1), start_time(-1), tot_duration(0), occupancy(0), tid(0) {}
+Room::Room(): guest_id(-1), room_id(-1), start_time(-1), tot_duration(0), occupancy(0) {}
 
-Room::Room(int room_num): guest_id(-1), room_id(room_num), start_time(-1), tot_duration(0), occupancy(0), tid(0) {}
-
-Room::Room(const Room & R): guest_id(R.guest_id), room_id(R.room_id), start_time(R.start_time), tot_duration(R.tot_duration), occupancy(R.occupancy), tid(R.tid) {}
+Room::Room(int room_num): guest_id(-1), room_id(room_num), start_time(-1), tot_duration(0), occupancy(0) {}
 
 ostream& operator<<(ostream& os, const Room& room){
     os << "Room " << room.room_id << " : " << room.guest_id << " " << room.start_time << " " << room.tot_duration << " " << room.occupancy << "\n";
