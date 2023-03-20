@@ -4,6 +4,7 @@ extern int N;
 extern set<pair<int,Room>,cmp> rooms;
 extern vector<int> evicted,priority;
 extern sem_t hotel_open,hotel_close,guest_book;
+extern pthread_t *guest_threads;
 
 /*
     int guest_id;
@@ -17,7 +18,7 @@ int guest_start = 0,guest_finish = 0;
 
 void* guest(void* arg){
     int guest_id = ((intptr_t)arg);
-    cout<<"Guest "<<guest_id<<" created\n";
+    // cout<<"Guest "<<guest_id<<" created" <<  endl;
 
     while(1){
         int sleep_time = gen_rand(GUEST_SLEEP_TIME);
@@ -45,9 +46,11 @@ void* guest(void* arg){
             else new_priority = priority[guest_id];
             room.start_time = time(NULL);
             room.guest_id = guest_id;
+            room.tid = guest_threads[guest_id];
+            room.room_id = it->second.room_id;
             rooms.erase(it);
             rooms.insert({new_priority , room});
-            cout << "Guest ID: " << guest_id << " starts their stay in room ID: " << room.room_id;
+            cout << "Guest ID: " << guest_id << " starts their stay in room ID: " << room.room_id << endl;
         }
         
         else{       // no empty room, but can evict another guest
@@ -57,9 +60,14 @@ void* guest(void* arg){
             room.tot_duration += curr_time - it->second.start_time;
             room.start_time = curr_time;
             room.guest_id = guest_id;
+            room.tid = guest_threads[guest_id];
+            room.room_id = it->second.room_id;
             evicted[it->second.guest_id] = room.start_time;     // to notify the evicted person when they were evicted
-            pthread_kill(it->second.guest_id , SIGUSR1);
-            cout << "Guest ID: " << guest_id << " evicts Guest ID: " << it->second.guest_id << " from room ID: " << room.room_id;
+            cout << "Guest ID: " << guest_id << " evicts Guest ID: " << it->second.guest_id << " from room ID: " << room.room_id << endl;
+            
+            pthread_kill(it->second.tid , SIGUSR1);
+            cout << "eviction zone" << endl;
+            
             rooms.erase(it);
             rooms.insert({new_priority , room});
         }

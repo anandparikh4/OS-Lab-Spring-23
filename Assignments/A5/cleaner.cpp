@@ -9,7 +9,7 @@ int cleaner_start = 0,cleaner_finish = 0;
 
 void* cleaner(void* arg){
     int cleaner_id = ((intptr_t)arg);
-    cout<<"Cleaner "<<cleaner_id<<" created\n";
+    // cout<<"Cleaner "<<cleaner_id<<" created\n";
 
     while(1){
         sem_wait(&cleaner_book);

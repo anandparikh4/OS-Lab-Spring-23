@@ -20,10 +20,11 @@ void signal_blocker(int sig,int state);
 class Room{
     public:
     int guest_id;
-    int room_id;  // Can put it, as it is intialised in main and all threads just change other parameters
+    int room_id;        // Can put it, as it is intialised in main and all threads just change other parameters
     int start_time;
     int tot_duration;
     int occupancy;
+    pthread_t tid;      // thread id of the corresponding guest id
 
     Room();
     
