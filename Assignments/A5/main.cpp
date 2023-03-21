@@ -12,7 +12,8 @@ sigset_t sigusr1_set;
 pthread_t *guest_threads , *cleaner_threads;
 
 int main(){
-    srand(time(NULL));
+    int seed = time(NULL);
+    srand(seed);
 
     signal(SIGUSR1 , sigusr1_handler);
 

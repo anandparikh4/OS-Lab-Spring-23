@@ -7,7 +7,7 @@ extern sem_t hotel_open,hotel_close,guest_book;
 extern sigset_t sigusr1_set;
 extern pthread_t *guest_threads;
 
-int guest_start = 0,guest_finish = 0;
+int guest_start = 0;
 
 void* guest(void* arg){
     int guest_id = ((intptr_t)arg);
@@ -15,6 +15,8 @@ void* guest(void* arg){
     while(1){
         int sleep_time = gen_rand(GUEST_SLEEP_TIME);
         int stay_time = gen_rand(GUEST_STAY_TIME);
+
+        sleep(sleep_time);
 
         if(sem_wait(&guest_book) < 0){
             exit_with_error("guest::sem_wait() failed");
@@ -31,7 +33,6 @@ void* guest(void* arg){
             if(sem_post(&guest_book) < 0){
                 exit_with_error("guest::sem_post() failed");
             }
-            sleep(sleep_time);
             continue;
         }
 
@@ -42,13 +43,14 @@ void* guest(void* arg){
             room.guest_id = guest_id;
             room.room_id = it->second.room_id;
             room.start_time = time(NULL);
+            room.stay_time = stay_time;
             room.tot_duration = it->second.tot_duration;
             room.occupancy = it->second.occupancy + 1;
             if(room.occupancy == 2) new_priority = INF;
             else new_priority = priority[guest_id];
             rooms.erase(it);
             rooms.insert({new_priority , room});
-            cout << "Guest ID-" << guest_id << " starts their stay in room ID-" << room.room_id << endl;
+            cout << "Guest ID-" << guest_id << " starts their stay in room ID-" << room.room_id << " for " << stay_time << " seconds" << endl;
         }
         
         else{       // no empty room, but can evict another guest
@@ -56,21 +58,37 @@ void* guest(void* arg){
             room.room_id = it->second.room_id;
             int curr_time = time(NULL);
             room.start_time = curr_time;
-            room.tot_duration = curr_time - it->second.start_time;
+            room.tot_duration = min(curr_time - it->second.start_time,room.stay_time);
+            room.stay_time = stay_time;
             room.occupancy = 2;
             new_priority = INF;
-            evicted[it->second.guest_id] = room.start_time;     // to notify the evicted person when they were evicted
-            if(pthread_kill(guest_threads[it->second.guest_id] , SIGUSR1) != 0){
-                exit_with_error("guest::pthread_kill() failed");
+            if(it->second.guest_id>=0){
+                evicted[it->second.guest_id] = curr_time;     // to notify the evicted person when they were evicted
+                if(pthread_kill(guest_threads[it->second.guest_id] , SIGUSR1) != 0){
+                    exit_with_error("guest::pthread_kill() failed");
+                }
             }
             cout << "Guest ID-" << guest_id << " evicts Guest ID-" << it->second.guest_id << " from room ID-" << room.room_id << endl;
+            cout << "Guest ID-" << guest_id << " starts their stay in room ID-" << room.room_id << " for " << stay_time << " seconds" << endl;
             rooms.erase(it);
             rooms.insert({new_priority , room});
         }
 
+        guest_start++;
+        // If (2*N)th guest arrives, then close the hotel and let the cleaners clean the rooms
+        if(guest_start == 2 * N){
+            guest_start = 0;
+            if(sem_post(&hotel_close) < 0){
+                exit_with_error("guest::sem_post() failed");
+            }
+            if(sem_post(&guest_book) < 0){
+                exit_with_error("guest::sem_post() failed");
+            }
+            continue;
+        }
+
         signal_blocker(SIGUSR1 , SIG_BLOCK);
 
-        guest_start++;
         if(sem_post(&guest_book) < 0){
             exit_with_error("guest::sem_post() failed");
         }
@@ -83,9 +101,15 @@ void* guest(void* arg){
         if(sem_wait(&guest_book) < 0){
             exit_with_error("guest::sem_wait() failed");
         }
-        guest_finish++;
 
         signal_blocker(SIGUSR1 , SIG_UNBLOCK);
+
+        if(guest_start==0){
+            if(sem_post(&guest_book) < 0){
+                exit_with_error("guest::sem_post() failed");
+            }
+            continue;
+        }
 
         if(evicted[guest_id]){
             cout << "Guest ID-" << guest_id << " realizes they were evicted from room ID-" << room.room_id << " after " << evicted[guest_id] - room.start_time << " seconds" << endl;
@@ -93,26 +117,27 @@ void* guest(void* arg){
         }
         else{
             auto it = rooms.find({new_priority , room});
+            if(it == rooms.end()){
+                if(sem_post(&guest_book) < 0){
+                    exit_with_error("guest::sem_post() failed");
+                }
+                continue;
+            }
             rooms.erase(it);
             int curr_time = time(NULL);
-            room.tot_duration += curr_time - room.start_time;
+            room.tot_duration += min((curr_time - room.start_time),room.stay_time);
+            room.guest_id = -1;
+            room.start_time = -1;
+            room.stay_time = 0;
             if(room.occupancy == 2) new_priority = INF;
             else new_priority = 0;
             rooms.insert({new_priority , room});
-            cout << "Guest ID-" << guest_id << " finishes their stay in room ID-" << room.room_id << " of " << curr_time - room.start_time << " seconds" << endl;
-        }
-        if(guest_finish == 2 * N){
-            guest_start = 0;
-            guest_finish = 0;
-            if(sem_post(&hotel_close) < 0){
-                exit_with_error("guest::sem_post() failed");
-            }
+            cout << "Guest ID-" << guest_id << " finishes their stay in room ID-" << room.room_id << endl;
         }
         if(sem_post(&guest_book) < 0){
             exit_with_error("guest::sem_post() failed");
         }
 
-        sleep(sleep_time);
     }
 
     pthread_exit(NULL);

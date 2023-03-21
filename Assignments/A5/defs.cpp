@@ -20,12 +20,12 @@ void signal_blocker(int sig,int state){
     return;
 }
 
-Room::Room(): guest_id(-1), room_id(-1), start_time(-1), tot_duration(0), occupancy(0) {}
+Room::Room(): guest_id(-1), room_id(-1), start_time(0), stay_time(0), tot_duration(0), occupancy(0) {}
 
-Room::Room(int room_num): guest_id(-1), room_id(room_num), start_time(-1), tot_duration(0), occupancy(0) {}
+Room::Room(int room_num): guest_id(-1), room_id(room_num), start_time(0), stay_time(0), tot_duration(0), occupancy(0) {}
 
 ostream& operator<<(ostream& os, const Room& room){
-    os << "Room " << room.room_id << " : " << room.guest_id << " " << room.start_time << " " << room.tot_duration << " " << room.occupancy << "\n";
+    os << "Room " << room.room_id << " : " << room.guest_id << " " << room.start_time << " " << room.stay_time << " " << room.tot_duration << " " << room.occupancy << "\n";
     return os;
 }
 

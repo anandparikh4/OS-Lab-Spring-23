@@ -1,0 +1,126 @@
+
+Enter number of rooms: 
+Enter number of cleaners: 
+Enter number of guests: Guest ID-5 starts their stay in room ID-0 for 24 seconds
+Guest ID-6 starts their stay in room ID-1 for 18 seconds
+Guest ID-0 starts their stay in room ID-2 for 18 seconds
+Guest ID-1 starts their stay in room ID-3 for 28 seconds
+Guest ID-2 starts their stay in room ID-4 for 22 seconds
+Guest ID-8 evicts Guest ID-5 from room ID-0
+Guest ID-8 starts their stay in room ID-0 for 19 seconds
+Guest ID-5 realizes they were evicted from room ID-0 after 8 seconds
+Guest ID-4 evicts Guest ID-6 from room ID-1
+Guest ID-4 starts their stay in room ID-1 for 10 seconds
+Guest ID-7 evicts Guest ID-1 from room ID-3
+Guest ID-7 starts their stay in room ID-3 for 11 seconds
+Guest ID-6 realizes they were evicted from room ID-1 after 10 seconds
+Guest ID-1 realizes they were evicted from room ID-3 after 4 seconds
+Guest ID-4 finishes their stay in room ID-1
+Guest ID-0 finishes their stay in room ID-2
+Guest ID-7 finishes their stay in room ID-3
+Guest ID-6 starts their stay in room ID-2 for 12 seconds
+Guest ID-8 finishes their stay in room ID-0
+Guest ID-2 finishes their stay in room ID-4
+Guest ID-6 finishes their stay in room ID-2
+Guest ID-4 starts their stay in room ID-4 for 12 seconds
+Cleaner ID-0 starts cleaning room ID-0 for 19 seconds
+Cleaner ID-1 starts cleaning room ID-1 for 10 seconds
+Cleaner ID-2 starts cleaning room ID-2 for 30 seconds
+Cleaner ID-1 finishes cleaning room ID-1
+Cleaner ID-1 starts cleaning room ID-3 for 11 seconds
+Cleaner ID-0 finishes cleaning room ID-0
+Cleaner ID-0 evicts guest ID-4 from room ID-4 after 0 seconds of their stay
+Cleaner ID-0 starts cleaning room ID-4 for 22 seconds
+Cleaner ID-1 finishes cleaning room ID-3
+Cleaner ID-2 finishes cleaning room ID-2
+Cleaner ID-0 finishes cleaning room ID-4
+Guest ID-3 starts their stay in room ID-0 for 28 seconds
+Guest ID-7 starts their stay in room ID-1 for 27 seconds
+Guest ID-0 starts their stay in room ID-2 for 22 seconds
+Guest ID-8 starts their stay in room ID-3 for 14 seconds
+Guest ID-5 starts their stay in room ID-4 for 11 seconds
+Guest ID-2 evicts Guest ID-3 from room ID-0
+Guest ID-2 starts their stay in room ID-0 for 25 seconds
+Guest ID-6 evicts Guest ID-5 from room ID-4
+Guest ID-6 starts their stay in room ID-4 for 15 seconds
+Guest ID-1 evicts Guest ID-8 from room ID-3
+Guest ID-1 starts their stay in room ID-3 for 19 seconds
+Guest ID-3 realizes they were evicted from room ID-0 after 0 seconds
+Guest ID-5 realizes they were evicted from room ID-4 after 0 seconds
+Guest ID-8 realizes they were evicted from room ID-3 after 0 seconds
+Guest ID-6 finishes their stay in room ID-4
+Guest ID-1 finishes their stay in room ID-3
+Guest ID-0 finishes their stay in room ID-2
+Guest ID-2 finishes their stay in room ID-0
+Guest ID-7 finishes their stay in room ID-1
+Guest ID-8 starts their stay in room ID-1 for 20 seconds
+Guest ID-5 starts their stay in room ID-2 for 20 seconds
+Cleaner ID-0 starts cleaning room ID-0 for 25 seconds
+Cleaner ID-1 evicts guest ID-8 from room ID-1 after 1 seconds of their stay
+Cleaner ID-1 starts cleaning room ID-1 for 28 seconds
+Cleaner ID-2 evicts guest ID-5 from room ID-2 after 0 seconds of their stay
+Cleaner ID-2 starts cleaning room ID-2 for 22 seconds
+Cleaner ID-2 finishes cleaning room ID-2
+Cleaner ID-2 starts cleaning room ID-3 for 19 seconds
+Cleaner ID-0 finishes cleaning room ID-0
+Cleaner ID-0 starts cleaning room ID-4 for 15 seconds
+Cleaner ID-1 finishes cleaning room ID-1
+Cleaner ID-0 finishes cleaning room ID-4
+Cleaner ID-2 finishes cleaning room ID-3
+Guest ID-3 starts their stay in room ID-0 for 17 seconds
+Guest ID-5 starts their stay in room ID-1 for 21 seconds
+Guest ID-6 starts their stay in room ID-2 for 30 seconds
+Guest ID-0 starts their stay in room ID-3 for 13 seconds
+Guest ID-2 starts their stay in room ID-4 for 20 seconds
+Guest ID-4 evicts Guest ID-3 from room ID-0
+Guest ID-4 starts their stay in room ID-0 for 30 seconds
+Guest ID-1 evicts Guest ID-5 from room ID-1
+Guest ID-1 starts their stay in room ID-1 for 30 seconds
+Guest ID-5 realizes they were evicted from room ID-1 after 0 seconds
+Guest ID-3 realizes they were evicted from room ID-0 after 0 seconds
+Guest ID-7 evicts Guest ID-6 from room ID-2
+Guest ID-7 starts their stay in room ID-2 for 19 seconds
+Guest ID-6 realizes they were evicted from room ID-2 after 0 seconds
+Guest ID-0 finishes their stay in room ID-3
+Guest ID-6 starts their stay in room ID-3 for 20 seconds
+Guest ID-7 finishes their stay in room ID-2
+Guest ID-2 finishes their stay in room ID-4
+Guest ID-8 starts their stay in room ID-4 for 28 seconds
+Cleaner ID-2 evicts guest ID-4 from room ID-0 after 25 seconds of their stay
+Cleaner ID-2 starts cleaning room ID-0 for 25 seconds
+Cleaner ID-0 evicts guest ID-1 from room ID-1 after 25 seconds of their stay
+Cleaner ID-0 starts cleaning room ID-1 for 25 seconds
+Cleaner ID-1 starts cleaning room ID-2 for 19 seconds
+Cleaner ID-1 finishes cleaning room ID-2
+Cleaner ID-1 evicts guest ID-6 from room ID-3 after 11 seconds of their stay
+Cleaner ID-1 starts cleaning room ID-3 for 24 seconds
+Cleaner ID-2 finishes cleaning room ID-0
+Cleaner ID-2 evicts guest ID-8 from room ID-4 after 0 seconds of their stay
+Cleaner ID-2 starts cleaning room ID-4 for 20 seconds
+Cleaner ID-0 finishes cleaning room ID-1
+Cleaner ID-1 finishes cleaning room ID-3
+Cleaner ID-2 finishes cleaning room ID-4
+Guest ID-0 starts their stay in room ID-0 for 27 seconds
+Guest ID-5 starts their stay in room ID-1 for 14 seconds
+Guest ID-7 starts their stay in room ID-2 for 27 seconds
+Guest ID-3 starts their stay in room ID-3 for 17 seconds
+Guest ID-2 starts their stay in room ID-4 for 11 seconds
+Guest ID-4 evicts Guest ID-3 from room ID-3
+Guest ID-4 starts their stay in room ID-3 for 14 seconds
+Guest ID-1 evicts Guest ID-5 from room ID-1
+Guest ID-1 starts their stay in room ID-1 for 24 seconds
+Guest ID-3 realizes they were evicted from room ID-3 after 0 seconds
+Guest ID-5 realizes they were evicted from room ID-1 after 0 seconds
+Guest ID-2 finishes their stay in room ID-4
+Guest ID-4 finishes their stay in room ID-3
+Guest ID-3 starts their stay in room ID-4 for 24 seconds
+Guest ID-1 finishes their stay in room ID-1
+Guest ID-0 finishes their stay in room ID-0
+Guest ID-7 finishes their stay in room ID-2
+Guest ID-2 starts their stay in room ID-0 for 19 seconds
+Guest ID-8 starts their stay in room ID-2 for 17 seconds
+Cleaner ID-2 evicts guest ID-2 from room ID-0 after 3 seconds of their stay
+Cleaner ID-2 starts cleaning room ID-0 for 30 seconds
+Cleaner ID-1 starts cleaning room ID-1 for 24 seconds
+Cleaner ID-0 evicts guest ID-8 from room ID-2 after 0 seconds of their stay
+Cleaner ID-0 starts cleaning room ID-2 for 27 seconds

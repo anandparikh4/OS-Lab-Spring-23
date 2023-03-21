@@ -21,6 +21,7 @@ class Room{
     int guest_id;
     int room_id;        // Can put it, as it is intialised in main and all threads just change other parameters
     int start_time;
+    int stay_time;   // Required, as cleaner threads should know the minimum out of when they start cleaning or when the user leaves
     int tot_duration;
     int occupancy;
 
