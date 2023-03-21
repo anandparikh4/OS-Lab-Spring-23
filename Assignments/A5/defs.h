@@ -14,6 +14,8 @@ void sigusr1_handler(int sig);
 
 void signal_blocker(int sig,int state);
 
+void exit_with_error(string s);
+
 class Room{
     public:
     int guest_id;

@@ -3,8 +3,6 @@
 extern void *guest(void *arg);
 extern void *cleaner(void *arg);
 
-// ## Add error checking to all syscalls
-
 int N,X,Y;
 set<pair<int,Room>,cmp> rooms;
 vector<int> evicted;
@@ -42,52 +40,62 @@ int main(){
     //     cout << p.second;
     // }
 
-    sem_init(&hotel_open , 0 , 1);
-    sem_init(&hotel_close , 0 , 0);
-    sem_init(&cleaner_book , 0 , 1);
-    sem_init(&guest_book , 0 , 1);
+    if(sem_init(&hotel_open , 0 , 1) < 0){
+        exit_with_error("sem_init() failed");
+    }
+    if(sem_init(&hotel_close , 0 , 0) < 0){
+        exit_with_error("sem_init() failed");
+    }
+    if(sem_init(&cleaner_book , 0 , 1) < 0){
+        exit_with_error("sem_init() failed");
+    }
+    if(sem_init(&guest_book , 0 , 1) < 0){
+        exit_with_error("sem_init() failed");
+    }
 
     guest_threads = (pthread_t *)malloc(Y * sizeof(pthread_t));
     cleaner_threads = (pthread_t *)malloc(X * sizeof(pthread_t));
     pthread_attr_t attr;
-    pthread_attr_init(&attr);
+    if(pthread_attr_init(&attr) != 0){
+        exit_with_error("pthread_attr_init() failed");
+    }
 
     for(int i=0;i<Y;i++){
-        pthread_create(&guest_threads[i], &attr, guest, (void *)(uintptr_t)i);
+        if(pthread_create(&guest_threads[i], &attr, guest, (void *)(uintptr_t)i) != 0){
+            exit_with_error("pthread_create() failed");
+        }
     }
     
     for(int i=0;i<X;i++){
-        pthread_create(&cleaner_threads[i], &attr, cleaner, (void *)(uintptr_t)i);
+        if(pthread_create(&cleaner_threads[i], &attr, cleaner, (void *)(uintptr_t)i) != 0){
+            exit_with_error("pthread_create() failed");
+        }
     }
 
-    // // main simulating guests
-    // for(int i=0;i<3;i++){
-    //     sem_wait(&hotel_open);
-    //     int x = rand() % 5;
-    //     cout << "Main simulates guests for " << x << " seconds" << endl;
-    //     for(int i=0;i<N;i++){
-    //         Room room(i);
-    //         room.tot_duration = rand()%8 + 2;   // [2,9]
-    //         cout << room.tot_duration << " " ;
-    //         cout << endl;
-    //         rooms.insert({0,room});
-    //     }
-    //     sleep(x);
-    //     sem_post(&hotel_close);
-    // }
-
     for(int i=0;i<Y;i++){
-        pthread_join(guest_threads[i], NULL);
+        if(pthread_join(guest_threads[i], NULL) != 0){
+            exit_with_error("pthread_join() failed");
+        }
     }
 
     for(int i=0;i<X;i++){
-        pthread_join(cleaner_threads[i], NULL);
+        if(pthread_join(cleaner_threads[i], NULL) != 0){
+            exit_with_error("pthread_join() failed");
+        }
     }
 
-    sem_destroy(&hotel_open);
-    sem_destroy(&hotel_close);
-    sem_destroy(&cleaner_book);
-    sem_destroy(&guest_book);
+    if(sem_destroy(&hotel_open) < 0){
+        exit_with_error("sem_destroy() failed");
+    }
+    if(sem_destroy(&hotel_close) < 0){
+        exit_with_error("sem_destroy() failed");
+    }
+    if(sem_destroy(&cleaner_book) < 0){
+        exit_with_error("sem_destroy() failed");
+    }
+    if(sem_destroy(&guest_book) < 0){
+        exit_with_error("sem_destroy() failed");
+    }
     free(guest_threads);
     free(cleaner_threads);
 

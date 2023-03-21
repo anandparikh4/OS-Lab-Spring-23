@@ -1,5 +1,10 @@
 #include "defs.h"
 
+void exit_with_error(string s){
+    perror(s.c_str());
+    exit(0);
+}
+
 void sigusr1_handler(int sig){
     signal(SIGUSR1 , sigusr1_handler);
     return;
@@ -9,7 +14,10 @@ void signal_blocker(int sig,int state){
     sigset_t sigset;
     sigemptyset(&sigset);
     sigaddset(&sigset , sig);
-    pthread_sigmask(state , &sigset , NULL);
+    if(pthread_sigmask(state , &sigset , NULL) != 0){
+        exit_with_error("signal_blocker::pthread_sigmask() failed");
+    }
+    return;
 }
 
 Room::Room(): guest_id(-1), room_id(-1), start_time(-1), tot_duration(0), occupancy(0) {}

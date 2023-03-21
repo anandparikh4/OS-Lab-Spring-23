@@ -16,15 +16,21 @@ void* guest(void* arg){
         int sleep_time = gen_rand(GUEST_SLEEP_TIME);
         int stay_time = gen_rand(GUEST_STAY_TIME);
 
-        sem_wait(&guest_book);
+        if(sem_wait(&guest_book) < 0){
+            exit_with_error("guest::sem_wait() failed");
+        }
         if(guest_start == 0){
-            sem_wait(&hotel_open);
+            if(sem_wait(&hotel_open) < 0){
+                exit_with_error("guest::sem_wait() failed");
+            }
         }
         auto it = rooms.begin();
 
         if(rooms.empty() || it->first >= priority[guest_id]){   // either all rooms currently occupied for the 2nd time OR all rooms occupied and minimum priority guest has higher priority than guest_id
             // cout << "Guest ID: " << guest_id << " is refused a room" << endl;
-            sem_post(&guest_book);
+            if(sem_post(&guest_book) < 0){
+                exit_with_error("guest::sem_post() failed");
+            }
             sleep(sleep_time);
             continue;
         }
@@ -54,7 +60,9 @@ void* guest(void* arg){
             room.occupancy = 2;
             new_priority = INF;
             evicted[it->second.guest_id] = room.start_time;     // to notify the evicted person when they were evicted
-            pthread_kill(guest_threads[it->second.guest_id] , SIGUSR1);
+            if(pthread_kill(guest_threads[it->second.guest_id] , SIGUSR1) != 0){
+                exit_with_error("guest::pthread_kill() failed");
+            }
             cout << "Guest ID-" << guest_id << " evicts Guest ID-" << it->second.guest_id << " from room ID-" << room.room_id << endl;
             rooms.erase(it);
             rooms.insert({new_priority , room});
@@ -63,14 +71,18 @@ void* guest(void* arg){
         signal_blocker(SIGUSR1 , SIG_BLOCK);
 
         guest_start++;
-        sem_post(&guest_book);
+        if(sem_post(&guest_book) < 0){
+            exit_with_error("guest::sem_post() failed");
+        }
 
         timespec ts;
         ts.tv_sec = stay_time;
         ts.tv_nsec = 0;
         sigtimedwait(&sigusr1_set , NULL , &ts);
 
-        sem_wait(&guest_book);
+        if(sem_wait(&guest_book) < 0){
+            exit_with_error("guest::sem_wait() failed");
+        }
         guest_finish++;
 
         signal_blocker(SIGUSR1 , SIG_UNBLOCK);
@@ -92,9 +104,13 @@ void* guest(void* arg){
         if(guest_finish == 2 * N){
             guest_start = 0;
             guest_finish = 0;
-            sem_post(&hotel_close);
+            if(sem_post(&hotel_close) < 0){
+                exit_with_error("guest::sem_post() failed");
+            }
         }
-        sem_post(&guest_book);
+        if(sem_post(&guest_book) < 0){
+            exit_with_error("guest::sem_post() failed");
+        }
 
         sleep(sleep_time);
     }

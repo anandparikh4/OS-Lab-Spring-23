@@ -12,12 +12,18 @@ void* cleaner(void* arg){
     // cout<<"Cleaner "<<cleaner_id<<" created\n";
 
     while(1){
-        sem_wait(&cleaner_book);
+        if(sem_wait(&cleaner_book) < 0){
+            exit_with_error("cleaner::sem_wait() failed");
+        }
         if(cleaner_start == 0){
-            sem_wait(&hotel_close);
+            if(sem_wait(&hotel_close) < 0){
+                exit_with_error("cleaner::sem_wait() failed");
+            }
         }
         if(rooms.empty()){
-            sem_post(&cleaner_book);
+            if(sem_post(&cleaner_book) < 0){
+                exit_with_error("cleaner::sem_post() failed");
+            }
             continue;
         }
         // always pick the first room, which is statistically randomized
@@ -26,11 +32,15 @@ void* cleaner(void* arg){
         Room room = it->second;
         rooms.erase(it);
         cleaner_start++;
-        sem_post(&cleaner_book);
+        if(sem_post(&cleaner_book) < 0){
+            exit_with_error("cleaner::sem_post() failed");
+        }
 
         sleep(PROPORTIONALITY_CONSTANT * room.tot_duration);
 
-        sem_wait(&cleaner_book);
+        if(sem_wait(&cleaner_book) < 0){
+            exit_with_error("cleaner::sem_wait() failed");
+        }
         cout << "Cleaner ID-" << cleaner_id << " cleans room ID-" << room.room_id << " for " << PROPORTIONALITY_CONSTANT * room.tot_duration << " seconds" << endl;
         cleaner_finish++;
         if(cleaner_finish == N){
@@ -38,9 +48,13 @@ void* cleaner(void* arg){
             cleaner_finish = 0;
             for(int i=0;i<N;i++) rooms.insert({0,Room(i)});
             for(int i=0;i<Y;i++) evicted[i] = 0;
-            sem_post(&hotel_open);
+            if(sem_post(&hotel_open) < 0){
+                exit_with_error("cleaner::sem_post() failed");
+            }   
         }
-        sem_post(&cleaner_book); 
+        if(sem_post(&cleaner_book) < 0){
+            exit_with_error("cleaner::sem_post() failed");
+        }
     }
 
     pthread_exit(NULL);
