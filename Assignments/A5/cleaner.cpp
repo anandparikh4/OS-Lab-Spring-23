@@ -26,12 +26,13 @@ void* cleaner(void* arg){
         Room room = it->second;
         rooms.erase(it);
         cleaner_start++;
+        cout << "Cleaner ID-" << cleaner_id << " starts cleaning room ID-" << room.room_id << " for " << PROPORTIONALITY_CONSTANT * room.tot_duration << " seconds" << endl;
         sem_post(&cleaner_book);
 
         sleep(PROPORTIONALITY_CONSTANT * room.tot_duration);
 
         sem_wait(&cleaner_book);
-        cout << "Cleaner ID-" << cleaner_id << " cleans room ID-" << room.room_id << " for " << PROPORTIONALITY_CONSTANT * room.tot_duration << " seconds" << endl;
+        cout << "Cleaner ID-" << cleaner_id << " finishes cleaning room ID-" << room.room_id << endl;
         cleaner_finish++;
         if(cleaner_finish == N){
             cleaner_start = 0;

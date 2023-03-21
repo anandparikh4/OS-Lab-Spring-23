@@ -42,7 +42,7 @@ void* guest(void* arg){
             else new_priority = priority[guest_id];
             rooms.erase(it);
             rooms.insert({new_priority , room});
-            cout << "Guest ID-" << guest_id << " starts their stay in room ID-" << room.room_id << endl;
+            cout << "Guest ID-" << guest_id << " starts their stay in room ID-" << room.room_id << " for " << stay_time << " seconds" << endl;
         }
         
         else{       // no empty room, but can evict another guest
@@ -53,9 +53,10 @@ void* guest(void* arg){
             room.tot_duration = curr_time - it->second.start_time;
             room.occupancy = 2;
             new_priority = INF;
-            evicted[it->second.guest_id] = room.start_time;     // to notify the evicted person when they were evicted
+            evicted[it->second.guest_id] = curr_time;     // to notify the evicted person when they were evicted
             pthread_kill(guest_threads[it->second.guest_id] , SIGUSR1);
             cout << "Guest ID-" << guest_id << " evicts Guest ID-" << it->second.guest_id << " from room ID-" << room.room_id << endl;
+            cout << "Guest ID-" << guest_id << " starts their stay in room ID-" << room.room_id << " for " << stay_time << " seconds" << endl;
             rooms.erase(it);
             rooms.insert({new_priority , room});
         }
@@ -87,7 +88,7 @@ void* guest(void* arg){
             if(room.occupancy == 2) new_priority = INF;
             else new_priority = 0;
             rooms.insert({new_priority , room});
-            cout << "Guest ID-" << guest_id << " finishes their stay in room ID-" << room.room_id << " of " << curr_time - room.start_time << " seconds" << endl;
+            cout << "Guest ID-" << guest_id << " finishes their stay in room ID-" << room.room_id << endl;
         }
         if(guest_finish == 2 * N){
             guest_start = 0;
