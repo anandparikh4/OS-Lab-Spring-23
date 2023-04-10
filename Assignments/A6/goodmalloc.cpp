@@ -9,6 +9,32 @@
 
 using namespace std;
 
+class Page{
+
+public:    
+    char *startAddress;
+    char *prev,*next;
+
+    Page(char * _startAddress);
+    Page(const Page &);
+    ~Page();
+
+};
+
+class List{
+    
+public:
+    string name;
+    int scope;
+    char * startAddress;
+    int size;
+    
+    List(string _name , int _size);
+    List(const List &);
+    ~List();
+
+};
+
 int ERRNO = 0;
 int curr_scope = 0;
 char * buf = NULL;
@@ -30,7 +56,7 @@ Page::~Page(){
     prev = next = NULL;
 }
 
-List::List(std::string _name , int _size):
+List::List(string _name , int _size):
 name(_name) , size(_size) , scope(curr_scope) , startAddress(NULL)
 {}
 
@@ -159,7 +185,7 @@ int createList(string &name , int size){
     if(R > 0) num_pages++;
 
     if(num_pages > freePages.size()){
-        ERRNO = OVERFLOW_ERR;
+        ERRNO = SIZE_ERR;
         return -1;
     }
     int got_pages = 0;
@@ -178,16 +204,53 @@ int createList(string &name , int size){
 
 }
 
+int assignVal(string name , int offset , int val){
+    auto curr_list = Lists.find({name,curr_scope});
+    if(curr_list == Lists.end()){
+        ERRNO = UNKNOWN_ERR;
+        return -1;
+    }
+    if(offset > curr_list->second.size - 4){
+        ERRNO = SIZE_ERR;
+        return -1;
+    }
 
+    int Q = offset / PAGE_SIZE;
+    int R = offset % PAGE_SIZE;
 
+    Page * curr_page = &(PageTable[curr_list->second.startAddress]);
+    while(Q--) curr_page = &(PageTable[curr_page->next]);
+    *(int *)(curr_page->startAddress + R) = val;
+    
+    return 0;
+}
 
-/*
+int readVal(string name , int offset , int * val){
+    auto curr_list = Lists.find({name,curr_scope});
+    if(curr_list == Lists.end()){
+        ERRNO = UNKNOWN_ERR;
+        return -1;
+    }
+    if(offset > curr_list->second.size - 4){
+        ERRNO = SIZE_ERR;
+        return -1;
+    }
 
-int createList(std::string name , int size);
+    int Q = offset / PAGE_SIZE;
+    int R = offset % PAGE_SIZE;
 
-int assignVal(std::string name , int offset , int val);
+    Page * curr_page = &(PageTable[curr_list->second.startAddress]);
+    while(Q--) curr_page = &(PageTable[curr_page->next]);
+    *val = *(int *)(curr_page->startAddress + R);
 
-int freeList(std::string name = "");
+    return 0;
+}
 
-#endif
-*/
+int freeList(string name){
+    if(name == ""){
+        for(auto & curr_list : Lists){
+            if(curr_list.second.scope != curr_scope) continue;
+
+        }
+    }
+}
