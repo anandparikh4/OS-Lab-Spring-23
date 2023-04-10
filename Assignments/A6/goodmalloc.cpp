@@ -98,7 +98,51 @@ int destroyMem(){
     return 0;
 }
 
-int createList(string name , int size){
+
+pair<char *,int> getFreePages(int num_pages){
+    if(freePages.size() == 0){
+        ERRNO = OVERFLOW_ERR;
+        return make_pair((char *)NULL,-1);
+    }
+    auto it = freePages.begin();
+    int curr_size = 0, max_size = 0;
+    char * start = NULL, *max_start = NULL, *prev = NULL;
+    while(it != freePages.end()){
+        if(curr_size == 0) start = *it;
+        if(prev != NULL && *it != prev + PAGE_SIZE){
+            if(curr_size > max_size){
+                max_size = curr_size;
+                max_start = start;
+            }
+            curr_size = 0;
+            start = NULL;
+            prev = NULL;
+            it++;
+            continue;
+        }
+        curr_size++;
+        prev = *it;
+        it++;
+        if(curr_size == num_pages){
+            max_size = curr_size;
+            max_start = start;
+            break;
+        }
+    }
+    if(max_size == 0){
+        ERRNO = OVERFLOW_ERR;
+        return make_pair((char *)NULL,-1);
+    }
+    return make_pair(max_start,max_size);
+
+}
+
+
+int createList(string &name , int size){
+    if(name.size() == 0){
+        ERRNO = NAME_ERR;
+        return -1;
+    }
     if(size <= 0){
         ERRNO = SIZE_ERR;
         return -1;
@@ -118,7 +162,19 @@ int createList(string name , int size){
         ERRNO = OVERFLOW_ERR;
         return -1;
     }
+    int got_pages = 0;
+    vector<char *> start_pages;
+    while(got_pages < num_pages){
+        auto p = getFreePages(num_pages - got_pages);
+        if(p.second == -1){
+            ERRNO = OVERFLOW_ERR;
+            return -1;
+        }
+        got_pages += p.second;
+        start_pages.push_back(p.first);
+    }
 
+    List l(name,size);
 
 }
 
