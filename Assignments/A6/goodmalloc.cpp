@@ -57,15 +57,29 @@ int scope_end(){
 }
 
 int createMem(int size){
+    if(size <= 0){
+        ERRNO = SIZE_ERR;
+        return -1;
+    }
     if(buf != NULL){
         ERRNO = MEM_ERR;
         return -1;
     }
-    buf = (char *)malloc(size * sizeof(char));
+
+    int Q = size / PAGE_SIZE;
+    int R = size % PAGE_SIZE;
+    int rounded_size = Q * PAGE_SIZE;
+    if(R > 0) rounded_size += PAGE_SIZE;
+    buf = (char *)malloc(rounded_size * sizeof(char));
     if(buf == NULL){
         ERRNO = SIZE_ERR;
         return -1;
     }
+
+    Lists.clear();
+    PageTable.clear();
+    for(int i=0;i<rounded_size/PAGE_SIZE;i++) freePages.insert(buf + i*PAGE_SIZE);
+
     return 0;
 }
 
@@ -74,12 +88,15 @@ int destroyMem(){
         ERRNO = MEM_ERR;
         return -1;
     }
+
     free(buf);
     buf = NULL;
+    Lists.clear();
+    PageTable.clear();
+    freePages.clear();
+
     return 0;
 }
-
-
 
 /*
 
