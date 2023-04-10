@@ -45,7 +45,9 @@ map<pair<string,int> , List> Lists;
 
 Page::Page(char * _startAddress):
 startAddress(_startAddress)
-{}
+{
+    prev = next = NULL;
+}
 
 Page::Page(const Page & other):
 startAddress(other.startAddress) , prev(other.prev) , next(other.next)
@@ -127,7 +129,7 @@ int destroyMem(){
 
 pair<char *,int> getFreePages(int num_pages){
     if(freePages.size() == 0){
-        ERRNO = OVERFLOW_ERR;
+        ERRNO = SIZE_ERR;
         return make_pair((char *)NULL,-1);
     }
     auto it = freePages.begin();
@@ -156,7 +158,7 @@ pair<char *,int> getFreePages(int num_pages){
         }
     }
     if(max_size == 0){
-        ERRNO = OVERFLOW_ERR;
+        ERRNO = SIZE_ERR;
         return make_pair((char *)NULL,-1);
     }
     return make_pair(max_start,max_size);
@@ -189,19 +191,32 @@ int createList(string &name , int size){
         return -1;
     }
     int got_pages = 0;
-    vector<char *> start_pages;
+    char *prev=NULL,*start_page=NULL;
     while(got_pages < num_pages){
         auto p = getFreePages(num_pages - got_pages);
         if(p.second == -1){
-            ERRNO = OVERFLOW_ERR;
+            ERRNO = SIZE_ERR;
             return -1;
         }
+        if(start_page == NULL) start_page = p.first;
+        for(int i=0;i<p.second;i++){
+            PageTable.insert({{p.first + i*PAGE_SIZE},Page(p.first + i*PAGE_SIZE)});
+            if(prev != NULL){
+                PageTable[prev].next = p.first + i*PAGE_SIZE;
+                PageTable[p.first + i*PAGE_SIZE].prev = prev;
+            } 
+            prev = p.first + i*PAGE_SIZE;
+            freePages.erase(p.first + i*PAGE_SIZE);
+        }
         got_pages += p.second;
-        start_pages.push_back(p.first);
     }
-
+    PageTable[prev].next = NULL;
     List l(name,size);
+    l.startAddress = start_page;
+    l.scope = curr_scope;
+    Lists.insert({{name,curr_scope},l});
 
+    return 0;
 }
 
 int assignVal(string name , int offset , int val){
