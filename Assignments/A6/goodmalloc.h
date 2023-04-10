@@ -7,6 +7,8 @@
 #define SCOPE_ERR 1
 #define MEM_ERR 2
 #define SIZE_ERR 3
+#define DUPLICATE_ERR 4
+#define OVERFLOW_ERR 5
 
 extern int ERRNO;
 

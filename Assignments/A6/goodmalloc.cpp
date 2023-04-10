@@ -98,6 +98,33 @@ int destroyMem(){
     return 0;
 }
 
+int createList(string name , int size){
+    if(size <= 0){
+        ERRNO = SIZE_ERR;
+        return -1;
+    }
+    auto it = Lists.find({name,curr_scope});
+    if(it != Lists.end()){
+        ERRNO = DUPLICATE_ERR;
+        return -1;
+    }
+
+    int Q = size / PAGE_SIZE;
+    int R = size % PAGE_SIZE;
+    int num_pages = Q;
+    if(R > 0) num_pages++;
+
+    if(num_pages > freePages.size()){
+        ERRNO = OVERFLOW_ERR;
+        return -1;
+    }
+
+
+}
+
+
+
+
 /*
 
 int createList(std::string name , int size);
