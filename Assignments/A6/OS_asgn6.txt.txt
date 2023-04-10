@@ -1,0 +1,47 @@
+// NOTE : this library does not identify threads
+// it is the user's responsibility to enforce synchronization and mutual exclusion while using this library in a multi-threaded program
+
+const int PAGESIZE = 4096;      // 4KB pages
+
+int scope = 0;
+scope_start() , scope_end()     // to manage scope value
+
+class Page{
+    startAddress    // start address of this page in allocated space
+    prev,next       // startAddresses of previous and next Pages of same List. -1 if none present
+}
+
+set< startAddress > freePages           // free pages is just a set of start addresses of unoccupied pages
+map< startAdress , Page > PageTable     // the page table is a map from start address to the page structure
+
+class List{
+    name            // string format name
+    scope           // scope value when it got created
+    startAddress    // startAddress of its first Page
+    size            // rounded to next larger multiple of Page size
+}
+
+map< pair< name , scope > , List > Lists      // a map from (name,scope) to the List object
+
+// allocate and de-allocate space in multiple of pages only
+// best-fit and first-fit is done at page level to allocate contiguous pages if more than 1 page is asked for
+
+// the following functions return 0 if successful, else they return -1 and errno is set
+
+int createMem(int size);    
+// create mem of given size
+
+int createList(string name, int size);
+// first check if a list with same name exists in current scope. if found, raise error
+// then check if enough free memory is available. if not, raise error
+// if more than 1 page is requested, attempt best fit, if not possible, do first fit
+// else just give a free page
+
+int assignVal(string name, int size, int val)
+// first check if such a list exists in given scope. if not, raise error
+// then check if it is of sufficient size. if not, raise error
+// then assign the val to the variable
+
+int freeList(<optional> string name)
+// if name is provided, check if such a name exists. if not, raise error. if it does, free all its pages
+// else if no parameter given, remove all lists with current scope
