@@ -8,37 +8,10 @@
 #define MEM_ERR 2
 #define SIZE_ERR 3
 #define DUPLICATE_ERR 4
-#define OVERFLOW_ERR 5
+#define UNKNOWN_ERR 5
+#define NAME_ERR 6
 
 extern int ERRNO;
-
-class Page{
-
-private:    
-    char *startAddress;
-    char *prev,*next;
-
-public:
-    Page(char * _startAddress);
-    Page(const Page &);
-    ~Page();
-
-};
-
-class List{
-    
-private:
-    std::string name;
-    int scope;
-    char * startAddress;
-    int size;
-
-public:
-    List(std::string _name , int _size);
-    List(const List &);
-    ~List();
-
-};
 
 int scope_start();
 
@@ -49,6 +22,8 @@ int createMem(int size);
 int createList(std::string name , int size);
 
 int assignVal(std::string name , int offset , int val);
+
+int readVal(std::string name , int offset , int * val);
 
 int freeList(std::string name = "");
 
