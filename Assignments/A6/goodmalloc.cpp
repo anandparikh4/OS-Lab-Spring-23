@@ -78,7 +78,7 @@ int scope_start(){
 int scope_end(){
     if(curr_scope - 1 < 0){
         ERRNO = SCOPE_ERR;
-        return -1;
+        exit(1);
     }
     curr_scope--;
     return 0;
@@ -222,8 +222,11 @@ int createList(const string &name , int size){
 int assignVal(const string &name , int offset , int val){
     auto curr_list = Lists.find({name,curr_scope});
     if(curr_list == Lists.end()){
-        ERRNO = UNKNOWN_ERR;
-        return -1;
+        curr_list = Lists.find({name,0});
+        if(curr_list == Lists.end()){
+            ERRNO = LIST_NOT_FOUND_ERR;
+            return -1;
+        }
     }
     if(offset > curr_list->second.size - 4){
         ERRNO = SIZE_ERR;
@@ -243,8 +246,11 @@ int assignVal(const string &name , int offset , int val){
 int readVal(const string &name , int offset , int * val){
     auto curr_list = Lists.find({name,curr_scope});
     if(curr_list == Lists.end()){
-        ERRNO = UNKNOWN_ERR;
-        return -1;
+        curr_list = Lists.find({name,0});
+        if(curr_list == Lists.end()){
+            ERRNO = LIST_NOT_FOUND_ERR;
+            return -1;
+        }
     }
     if(offset > curr_list->second.size - 4){
         ERRNO = SIZE_ERR;
@@ -283,7 +289,7 @@ int freeList(const string &name){
     
     auto it = Lists.find({name , curr_scope});
     if(it == Lists.end()){
-        ERRNO = UNKNOWN_ERR;
+        ERRNO = LIST_NOT_FOUND_ERR;
         return -1;
     }
 

@@ -8,7 +8,7 @@
 #define MEM_ERR 2
 #define SIZE_ERR 3
 #define DUPLICATE_ERR 4
-#define UNKNOWN_ERR 5
+#define LIST_NOT_FOUND_ERR 5
 #define NAME_ERR 6
 
 extern int ERRNO;
