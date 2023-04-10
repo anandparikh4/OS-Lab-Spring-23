@@ -19,12 +19,14 @@ int scope_end();
 
 int createMem(int size);
 
-int createList(std::string name , int size);
+int createList(const std::string &name , int size);
 
-int assignVal(std::string name , int offset , int val);
+int assignVal(const std::string &name , int offset , int val);
 
-int readVal(std::string name , int offset , int * val);
+int readVal(const std::string &name , int offset , int * val);
 
-int freeList(std::string name = "");
+int freeList(const std::string &name = "");
+
+int destroyMem();
 
 #endif

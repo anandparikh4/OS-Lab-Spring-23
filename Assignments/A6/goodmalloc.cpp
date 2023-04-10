@@ -166,7 +166,7 @@ pair<char *,int> getFreePages(int num_pages){
 }
 
 
-int createList(string &name , int size){
+int createList(const string &name , int size){
     if(name.size() == 0){
         ERRNO = NAME_ERR;
         return -1;
@@ -219,7 +219,7 @@ int createList(string &name , int size){
     return 0;
 }
 
-int assignVal(string &name , int offset , int val){
+int assignVal(const string &name , int offset , int val){
     auto curr_list = Lists.find({name,curr_scope});
     if(curr_list == Lists.end()){
         ERRNO = UNKNOWN_ERR;
@@ -240,7 +240,7 @@ int assignVal(string &name , int offset , int val){
     return 0;
 }
 
-int readVal(string &name , int offset , int * val){
+int readVal(const string &name , int offset , int * val){
     auto curr_list = Lists.find({name,curr_scope});
     if(curr_list == Lists.end()){
         ERRNO = UNKNOWN_ERR;
@@ -261,9 +261,9 @@ int readVal(string &name , int offset , int * val){
     return 0;
 }
 
-int freeList(string name){
+int freeList(const string &name){
     if(name == ""){
-        vector<string &> delete_lists(0);
+        vector<string> delete_lists(0);
         for(auto &curr_list : Lists){
             if(curr_list.second.scope != curr_scope) continue;
             delete_lists.push_back(curr_list.second.name);
