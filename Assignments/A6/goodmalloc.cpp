@@ -15,7 +15,7 @@ public:
     char *startAddress;
     char *prev,*next;
 
-    Page(char * _startAddress);
+    Page(char * _startAddress = NULL);
     Page(const Page &);
     ~Page();
 
@@ -29,7 +29,7 @@ public:
     char * startAddress;
     int size;
     
-    List(string _name , int _size);
+    List(string _name = "" , int _size = 0);
     List(const List &);
     ~List();
 
@@ -263,9 +263,46 @@ int readVal(string name , int offset , int * val){
 
 int freeList(string name){
     if(name == ""){
-        for(auto & curr_list : Lists){
+        vector<List> delete_lists(0);
+        for(auto curr_list : Lists){
             if(curr_list.second.scope != curr_scope) continue;
-
+            delete_lists.push_back(curr_list.second);
+            vector<Page> free_pages(0);
+            Page curr_page = PageTable[curr_list.second.startAddress];
+            while(1){
+                free_pages.push_back(curr_page);
+                if(curr_page.next == NULL) break;
+                curr_page = PageTable[curr_page.next];
+            }
+            for(auto & curr_page : free_pages){
+                PageTable.erase(curr_page.startAddress);
+                freePages.insert(curr_page.startAddress);
+            }
         }
+        for(auto & curr_list : delete_lists){
+            Lists.erase(Lists.find({curr_list.name , curr_scope}));
+        }
+        return 0;
     }
+    
+    auto it = Lists.find({name , curr_scope});
+    if(it == Lists.end()){
+        ERRNO = UNKNOWN_ERR;
+        return -1;
+    }
+
+    vector<Page> free_pages(0);
+    Page curr_page = PageTable[it->second.startAddress];
+    while(1){
+        free_pages.push_back(curr_page);
+        if(curr_page.next == NULL) break;
+        curr_page = PageTable[curr_page.next];
+    }
+    for(auto & curr_page : free_pages){
+        PageTable.erase(curr_page.startAddress);
+        freePages.insert(curr_page.startAddress);
+    }
+    Lists.erase(it);
+
+    return 0;
 }
