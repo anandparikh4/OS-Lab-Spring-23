@@ -173,13 +173,19 @@ int main(){
     // destroyMem();
 
     srand(time(NULL));
-    createMem(10000);
+    if(createMem(250000000) < 0){
+        printf("Error: %d\n" , ERRNO);
+        exit(0);
+    }
     vector<int> v;
     int val;
     string arr = "arr";
-    createList(arr, 1000);
-    for(int i = 0; i < 250; i++){
-        val = rand()%251;
+    if(createList(arr, 200000) < 0){
+        printf("Error: %d\n" , ERRNO);
+        exit(0);
+    }
+    for(int i = 0; i < 50000; i++){
+        val = rand()%100000 + 1;
         v.push_back(val);
         if(assignVal(arr, 4*i, val)<0){
             cout << "Error in assigning value: ";
@@ -189,7 +195,7 @@ int main(){
     }
 
     cout<<"Before sorting: \n";
-    for(int i = 0; i < 250; i++){
+    for(int i = 0; i < 50000; i++){
         int val;
         if(readVal(arr, 4*i, &val)<0){
             cout << "Error in reading value: ";
@@ -203,12 +209,12 @@ int main(){
     }
     cout << endl<<endl<<endl;
 
-    mergeSort(arr, 0, 249);
+    mergeSort(arr, 0, 49999);
 
     sort(v.begin(), v.end());
 
     cout<<"After sorting: \n";
-    for(int i = 0; i < 250; i++){
+    for(int i = 0; i < 50000; i++){
         int val;
         if(readVal(arr, 4*i, &val)<0){
             cout << "Error in reading value: ";
