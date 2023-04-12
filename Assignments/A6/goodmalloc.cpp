@@ -1,6 +1,7 @@
 #include "goodmalloc.h"
 #include <iostream>
 #include <utility>
+#include <algorithm>
 #include <vector>
 #include <set>
 #include <map>
@@ -9,24 +10,13 @@
 
 using namespace std;
 
-class Page{
-
-public:    
-    char *startAddress;
-    char *prev,*next;
-
-    Page(char * _startAddress = NULL);
-    Page(const Page &);
-    ~Page();
-
-};
 
 class List{
     
 public:
     string name;
     int scope;
-    char * startAddress;
+    vector<char *> PageTable;
     int size;
     
     List(const string &_name="", int _size = 0);
@@ -40,34 +30,22 @@ int curr_scope = 0;
 char * buf = NULL;
 
 set<char *> freePages;
-map<char *,Page> PageTable;
 map<pair<string,int> , List> Lists;
 
-Page::Page(char * _startAddress):
-startAddress(_startAddress)
-{
-    prev = next = NULL;
-}
-
-Page::Page(const Page & other):
-startAddress(other.startAddress) , prev(other.prev) , next(other.next)
-{}
-
-Page::~Page(){
-    startAddress = NULL;
-    prev = next = NULL;
-}
 
 List::List(const string &_name , int _size):
-name(_name) , size(_size) , scope(curr_scope) , startAddress(NULL)
-{}
+name(_name) , size(_size) , scope(curr_scope)
+{
+    PageTable.clear();
+}
 
 List::List(const List & other):
-name(other.name) , size(other.size) , scope(other.scope) ,  startAddress(other.startAddress)
+name(other.name) , size(other.size) , scope(other.scope) ,  PageTable(other.PageTable)
 {}
 
 List::~List(){
-    startAddress = NULL;
+    name.clear();
+    PageTable.clear();
 }
 
 int scope_start(){
@@ -105,7 +83,6 @@ int createMem(int size){
     }
 
     Lists.clear();
-    PageTable.clear();
     for(int i=0;i<rounded_size/PAGE_SIZE;i++) freePages.insert(buf + i*PAGE_SIZE);
 
     return 0;
@@ -120,17 +97,16 @@ int destroyMem(){
     free(buf);
     buf = NULL;
     Lists.clear();
-    PageTable.clear();
     freePages.clear();
 
     return 0;
 }
 
 
-pair<char *,int> getFreePages(int num_pages){
+int getFreePages(int num_pages, vector<char *> &pages){
     if(freePages.size() == 0){
         ERRNO = SIZE_ERR;
-        return make_pair((char *)NULL,-1);
+        return -1;
     }
     auto it = freePages.begin();
     int curr_size = 0, max_size = 0;
@@ -159,10 +135,11 @@ pair<char *,int> getFreePages(int num_pages){
     }
     if(max_size == 0){
         ERRNO = SIZE_ERR;
-        return make_pair((char *)NULL,-1);
+        return -1;
     }
-    return make_pair(max_start,max_size);
-
+    pages.clear();
+    for(int i=0;i<max_size;i++) pages.push_back(max_start + i*PAGE_SIZE);
+    return 0;
 }
 
 
@@ -192,29 +169,23 @@ int createList(const string &name , int size){
     }
     int got_pages = 0;
     char *prev=NULL,*start_page=NULL;
+    List l(name,size);
+    l.scope = curr_scope;
+    l.PageTable.clear();
     while(got_pages < num_pages){
-        auto p = getFreePages(num_pages - got_pages);
-        if(p.second == -1){
+        vector <char *> pages;
+        if(getFreePages(num_pages - got_pages, pages) < 0){
             ERRNO = SIZE_ERR;
             return -1;
         }
-        if(start_page == NULL) start_page = p.first;
-        for(int i=0;i<p.second;i++){
-            PageTable.insert({{p.first + i*PAGE_SIZE},Page(p.first + i*PAGE_SIZE)});
-            if(prev != NULL){
-                PageTable[prev].next = p.first + i*PAGE_SIZE;
-                PageTable[p.first + i*PAGE_SIZE].prev = prev;
-            } 
-            prev = p.first + i*PAGE_SIZE;
-            freePages.erase(p.first + i*PAGE_SIZE);
+        for(auto &it:pages){
+            l.PageTable.push_back(it);
+            freePages.erase(it);
         }
-        got_pages += p.second;
+        got_pages += pages.size();
     }
-    PageTable[prev].next = NULL;
-    List l(name,size);
-    l.startAddress = start_page;
-    l.scope = curr_scope;
-    Lists.insert({{name,curr_scope},l});
+    sort(l.PageTable.begin(),l.PageTable.end());
+    Lists.insert(make_pair(make_pair(name,curr_scope),l));
 
     return 0;
 }
@@ -236,9 +207,8 @@ int assignVal(const string &name , int offset , int val){
     int Q = offset / PAGE_SIZE;
     int R = offset % PAGE_SIZE;
 
-    Page * curr_page = &(PageTable[curr_list->second.startAddress]);
-    while(Q--) curr_page = &(PageTable[curr_page->next]);
-    *(int *)(curr_page->startAddress + R) = val;
+    char *curr_page = curr_list->second.PageTable[Q];
+    *((int *)(curr_page + R)) = val;
     
     return 0;
 }
@@ -260,47 +230,37 @@ int readVal(const string &name , int offset , int * val){
     int Q = offset / PAGE_SIZE;
     int R = offset % PAGE_SIZE;
 
-    Page * curr_page = &(PageTable[curr_list->second.startAddress]);
-    while(Q--) curr_page = &(PageTable[curr_page->next]);
-    *val = *(int *)(curr_page->startAddress + R);
+    char *curr_page = curr_list->second.PageTable[Q];
+    *val = *((int *)(curr_page + R));
 
     return 0;
 }
 
 int freeList(const string &name){
     if(name == ""){
-        vector<string> delete_lists(0);
-        for(auto &curr_list : Lists){
-            if(curr_list.second.scope != curr_scope) continue;
-            delete_lists.push_back(curr_list.second.name);
-            Page curr_page = PageTable[curr_list.second.startAddress];
-            while(1){
-                PageTable.erase(curr_page.startAddress);
-                freePages.insert(curr_page.startAddress);
-                if(curr_page.next == NULL) break;
-                curr_page = PageTable[curr_page.next];
+        for(auto curr_list = Lists.begin(); curr_list!=Lists.end(); ){
+            if(curr_list->second.scope != curr_scope){
+                curr_list++;
+                continue;
             }
-        }
-        for(auto &curr_list : delete_lists){
-            Lists.erase(Lists.find({curr_list , curr_scope}));
+            for(auto &curr_page: curr_list->second.PageTable){
+                freePages.insert(curr_page);
+            }
+            curr_list = Lists.erase(curr_list);
         }
         return 0;
     }
     
-    auto it = Lists.find({name , curr_scope});
-    if(it == Lists.end()){
+    auto curr_list = Lists.find({name , curr_scope});
+    if(curr_list == Lists.end()){
         ERRNO = LIST_NOT_FOUND_ERR;
         return -1;
     }
 
-    Page curr_page = PageTable[it->second.startAddress];
-    while(1){
-        PageTable.erase(curr_page.startAddress);
-        freePages.insert(curr_page.startAddress);
-        if(curr_page.next == NULL) break;
-        curr_page = PageTable[curr_page.next];
+    for(auto &curr_page: curr_list->second.PageTable){
+        freePages.insert(curr_page);
     }
-    Lists.erase(it);
+    Lists.erase(curr_list);
 
     return 0;
 }

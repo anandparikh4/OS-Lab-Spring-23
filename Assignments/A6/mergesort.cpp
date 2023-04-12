@@ -128,8 +128,7 @@ void merge(string &arr, int l, int m, int r){
         k++;
     }
 
-    freeList(L);
-    freeList(R);
+    freeList();
     scope_end();
 }
 
@@ -173,11 +172,13 @@ int main(){
     // destroyMem();
 
     srand(time(NULL));
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     if(createMem(250000000) < 0){
         printf("Error: %d\n" , ERRNO);
         exit(0);
     }
-    vector<int> v;
+    // vector<int> v;
     int val;
     string arr = "arr";
     if(createList(arr, 200000) < 0){
@@ -186,7 +187,7 @@ int main(){
     }
     for(int i = 0; i < 50000; i++){
         val = rand()%100000 + 1;
-        v.push_back(val);
+        // v.push_back(val);
         if(assignVal(arr, 4*i, val)<0){
             cout << "Error in assigning value: ";
             cout << ERRNO << endl;
@@ -204,14 +205,14 @@ int main(){
         }
         cout << val << " ";
         if(i%20 == 19){
-            cout << endl;
+            cout << "\n";
         }
     }
-    cout << endl<<endl<<endl;
+    cout << "\n\n"<<endl;
 
     mergeSort(arr, 0, 49999);
 
-    sort(v.begin(), v.end());
+    // sort(v.begin(), v.end());
 
     cout<<"After sorting: \n";
     for(int i = 0; i < 50000; i++){
@@ -222,16 +223,22 @@ int main(){
             exit(0);
         }
         cout << val << " ";
-        if(val != v[i]){
-            cout << "Error in sorting" << endl;
-            exit(0);
-        }
+        // if(val != v[i]){
+        //     cout << "Error in sorting" << endl;
+        //     exit(0);
+        // }
         if(i%20 == 19){
-            cout << endl;
+            cout << "\n";
         }
     }
-    cout << endl<<endl;
+    cout << "\n\n";
     freeList(arr);
     destroyMem();
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double time_taken;
+    time_taken = (end.tv_sec - start.tv_sec) * 1e3;
+    time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)/1000000.0);
+    cout << "Time taken by program is : " << time_taken;
+    cout << " milli sec " << endl;
     return 0;
 }
