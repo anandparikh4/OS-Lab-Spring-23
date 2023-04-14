@@ -3,7 +3,7 @@
 
 #include <string>
 
-#define PAGE_SIZE 256      // ## Subject to change, currently 4KB
+#define PAGE_SIZE 256 
 #define SCOPE_ERR 1
 #define MEM_ERR 2
 #define SIZE_ERR 3
