@@ -147,32 +147,11 @@ void mergeSort(string &arr, int l, int r){
 
 
 int main(){
-    cout << "Hello World!" << endl;
-
-    // createMem(4096);
-    // createList("list", 1000);
-    // for(int i = 0; i < 250; i++){
-    //     if(assignVal("list", 4*i, 250 - i)<0){
-    //         cout << "Error in assigning value: ";
-    //         cout << ERRNO << endl;
-    //         exit(0);
-    //     }
-    // }
-    // freeList("list");
-    // cout<<"Hell\n";
-    // for(int i = 0; i < 250; i++){
-    //     int val;
-    //     if(readVal("list", 4*i, &val)<0){
-    //         cout << "Error in reading value: ";
-    //         cout << ERRNO << endl;
-    //         exit(0);
-    //     }
-    //     cout << val << " ";
-    // }
-    // destroyMem();
 
     srand(time(NULL));
     struct timespec start, end;
+    ofstream myfile;
+    myfile.open("mergeSort_output.txt", ios::out);
     clock_gettime(CLOCK_MONOTONIC, &start);
     if(createMem(250000000) < 0){
         printf("Error: %d\n" , ERRNO);
@@ -195,7 +174,7 @@ int main(){
         }
     }
 
-    cout<<"Before sorting: \n";
+    myfile<<"Before sorting: \n";
     for(int i = 0; i < 50000; i++){
         int val;
         if(readVal(arr, 4*i, &val)<0){
@@ -203,18 +182,18 @@ int main(){
             cout << ERRNO << endl;
             exit(0);
         }
-        cout << val << " ";
+        myfile << val << " ";
         if(i%20 == 19){
-            cout << "\n";
+            myfile << "\n";
         }
     }
-    cout << "\n\n"<<endl;
+    myfile << "\n\n"<<endl;
 
     mergeSort(arr, 0, 49999);
 
     // sort(v.begin(), v.end());
 
-    cout<<"After sorting: \n";
+    myfile<<"After sorting: \n";
     for(int i = 0; i < 50000; i++){
         int val;
         if(readVal(arr, 4*i, &val)<0){
@@ -222,23 +201,23 @@ int main(){
             cout << ERRNO << endl;
             exit(0);
         }
-        cout << val << " ";
+        myfile << val << " ";
         // if(val != v[i]){
         //     cout << "Error in sorting" << endl;
         //     exit(0);
         // }
         if(i%20 == 19){
-            cout << "\n";
+            myfile << "\n";
         }
     }
-    cout << "\n\n";
+    myfile << "\n\n";
     freeList(arr);
     destroyMem();
     clock_gettime(CLOCK_MONOTONIC, &end);
     double time_taken;
     time_taken = (end.tv_sec - start.tv_sec) * 1e3;
     time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)/1000000.0);
-    cout << "Time taken by program is : " << time_taken;
-    cout << " milli sec " << endl;
+    myfile << "Time taken by program is : " << time_taken;
+    myfile << " milli sec " << endl;
     return 0;
 }
