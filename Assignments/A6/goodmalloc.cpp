@@ -63,6 +63,7 @@ int scope_end(){
 }
 
 int createMem(int size){
+    cout << "createMem() called\n";
     if(size <= 0){
         ERRNO = SIZE_ERR;
         return -1;
@@ -89,6 +90,7 @@ int createMem(int size){
 }
 
 int destroyMem(){
+    cout << "destroyMem() called\n";
     if(buf == NULL){
         ERRNO = MEM_ERR;
         return -1;
@@ -144,6 +146,7 @@ int getFreePages(int num_pages, vector<char *> &pages){
 
 
 int createList(const string &name , int size){
+    cout << "createList() called\n";
     if(name.size() == 0){
         ERRNO = NAME_ERR;
         return -1;
@@ -191,6 +194,11 @@ int createList(const string &name , int size){
 }
 
 int assignVal(const string &name , int offset , int val){
+    cout << "assignVal() called\n";
+    if(offset < 0){
+        ERRNO = SIZE_ERR;
+        return -1;
+    }
     auto curr_list = Lists.find({name,curr_scope});
     if(curr_list == Lists.end()){
         curr_list = Lists.find({name,0});
@@ -214,6 +222,11 @@ int assignVal(const string &name , int offset , int val){
 }
 
 int readVal(const string &name , int offset , int * val){
+    cout << "readVal() called\n";
+    if(offset < 0){
+        ERRNO = SIZE_ERR;
+        return -1;
+    }
     auto curr_list = Lists.find({name,curr_scope});
     if(curr_list == Lists.end()){
         curr_list = Lists.find({name,0});
@@ -237,7 +250,9 @@ int readVal(const string &name , int offset , int * val){
 }
 
 int freeList(const string &name){
+    cout << "freeList() called" ;
     if(name == ""){
+        cout << " without arguments\n";
         for(auto curr_list = Lists.begin(); curr_list!=Lists.end(); ){
             if(curr_list->second.scope != curr_scope){
                 curr_list++;
@@ -250,7 +265,7 @@ int freeList(const string &name){
         }
         return 0;
     }
-    
+    cout << " with arguments\n";
     auto curr_list = Lists.find({name , curr_scope});
     if(curr_list == Lists.end()){
         ERRNO = LIST_NOT_FOUND_ERR;
